@@ -1,2 +1,3 @@
 Author, Researcher, Artist
-connec@writerjoshua.com
+
+connect@writerjoshua.com
