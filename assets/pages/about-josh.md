@@ -6,7 +6,7 @@ keywords: "Joshua Lucero, @JoshWritesWell, @SeeJoshsPhotos, QSoulSeesBests, biog
 ---
 
 # About Josh
-<img src="writerjoshua/assets/media/joshua-lucero.jpg" alt="Joshua Lucero, 2024" style="width:100%; height:auto;" />
+<img src="/writerjoshua/assets/media/joshua-lucero.jpg" alt="Joshua Lucero, 2024" style="width:100%; height:auto;" />
 
 ## Hello. My name is Josh.
 I've been reading since before pre-school and have been actively writing since Kindergarten. I turned 40 in August, and you may expect that, by now, I have a fancy writing job or have published books. That's not quite the case. My web domain is WriterJoshua.com but, to simply label myself as a writer would be insufficient. 
@@ -42,13 +42,13 @@ As of February 2026, I've committed to hosting my work independently, thanks to 
 *I will entertain proposals from like-minded individuals, intent on building excellence in any field you feel inspired to consult me with. If email isn't enough, you will find my socials on the Contact page, listed below.*
 
 Joshua Lucero  
-*connect@writerjoshua.com*
+*connect@writerjoshua.com* 
 ---
 
-<iframe><img src="writerjoshua/assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner Logo" style="width:100%; height:auto;" /></iframe>
+<img src="/writerjoshua/assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner Logo" style="width:100%; height:auto;" />
 
 ### Also Read:
-- [WriterJoshua Blog Archive](writerjoshua/blog/archive.md)
+- [WriterJoshua Blog Archive](blog/archive.md)
 - [WriterJoshua Project List](assets/pages/projects.md)
 - [Contact Joshua Lucero](assets/pages/contact.md)
 

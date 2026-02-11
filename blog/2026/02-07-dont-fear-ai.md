@@ -53,6 +53,4 @@ Joshua Lucero
 [contact]: assets/pages/contact.md
 [projects]: assets/pages/projects.md
 [archive]: blog/archive.md
-[about]: assets/pages/about-josh.md
-[WWW]: https://www.writerjoshua.com
-[ailab]: assets/pages/ai-architecture-lab.md
+[about]:

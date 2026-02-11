@@ -19,8 +19,13 @@ keywords: "@JoshWritesWell, brand management, social media, trending, going vira
 3. Prioritize SEO and Backlinks
 4. Use socials efficiently
 5. Re-evaluate regularly
+
 ---
-![World Map at SLC International, 2026. By SeeJoshsPhotos][img]
+
+<img src="https://writerjoshua.github.io/writerjoshua/assets/media/slc-int-worldmap.heic"
+     alt="World Map at SLC International, 2026. By SeeJoshsPhotos"
+     style="max-width:100%;height:auto;display:block;margin:0 auto;">
+
 
 ### Likes, Shares, and Engagement are valuable to your brand but, only so much as they drive traffic to it.
 
@@ -53,6 +58,7 @@ Assuming that the internet remains free (hell, even if it doesn't), the best pra
 3. Prioritize SEO and Backlinks
 4. Use socials efficiently
 5. Re-evaluate regularly
+
 ---
 
 ### 1. Own Your Domain
@@ -97,6 +103,7 @@ Technology is constantly evolving. Do you remember when MySpace changed everythi
 3. Prioritize SEO and Backlinks
 4. Use socials efficiently
 5. Re-evaluate regularly
+
 ---
 ### In Conclusion
 Whether it's time to pivot, or if you're just starting up, I hope these insights inspire your direction. At the very least, I hope that can shift your perspective enough to give you some confidence, venturing into what can be an intimidating space. Technology continues to change everything, and it gets faster with every new generation. However, the same ancient principles still apply. It's important to have a strong sense of who your brand is, what matters to its customers, and why it exists. Everything else can be adjusted to fit, as the next innovation unfolds.
@@ -105,18 +112,11 @@ I look forward to you mentioning me in your blog about how this helped ;)
 
 ---
 Joshua Lucero  
-*connect@writerjoshua.com*
+*[connect@writerjoshua.com](connect@writerjoshua.com)*
 ---
 
 ### Also Read:
-- [About Joshua Lucero][about]
-- [WriterJoshua Blog Archive][archive]
-- [WriterJoshua Project List][projects]
-- [Contact Joshua Lucero][contact]
-
-[img]: assets/media/slc-int-worldmap.jpg
-[contact]: assets/pages/contact.md
-[projects]: assets/pages/projects.md
-[archive]: blog/archive.md
-[about]: assets/pages/about-josh.md
-[WWW]: https://www.writerjoshua.com
+- [About Joshua Lucero](assets/pages/about-josh.md)
+- [WriterJoshua Blog Archive](blog/archive.md)
+- [WriterJoshua Project List](assets/pages/projects.md)
+- [Contact Joshua Lucero](assets/pages/contact.md)
