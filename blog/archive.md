@@ -8,16 +8,17 @@ keywords: "@JoshWritesWell, blogger, opinion, art, science, technology, ai, pop 
 ### A full collection of blog posts written by Joshua Lucero
 *Established February 2026*
 
-![WriterJoshua Banner Logo][img]
+![WriterJoshua Banner Logo](../assets/media/writerjoshua-banner.jpg)
 
 ## 2026
 ### February
-- February 11, 2026 - [**Reallocate Your Socials: Five Point Online Brand Checklist** ~ *Is your brand's portfolio overweight on social media? Building an online brand presence can work without it. Five Keys.*](blog/2026/02-10-reallocate-socials.md)
-- February 07, 2026 - [**Don't Be Intimidated by AI:** ~ *It's okay to be concerned about the hype. It's legitimately exciting but, it's not quite living up to the dream, as it were. However, I believe it will, and relatively quickly.*](blog/2026/02-07-dont-fear-ai.md)
+- February 11, 2026 - [**Reallocate Your Socials: Five Point Online Brand Checklist** ~ *Is your brand's portfolio overweight on social media? Building an online brand presence can work without it. Five Keys.*](../blog/2026/02-10-reallocate-socials.md)
+- February 07, 2026 - [**Don't Be Intimidated by AI:** ~ *It's okay to be concerned about the hype. It's legitimately exciting but, it's not quite living up to the dream, as it were. However, I believe it will, and relatively quickly.*](../blog/2026/02-07-dont-fear-ai.md)
 
 ---
 Joshua Lucero  
-*connect@writerjoshua.com*
+*[connect@writerjoshua.com](mailto:connect@writerjoshua.com)*
+
 ---
 
 ### Also Read:
@@ -26,8 +27,6 @@ Joshua Lucero
 - [Contact Joshua Lucero][contact]
 
 
-[contact]: assets/pages/contact.md
-[projects]: assets/pages/projects.md
-[about]: assets/pages/about-josh.md
-[WWW]: https://www.writerjoshua.com
-[img]: assets/media/writerjoshua-banner.jpg
+[contact]: ../assets/pages/contact.md
+[projects]: ../assets/pages/projects.md
+[about]: ../assets/pages/about-josh.md

@@ -6,7 +6,7 @@ keywords: "Joshua Lucero, @JoshWritesWell, @SeeJoshsPhotos, QSoulSeesBests, biog
 ---
 
 # About Josh
-<img src="/writerjoshua/assets/media/joshua-lucero.jpg" alt="Joshua Lucero, 2024" style="width:100%; height:auto;" />
+<img src="../../assets/media/joshua-lucero.jpg" alt="Joshua Lucero, 2024" style="width:100%; height:auto;" />
 
 ## Hello. My name is Josh.
 I've been reading since before pre-school and have been actively writing since Kindergarten. I turned 40 in August, and you may expect that, by now, I have a fancy writing job or have published books. That's not quite the case. My web domain is WriterJoshua.com but, to simply label myself as a writer would be insufficient. 
@@ -45,12 +45,12 @@ Joshua Lucero
 *connect@writerjoshua.com* 
 ---
 
-<img src="/writerjoshua/assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner Logo" style="width:100%; height:auto;" />
+<img src="../../assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner Logo" style="width:100%; height:auto;" />
 
 ### Also Read:
-- [WriterJoshua Blog Archive](blog/archive.md)
-- [WriterJoshua Project List](assets/pages/projects.md)
-- [Contact Joshua Lucero](assets/pages/contact.md)
+- [WriterJoshua Blog Archive](../../blog/archive.md)
+- [WriterJoshua Project List](../../assets/pages/projects.md)
+- [Contact Joshua Lucero](../../assets/pages/contact.md)
 
 ### Donations
 - [$WriterJoshua on Cash App][cashapp]
