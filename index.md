@@ -16,7 +16,7 @@ While I have been fascinated with the English language from an early age, it is 
 
 - #### [Read Joshua Lucero's Full Bio](assets/pages/about-josh.md)
 
-<img src="assets/media/joshua-lucero.jpg" alt="Joshua Lucero, 2024" style="width:100%; height:auto;" />
+<img src="assets/media/joshua-lucero.jpg" alt="Joshua Lucero, 2024" style="width:80%; height:auto;" />
 
 ---
 
@@ -30,7 +30,7 @@ While I have been fascinated with the English language from an early age, it is 
   
 
 ---
-<img src="assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner Logo" style="width:45%; height:auto;" />
+<img src="assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner Logo" style="width:100%; height:auto;" />
 
 ### Projects
 - #### [AI Architecture Lab](assets/pages/ai-architecture-lab.md) - Artificial Intelligence and Tech Study

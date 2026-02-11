@@ -26,6 +26,4 @@ For now, most of my portfolio can be seen on social media.
 ### SeeJoshsPhotos on Social
 - [@SeeJoshsPhotos on Instagram](https://www.instagram.com/seejoshsphotos)
 - [@SeeJoshsPhotos on X](https://www.x.com/seejoshsphotos)
-- [@SeeJoshsPhotos on Threads](https://threads.com/@seejoshsphotos)
-
-<iframe><a data-flickr-embed="true" data-header="true" data-footer="true" href="https://www.flickr.com/photos/149526015@N03" title=""><img src="https://live.staticflickr.com/65535/53288719563_a04d096f71_w.jpg" width="400" height="300" alt=""/></a><script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script></iframe>
+- [@SeeJoshsPhotos on Threads](https://threads.com/@seejoshsphotos)  
