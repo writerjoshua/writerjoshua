@@ -26,4 +26,4 @@ It was at that point I decided to archive our work. Both out of fascination and 
 ## The Latest
 - As of February 2026, I am in the early stages of archiving the data, and publishing it to the repo but, I continue to use Anthropic's Claude, and other AI tools to continue my academic exploration in this fascinating field.
 
-## GitHub Repo: [AI Architecture Lab](https://github.com/writerjoshua/ai-architecture-lab/tree/main)
+## GitHub Repo: [AI Architecture Lab](https://github.com/writerjoshua/ai-architecture-lab/blob/main/README.md)

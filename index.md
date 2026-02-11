@@ -16,7 +16,7 @@ While I have been fascinated with the English language from an early age, it is 
 
 - #### [Read Joshua Lucero's Full Bio](assets/pages/about-josh.md)
 
-<img src="assets/media/joshua-lucero.jpg" alt="Joshua Lucero, 2024" style="width:45%; height:auto;" />
+<iframe><img src="assets/media/joshua-lucero.jpg" alt="Joshua Lucero, 2024" style="width:84%; height:auto;" /></iframe>
 
 ---
 
