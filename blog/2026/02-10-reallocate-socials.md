@@ -3,7 +3,7 @@ title: Reallocate Your Socials: Five-Point Online Brand Checklist
 date: 2026-02-10
 time: 15:00
 excerpt: Is your brand's portfolio overweight on social media? Building an online brand presence can work without it. Five Keys.
-image: assets/media/slc-int-worldmap.jpg
+image: https://writerjoshua.github.io/writerjoshua/assets/media/slc-int-worldmap.jpeg
 twitter-title: "Reallocate Your Socials: Five-Point Online Brand Checklist"
 twitter-description: "Is your brand's portfolio overweight on social media? Building an online brand presence can work without it. Five Keys."
 keywords: "@JoshWritesWell, brand management, social media, trending, going viral, followers, likes, engagement, shadowbanned, facebook, instagram, twitter, x, meta, threads, algorithms, paid posts, advertising, marketing, tech, software, ai, #wj_ai"
@@ -45,7 +45,7 @@ There is a case to be made for brand awareness, and trust building, and all of t
 
 So, what can you do?
 
-It's not totally hopeless. While there are still questions about the value of traditional SEO (Search Engine Optimazation), such as flooidng keywords, manufactured traffic, and paid advertisement, I believe that your next valuable lead can come from leveraging the world wide web's old standard: text content.
+It's not totally hopeless. While there are still questions about the value of traditional SEO (Search Engine Optimization), such as flooding keywords, manufactured traffic, and paid advertisement, I believe that your next valuable lead can come from leveraging the world wide web's old standard: text content.
 
 While the shift from traditional search to AI chat is happening as I type, even those agents are searching the web with the same protocols. There is reason to be concerned about the same algorithm biases that killed social media equity, such as ads in AI (OpenAI is testing ads in ChatGPT), or promoted content. From what I can tell, though, they seem to be logical about searching content, so far.
 
@@ -64,7 +64,7 @@ Assuming that the internet remains free (hell, even if it doesn't), the best pra
 ### 1. Own Your Domain
 Think about how many active users visit the biggest sites. If you're researching this far, I'm sure you're aware of this metric. What social media has done, is hijack web traffic. When everyone is visiting the same site for their entire internet experience, they are neglecting the rest of the web. That's why they leverage an internal browser, so even when the content comes from outside their domain, they leverage that traffic.
 
-Aside from what esssentially amounts to bragging rights, you want traffic to your website becuase it signals interest in your brand and offers a legitimacy to your content. Imagine the value of real estate being on a busy street. You're more likely to convert sales if your shop is set up where there are more people. Unfortunately, this is where marketing and ad companies see value, as well. They will lure you into exploiting your traffic by offering pennies per click. That's up to you but, there is much more value to generating traffic than becoming a billboard.
+Aside from what essentially amounts to bragging rights, you want traffic to your website because it signals interest in your brand and offers a legitimacy to your content. Imagine the value of real estate being on a busy street. You're more likely to convert sales if your shop is set up where there are more people. Unfortunately, this is where marketing and ad companies see value, as well. They will lure you into exploiting your traffic by offering pennies per click. That's up to you but, there is much more value to generating traffic than becoming a billboard.
 
 ### 2. Build Your Own Content
 It's one thing to generate traffic but, it's another to provide value to that traffic, once they reach your brand's website. What makes a visitor stay? Your content should reflect the quality of your brand's products, or services. Search engines prioritize active screen time, such as having plenty of engaging text ,and related content, where users click links to other pages within your website, and backlinks, where other websites are linked to your content, and vice-versa. 
@@ -74,9 +74,9 @@ We'll get more into these topics in the next point. The key takeaway is providin
 ### 3. Prioritize SEO and Backlinks
 As I mentioned before, Search Engine Optimization can help your brand reach audiences who are already searching for what you offer. Use keywords that are relevant to your product, or service. You can use sites like Google Trends to research your brand and cross-reference related words. Don't just dump all the keywords into your headline but, make note of the ones you're not using, yet. Focus on generating relevant content in that direction.
 
-Search Engine rankings primarily count visits but, there are other factors to consider. They also look at links to other websites. Think of these as referrals. When another website links to yours, such as a featured blog post about your product, this counts towards your ranking as well. So, network with likeminded publications to generate your network. 
+Search Engine rankings primarily count visits but, there are other factors to consider. They also look at links to other websites. Think of these as referrals. When another website links to yours, such as a featured blog post about your product, this counts towards your ranking as well. So, network with like-minded publications to generate your network. 
 
-I want to keep this as simple as possible but, there are more technical measures you can take to levarage SEO. While some webhosting products provide options, if you're building from scratch, or have access to the code, there are certain variables you can use to further optimize, like using bullet points, and effective headers to organize content. Think of it like, making it easier for the search engines to understand your webpages. Search (or ask your AI) SEO and see what else you can learn. 
+I want to keep this as simple as possible but, there are more technical measures you can take to leverage SEO. While some web-hosting products provide options, if you're building from scratch, or have access to the code, there are certain variables you can use to further optimize, like using bullet points, and effective headers to organize content. Think of it like, making it easier for the search engines to understand your webpages. Search (or ask your AI) SEO and see what else you can learn. 
 
 ### 4. Use Socials Efficiently
 Given that the trend in social media algorithms have severely weakened your opportunity to capitalize on the 'public marketplace' that it once was, you should focus more of your attention, elsewhere. Like I mentioned before, it's not a total loss. You can still communicate directly with potential customers and allies but, 'going viral' isn't possible, anymore. Think of trends on social media, going forward, as more a professional wrestling stunt, than a legitimate boxing contest. There may be actual talent, there but, it's scripted to benefit whoever put their money up, and creating a narrative.
@@ -112,11 +112,12 @@ I look forward to you mentioning me in your blog about how this helped ;)
 
 ---
 Joshua Lucero  
-*[connect@writerjoshua.com](connect@writerjoshua.com)*
+*[connect@writerjoshua.com](mailto:connect@writerjoshua.com)*
+
 ---
 
 ### Also Read:
-- [About Joshua Lucero](assets/pages/about-josh.md)
-- [WriterJoshua Blog Archive](blog/archive.md)
-- [WriterJoshua Project List](assets/pages/projects.md)
-- [Contact Joshua Lucero](assets/pages/contact.md)
+- [About Joshua Lucero](writerjoshua.github.io/writerjoshua/assets/pages/about-josh.md)
+- [WriterJoshua Blog Archive](writerjoshua/blog/archive.md)
+- [WriterJoshua Project List](https://writerjoshua.github.io/writerjoshua/assets/pages/projects.md)
+- [Contact Joshua Lucero](/writerjoshua/assets/pages/contact.md)
