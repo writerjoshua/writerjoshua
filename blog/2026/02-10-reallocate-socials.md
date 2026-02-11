@@ -22,7 +22,7 @@ keywords: "@JoshWritesWell, brand management, social media, trending, going vira
 
 ---
 
-<img src="https://writerjoshua.github.io/writerjoshua/assets/media/slc-int-worldmap.heic"
+<img src="https://writerjoshua.github.io/writerjoshua/assets/media/slc-int-worldmap.jpeg"
      alt="World Map at SLC International, 2026. By SeeJoshsPhotos"
      style="max-width:100%;height:auto;display:block;margin:0 auto;">
 

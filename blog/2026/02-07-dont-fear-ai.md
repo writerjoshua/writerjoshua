@@ -49,8 +49,7 @@ Joshua Lucero
 - [WriterJoshua Project List][projects]
 - [Contact Joshua Lucero][contact]
 
-[img]: assets/media/slc-int-art.jpg
+[img]: assets/media/slc-int-art.jpeg
 [contact]: assets/pages/contact.md
 [projects]: assets/pages/projects.md
 [archive]: blog/archive.md
-[about]:
