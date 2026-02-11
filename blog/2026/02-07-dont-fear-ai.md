@@ -3,7 +3,7 @@ title: Don't be intimidated by AI.
 date: 2026-02-07
 time: 14:15
 excerpt: It's okay to be concerned about the hype. It's legitimately exciting but, it's not quite living up to the dream, as it were. However, I believe it will, and relatively quickly.
-image: assets/media/slc-int-worldmap.jpg
+image: ../../assets/media/slc-int-art.jpeg
 twitter-title: "Don't be intimidated by AI"
 twitter-description: "It's okay to be concerned about the hype. It's legitimately exciting but, it's not quite living up to the dream, as it were. However, I believe it will, and relatively quickly."
 keywords: "ai, blog, WriterJoshua, technology, computers, artificial intelligence, data center, hyperscaler, future"
@@ -11,9 +11,9 @@ keywords: "ai, blog, WriterJoshua, technology, computers, artificial intelligenc
 
 # Don't be intimidated by AI
 
-## *It's easy to see Artificial Intelligence as something brand new. That can be overwhelming, especially if you'r not well versed with computers but, think of it like this: Just like when smartphone technology was invented, when high speed internet, even when the original computer was invented, what's 'new' about this technology is the speed in which it moves.*
+## *It's easy to see Artificial Intelligence as something brand new. That can be overwhelming, especially if you're not well versed with computers but, think of it like this: Just like when smartphone technology was invented, when high speed internet, even when the original computer was invented, what's feels so 'new' about a technology is the speed in which it moves.*
 
-![Art installation at SLC International, 2026 by SeeJoshsPhotos][img]
+![Art installation at SLC International, 2026 by SeeJoshsPhotos](../../assets/media/slc-int-art.jpeg)
 
 A computer was fascinating because it did what a calculator does but, many times, quicker, and with less human input. That's all. It is a fancy automated calculator. As technology has advanced, all that's happening, is that they are capable of doing more math, at a higher rate. You might have heard of "1's and Zero's" being computer language. It still is. You line up enough of them in particular order, they make up anything you've ever looked at on a screen.
 
@@ -32,24 +32,19 @@ I've never understood how to code, completely. Yet, because I am capable of havi
 
 It's okay to be concerned about the hype. It's legitimately exciting but, it's not quite living up to the dream, just yet. However, I believe it will, and relatively quickly. 
 
-So, instead of worrying about all of the bad potential, start familarizing yourself with the technology. Would you want to be looking for a job, today in 2026, if you didn't know how to use a smartphone, or a calculator? 
+So, instead of worrying about all of the bad potential, start familiarizing yourself with the technology. Would you want to be looking for a job, today in 2026, if you didn't know how to use a smartphone, or a calculator? 
 
 Even better, ask your favorite AI how to use it. It can help you with that, too.
 
 
-All the best,  
+---
 Joshua Lucero  
-*connect@writerjoshua.com*
+*[connect@writerjoshua.com](mailto:connect@writerjoshua.com)*
+
 ---
 
 ### Also Read:
-- [About Joshua Lucero][about]
-- [WriterJoshua Blog Archive][archive]
-- [AI Architecture Lab][ailab]
-- [WriterJoshua Project List][projects]
-- [Contact Joshua Lucero][contact]
-
-[img]: assets/media/slc-int-art.jpeg
-[contact]: assets/pages/contact.md
-[projects]: assets/pages/projects.md
-[archive]: blog/archive.md
+- [About Joshua Lucero](../../assets/pages/about-josh.md)
+- [WriterJoshua Blog Archive](../archive.md)
+- [WriterJoshua Project List](../../assets/pages/projects.md)
+- [Contact Joshua Lucero](../../assets/pages/contact.md)

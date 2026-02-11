@@ -3,7 +3,7 @@ title: Reallocate Your Socials: Five-Point Online Brand Checklist
 date: 2026-02-10
 time: 15:00
 excerpt: Is your brand's portfolio overweight on social media? Building an online brand presence can work without it. Five Keys.
-image: https://writerjoshua.github.io/writerjoshua/assets/media/slc-int-worldmap.jpeg
+image: ../../assets/media/slc-int-worldmap.jpeg
 twitter-title: "Reallocate Your Socials: Five-Point Online Brand Checklist"
 twitter-description: "Is your brand's portfolio overweight on social media? Building an online brand presence can work without it. Five Keys."
 keywords: "@JoshWritesWell, brand management, social media, trending, going viral, followers, likes, engagement, shadowbanned, facebook, instagram, twitter, x, meta, threads, algorithms, paid posts, advertising, marketing, tech, software, ai, #wj_ai"
@@ -22,7 +22,7 @@ keywords: "@JoshWritesWell, brand management, social media, trending, going vira
 
 ---
 
-<img src="https://writerjoshua.github.io/writerjoshua/assets/media/slc-int-worldmap.jpeg"
+<img src="../../assets/media/slc-int-worldmap.jpeg"
      alt="World Map at SLC International, 2026. By SeeJoshsPhotos"
      style="max-width:100%;height:auto;display:block;margin:0 auto;">
 
@@ -117,7 +117,7 @@ Joshua Lucero
 ---
 
 ### Also Read:
-- [About Joshua Lucero](writerjoshua.github.io/writerjoshua/assets/pages/about-josh.md)
-- [WriterJoshua Blog Archive](writerjoshua/blog/archive.md)
-- [WriterJoshua Project List](https://writerjoshua.github.io/writerjoshua/assets/pages/projects.md)
-- [Contact Joshua Lucero](/writerjoshua/assets/pages/contact.md)
+- [About Joshua Lucero](../../assets/pages/about-josh.md)
+- [WriterJoshua Blog Archive](../archive.md)
+- [WriterJoshua Project List](../../assets/pages/projects.md)
+- [Contact Joshua Lucero](../../assets/pages/contact.md)
