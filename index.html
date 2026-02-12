@@ -39,7 +39,7 @@
   
   <script>
     function loadProjects() {
-  fetch('projects')
+  fetch('/assets/pages/projects.json')
     .then(r => r.json())
     .then(data => {
       let html = '<h1>Projects</h1>';
@@ -59,7 +59,7 @@
               <img src="${project.image}" alt="${project.title}" class="project-image">
               <h2>${project.title}</h2>
             </a>
-            <div class="project-excerpt">${project.excerpt}</div>`;
+            <div class="project-excerpt">${project.excerpt}</div></div>`;
          
         
       });
@@ -76,7 +76,7 @@
     });
 }
     function loadJots() {
-      fetch('jots')
+      fetch('/assets/pages/jots.json')
       .then(r => r.json())
       .then(jots => {
         const sorted = jots.sort((a, b) => 
@@ -172,22 +172,7 @@ function shareCurrentPage() {
           document.getElementById('content').innerHTML = 
             '<p>Page not found.</p>';
         });
-    }
-    function shareCurrentPage() {
-  const title = document.querySelector('h1')?.innerText || document.title;
-  const url = window.location.href;
-  const text = `${title} - Check it out!`;
-  
-  if (navigator.share) {
-    navigator.share({
-      title: title,
-      text: text,
-      url: url
-    });
-  } else {
-    alert('Share not supported on this device');
-  }
-} 
+      }
     const page = getPageParam();
 
 if (page === 'jots') {
