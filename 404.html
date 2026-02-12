@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirect</title>
+  <script>
+    // Capture the path where the 404 occurred
+    sessionStorage.redirect = location.href;
+  </script>
+  <!-- Redirect to home page - GitHub Pages will serve this for 404s -->
+  <meta http-equiv="refresh" content="0;URL='/writerjoshua/'">
+</head>
+<body>
+  <!-- Fallback message if refresh doesn't work -->
+  <p>Redirecting to home...</p>
+</body>
+</html>

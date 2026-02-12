@@ -3,192 +3,273 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Author, Researcher, Artist">
   <title>WriterJoshua</title>
-  <description>Author, Researcher, Artist</description>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>📚</text></svg>">
-  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="./assets/css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it@14/dist/markdown-it.min.js"></script>
 </head>
 <body>
   <header>
     <a href="?page=home" class="header-logo-link">
-      <img src="assets/media/writerjoshua.jpg" width="25px" alt="WriterJoshua" class="profile-pic">
+      <img src="./assets/media/writerjoshua.jpg" width="25px" alt="WriterJoshua" class="profile-pic">
     </a>
-    <h1>WriterJoshua</h1>
-    <p>Author, Researcher, Artist</p>
+    <div class="header-text">
+      <h1>WriterJoshua</h1>
+      <p>Author, Researcher, Artist</p>
+    </div>
   </header>
   
   <nav>
-    <a href="?page=home">Home</a>
-    <a href="?page=about-josh">About Josh</a>
-    <a href="?page=jots">Jots</a>
-    <a href="?page=archive">Blog</a>
-    <a href="?page=projects">Projects</a>
-    <a href="?page=contact">Contact</a>
+    <a href="?page=home" class="nav-link">Home</a>
+    <a href="?page=about-josh" class="nav-link">About Josh</a>
+    <a href="?page=jots" class="nav-link">Jots</a>
+    <a href="?page=archive" class="nav-link">Blog</a>
+    <a href="?page=projects" class="nav-link">Projects</a>
+    <a href="?page=contact" class="nav-link">Contact</a>
   </nav>
   
   <div id="content"></div>
   
   <footer>
-  <img src="assets/media/writerjoshua-banner.jpg" alt="Footer banner" class="footer-banner">
-  <div class="footer-controls">
-    <button onclick="shareCurrentPage()" class="share-btn">Share</button>
-  </div>
-  <p class="footer-copyright">&copy; 2026 Joshua Lucero</p>
-</footer>
-  
+    <img src="./assets/media/writerjoshua-banner.jpg" alt="Footer banner" class="footer-banner" onerror="this.style.display='none';">
+    <div class="footer-controls">
+      <button onclick="shareCurrentPage()" class="share-btn">Share</button>
+    </div>
+    <p class="footer-copyright">&copy; 2026 Joshua Lucero</p>
+  </footer>
 
 <script>
-
-    /* PROJECTS */
-    function loadProjects() {
-      fetch('/assets/pages/projects.json')
-      .then(r => r.json())
-      .then(data => {
-        let html = '<h1>Projects</h1>';
-      
-      if (data.intro) {
-        html += `<p>${data.intro}</p>`;
-      }
-      if (data.introImage) {
-        html += `<img src="${data.introImage}" alt="Projects intro" class="projects-image">`;
-      }
-      
-      html += '<div class="projects-grid">';
-      data.projects.forEach(project => {
-        html += `
-          <div class="project-card">
-            <a href="index.html?page=${project.slug}">
-              <img src="${project.image}" alt="${project.title}" class="project-image">
-              <h2>${project.title}</h2>
-            </a>
-            <div class="project-excerpt">${project.excerpt}</div></div>`;
-         
-        
-      });
-      html += '</div>';
-      
-      if (data.outro) {
-        html += `<p>${data.outro}</p>`;
-      }
-      if (data.outroImage) {
-        html += `<img src="${data.outroImage}" alt="Projects outro" class="projects-image">`;
-      }
-      
-      document.getElementById('content').innerHTML = html;
-    });
-}
-
-      /* JOTS */
-    function loadJots() {
-      fetch('/assets/pages/jots.json')
-      .then(r => r.json())
-      .then(jots => {
-        const sorted = jots.sort((a, b) => 
-          new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
-        );
-      
-        let html = '<h1>Jots</h1>';
-        sorted.forEach(jot => {
-         html += `
-           <div class="jot">
-              <h2>${jot.title}</h2>
-              <p class="jot-meta">${jot.date} at ${jot.time}</p>
-              <p>${jot.content}</p>
-              ${jot.image ? `<img src="${jot.image}" alt="${jot.title}" class="jot-image">` : ''}
-            </div>
-          `;
-        });
-      
-        document.getElementById('content').innerHTML = html;
-      });
-    }
-    function loadArchive() {
-  fetch('/assets/pages/archive.json')
-    .then(r => r.json())
-    .then(data => {
-      let html = '<h1>Archive</h1>';
-      
-      if (data.intro) {
-        html += `<p>${data.intro}</p>`;
-      }
-      if (data.introImage) {
-        html += `<img src="${data.introImage}" alt="Archive intro" class="archive-image">`;
-      }
-      
-      data.years.forEach(yearMonth => {
-        const monthName = new Date(yearMonth.year, yearMonth.month - 1).toLocaleString('default', { month: 'long' });
-        html += `<h2>${monthName} ${yearMonth.year}</h2><ul>`;
-        
-        yearMonth.posts.forEach(post => {
-          html += `<li>
-                      <a href="index.html?page=${post.slug}">${post.title}</a> — ${post.date}
-                      <p class="post-excerpt">${post.excerpt}</p>
-                  </li>`;
-        });
-        
-        html += '</ul>';
-      });
-      
-      if (data.outro) {
-        html += `<p>${data.outro}</p>`;
-      }
-      if (data.outroImage) {
-        html += `<img src="${data.outroImage}" alt="Archive outro" class="archive-image">`;
-      }
-      
-      document.getElementById('content').innerHTML = html;
-    });
-}
-
-function shareCurrentPage() {
-  const title = document.querySelector('h1')?.innerText || document.title;
-  const url = window.location.href;
-  const text = `${title} - #writerjoshua`;
+  // ===== CONFIG =====
+  const ASSET_BASE = './assets/data/';
   
-  if (navigator.share) {
-    navigator.share({
-      title: title,
-      text: text,
-      url: url
-    });
-  } else {
-    alert('Share not supported on this device');
+  // ===== UTILITIES =====
+  function getPageParam() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('page') || 'home';
   }
-}
-
-    function getPageParam() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get('page') || 'index';
+  
+  function highlightActiveNav() {
+    const page = getPageParam();
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const param = new URLSearchParams(link.search).get('page');
+      if (param === page) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+  
+  function showError(message = 'Unable to load content. Please try again later.') {
+    document.getElementById('content').innerHTML = `<p class="error">${message}</p>`;
+  }
+  
+  // ===== MARKDOWN LOADER =====
+  function loadMarkdown(page) {
+    if (!window.markdownit) {
+      showError('Markdown processor failed to load. Please refresh the page.');
+      return;
     }
     
-    function loadMarkdown(page) {
-      const file = page + '.md';
+    // Your actual structure: assets/pages/*.md and *.md at root
+    const paths = [
+      `./assets/pages/${page}.md`,
+      `./${page}.md`
+    ];
+    
+    let attempts = 0;
+    function tryLoad() {
+      if (attempts >= paths.length) {
+        showError(`Page "${page}" not found.`);
+        return;
+      }
+      
+      const file = paths[attempts];
       fetch(file)
         .then(r => {
           if (!r.ok) throw new Error('Not found');
           return r.text();
         })
         .then(md => {
-          document.getElementById('content').innerHTML = 
-            window.markdownit().render(md);
+          document.getElementById('content').innerHTML = window.markdownit().render(md);
+          highlightActiveNav();
         })
         .catch(() => {
-          document.getElementById('content').innerHTML = 
-            '<p>Page not found.</p>';
+          attempts++;
+          tryLoad();
         });
-      }
-    const page = getPageParam();
-
-if (page === 'jots') {
-  loadJots();
-} else if (page === 'archive') {
-  loadArchive();
-} else if (page === 'projects') {
-  loadProjects();
-} else {
-  loadMarkdown(page);
-}
-  </script>
+    }
+    
+    tryLoad();
+  }
+  
+  // ===== PROJECTS LOADER =====
+  function loadProjects() {
+    fetch(ASSET_BASE + 'projects.json')
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        let html = '<h1>Projects</h1>';
+        
+        if (data.intro) {
+          html += `<p>${escapeHtml(data.intro)}</p>`;
+        }
+        if (data.introImage) {
+          html += `<img src="${escapeHtml(data.introImage)}" alt="Projects intro" class="projects-image">`;
+        }
+        
+        html += '<div class="projects-grid">';
+        (data.projects || []).forEach(project => {
+          html += `
+            <div class="project-card">
+              <a href="?page=${encodeURIComponent(project.slug)}">
+                <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" class="project-image">
+                <h2>${escapeHtml(project.title)}</h2>
+              </a>
+              <div class="project-excerpt">${escapeHtml(project.excerpt)}</div>
+            </div>`;
+        });
+        html += '</div>';
+        
+        if (data.outro) {
+          html += `<p>${escapeHtml(data.outro)}</p>`;
+        }
+        if (data.outroImage) {
+          html += `<img src="${escapeHtml(data.outroImage)}" alt="Projects outro" class="projects-image">`;
+        }
+        
+        document.getElementById('content').innerHTML = html;
+        highlightActiveNav();
+      })
+      .catch(err => {
+        console.error('Projects load failed:', err);
+        showError('Error loading projects. Please try again later.');
+      });
+  }
+  
+  // ===== JOTS LOADER =====
+  function loadJots() {
+    fetch(ASSET_BASE + 'jots.json')
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(jots => {
+        const sorted = jots.sort((a, b) => 
+          new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
+        );
+        
+        let html = '<h1>Jots</h1>';
+        sorted.forEach(jot => {
+          html += `
+            <div class="jot">
+              <h2>${escapeHtml(jot.title)}</h2>
+              <p class="jot-meta">${escapeHtml(jot.date)} at ${escapeHtml(jot.time)}</p>
+              <p>${escapeHtml(jot.content)}</p>
+              ${jot.image ? `<img src="${escapeHtml(jot.image)}" alt="${escapeHtml(jot.title)}" class="jot-image">` : ''}
+            </div>
+          `;
+        });
+        
+        document.getElementById('content').innerHTML = html;
+        highlightActiveNav();
+      })
+      .catch(err => {
+        console.error('Jots load failed:', err);
+        showError('Error loading jots. Please try again later.');
+      });
+  }
+  
+  // ===== ARCHIVE LOADER =====
+  function loadArchive() {
+    fetch(ASSET_BASE + 'archive.json')
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        let html = '<h1>Archive</h1>';
+        
+        if (data.intro) {
+          html += `<p>${escapeHtml(data.intro)}</p>`;
+        }
+        if (data.introImage) {
+          html += `<img src="${escapeHtml(data.introImage)}" alt="Archive intro" class="archive-image">`;
+        }
+        
+        (data.years || []).forEach(yearMonth => {
+          const monthName = new Date(yearMonth.year, yearMonth.month - 1).toLocaleString('default', { month: 'long' });
+          html += `<h2>${escapeHtml(monthName)} ${yearMonth.year}</h2><ul>`;
+          
+          (yearMonth.posts || []).forEach(post => {
+            const slug = post.slug.replace(/^\/+/, ''); // Remove leading slashes
+            html += `<li>
+              <a href="?page=${encodeURIComponent(slug)}">${escapeHtml(post.title)}</a> — ${escapeHtml(post.date)}
+              <p class="post-excerpt">${escapeHtml(post.excerpt)}</p>
+            </li>`;
+          });
+          
+          html += '</ul>';
+        });
+        
+        if (data.outro) {
+          html += `<p>${escapeHtml(data.outro)}</p>`;
+        }
+        if (data.outroImage) {
+          html += `<img src="${escapeHtml(data.outroImage)}" alt="Archive outro" class="archive-image">`;
+        }
+        
+        document.getElementById('content').innerHTML = html;
+        highlightActiveNav();
+      })
+      .catch(err => {
+        console.error('Archive load failed:', err);
+        showError('Error loading archive. Please try again later.');
+      });
+  }
+  
+  // ===== SHARING =====
+  function shareCurrentPage() {
+    const title = document.querySelector('h1')?.innerText || document.title;
+    const url = window.location.href;
+    const text = `${title} - #writerjoshua`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: title,
+        text: text,
+        url: url
+      }).catch(err => console.log('Share failed:', err));
+    } else {
+      alert('Share not supported on this device');
+    }
+  }
+  
+  // ===== SECURITY =====
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // ===== MAIN ROUTING =====
+  const page = getPageParam();
+  
+  if (page === 'jots') {
+    loadJots();
+  } else if (page === 'archive') {
+    loadArchive();
+  } else if (page === 'projects') {
+    loadProjects();
+  } else {
+    loadMarkdown(page);
+  }
+  
+  // Highlight nav on load
+  highlightActiveNav();
+</script>
 </body>
 </html>
