@@ -158,10 +158,35 @@ blockquote {
 }
 
 /* ===== LAYOUT ===== */
-#content, main {
+html {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  flex-shrink: 0;
+}
+
+nav {
+  flex-shrink: 0;
+}
+
+main {
+  flex: 1;
   max-width: var(--max-width);
+  width: 100%;
   margin: 0 auto;
   padding: var(--sp-lg);
+}
+
+footer {
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 /* ===== HEADER ===== */
@@ -191,6 +216,16 @@ header p {
   border-radius: var(--radius);
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.header-link {
+  display: block;
+  border-radius: var(--radius);
+}
+
+.header-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* ===== NAVIGATION ===== */
