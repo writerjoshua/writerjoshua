@@ -42,15 +42,15 @@ As of February 2026, I've committed to hosting my work independently, thanks to 
 *I will entertain proposals from like-minded individuals, intent on building excellence in any field you feel inspired to consult me with. If email isn't enough, you will find my socials on the Contact page, listed below.*
 
 Joshua Lucero  
-*connect@writerjoshua.com* 
+*[connect@writerjoshua.com](mailto:connect@writerjoshua.com)* 
 ---
 
 <img src="../../assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner Logo" style="width:100%; height:auto;" />
 
 ### Also Read:
-- [WriterJoshua Blog Archive](../../blog/archive.md)
-- [WriterJoshua Project List](../../assets/pages/projects.md)
-- [Contact Joshua Lucero](../../assets/pages/contact.md)
+- [WriterJoshua Blog Archive](index.html?page=archive)
+- [WriterJoshua Project List](index.html?page=projects)
+- [Contact Joshua Lucero](index.html?page=contact)
 
 ### Donations
 - [$WriterJoshua on Cash App][cashapp]

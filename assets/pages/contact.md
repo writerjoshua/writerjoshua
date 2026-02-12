@@ -22,5 +22,3 @@ I don't write promo. If you present me with a product, or idea, that I believe i
 If you want me to write for your project, we can discuss but, the same rules apply. Tell me why I should believe in what you're doing. If it can adhere to sustainability, ecological and economic responsibility, and innovate in exciting ways, I may very well be interested. 
 
 Browse my work. You would be surprised what I can do, given the right motivation. Get in touch if you think I can contribute to something meaningful.
-
-## [Home](../../index.md)

@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "title": "First Jot",
+    "date": "2026-02-11",
+    "time": "19:15",
+    "content": "This is my social media. These are Josh's Jots. I hope you'll like them. Welcome to my site.",
+    "image": "/assets/media/writerjoshua.jpg"
+  },
+  {
+    "id": 2,
+    "title": "Second Jot",
+    "date": "2026-02-10",
+    "time": "20:26",
+    "content": "Hey, look! Another Jot! I'm just testing out the Jots feature. It's pretty cool, right?"
+  }
+]

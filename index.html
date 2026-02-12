@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WriterJoshua</title>
+  <description>Author, Researcher, Artist</description>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it@14/dist/markdown-it.min.js"></script>
+</head>
+<body>
+  <header>
+    <a href="?page=index" class="header-logo-link">
+      <img src="writerjoshua.jpg" alt="WriterJoshua" class="profile-pic">
+    </a>
+    <h1>WriterJoshua</h1>
+    <p>Author, Researcher, Artist</p>
+  </header>
+  
+  <nav>
+    <a href="?page=index">Home</a>
+    <a href="?page=about-josh">About Josh</a>
+    <a href="?page=jots">Jots</a>
+    <a href="?page=blog">Blog</a>
+    <a href="?page=projects">Projects</a>
+    <a href="?page=contact">Contact</a>
+  </nav>
+  
+  <div id="content"></div>
+  
+  <footer>
+  <img src="assets/media/projects-footer.jpg" alt="Footer banner" class="footer-banner">
+  <div class="footer-controls">
+    <button onclick="shareCurrentPage()" class="share-btn">Share</button>
+  </div>
+  <p class="footer-copyright">&copy; 2026 Joshua Lucero</p>
+</footer>
+  
+  <script>
+    function loadProjects() {
+  fetch('/assets/pages/projects.json')
+    .then(r => r.json())
+    .then(data => {
+      let html = '<h1>Projects</h1>';
+      
+      if (data.intro) {
+        html += `<p>${data.intro}</p>`;
+      }
+      if (data.introImage) {
+        html += `<img src="${data.introImage}" alt="Projects intro" class="projects-image">`;
+      }
+      
+      html += '<div class="projects-grid">';
+      data.projects.forEach(project => {
+        html += `
+          <div class="project-card">
+            <a href="index.html?page=${project.slug}">
+              <img src="${project.image}" alt="${project.title}" class="project-image">
+              <h2>${project.title}</h2>
+            </a>
+            <p class="project-excerpt">${project.excerpt}</p>
+          </div>
+        `;
+      });
+      html += '</div>';
+      
+      if (data.outro) {
+        html += `<p>${data.outro}</p>`;
+      }
+      if (data.outroImage) {
+        html += `<img src="${data.outroImage}" alt="Projects outro" class="projects-image">`;
+      }
+      
+      document.getElementById('content').innerHTML = html;
+    });
+}
+    function loadJots() {
+      fetch('/assets/pages/jots.json')
+      .then(r => r.json())
+      .then(jots => {
+        const sorted = jots.sort((a, b) => 
+          new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
+        );
+      
+        let html = '<h1>Jots</h1>';
+        sorted.forEach(jot => {
+         html += `
+           <div class="jot">
+              <h2>${jot.title}</h2>
+              <p class="jot-meta">${jot.date} at ${jot.time}</p>
+              <p>${jot.content}</p>
+              ${jot.image ? `<img src="${jot.image}" alt="${jot.title}" class="jot-image">` : ''}
+            </div>
+          `;
+        });
+      
+        document.getElementById('content').innerHTML = html;
+      });
+    }
+    function loadArchive() {
+  fetch('/assets/pages/archive.json')
+    .then(r => r.json())
+    .then(data => {
+      let html = '<h1>Archive</h1>';
+      
+      if (data.intro) {
+        html += `<p>${data.intro}</p>`;
+      }
+      if (data.introImage) {
+        html += `<img src="${data.introImage}" alt="Archive intro" class="archive-image">`;
+      }
+      
+      data.years.forEach(yearMonth => {
+        const monthName = new Date(yearMonth.year, yearMonth.month - 1).toLocaleString('default', { month: 'long' });
+        html += `<h2>${monthName} ${yearMonth.year}</h2><ul>`;
+        
+        yearMonth.posts.forEach(post => {
+          html += `<li>
+                      <a href="index.html?page=${post.slug}">${post.title}</a> — ${post.date}
+                      <p class="post-excerpt">${post.excerpt}</p>
+                  </li>`;
+        });
+        
+        html += '</ul>';
+      });
+      
+      if (data.outro) {
+        html += `<p>${data.outro}</p>`;
+      }
+      if (data.outroImage) {
+        html += `<img src="${data.outroImage}" alt="Archive outro" class="archive-image">`;
+      }
+      
+      document.getElementById('content').innerHTML = html;
+    });
+}
+
+
+
+    function getPageParam() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('page') || 'index';
+    }
+    
+    function loadMarkdown(page) {
+      const file = page + '.md';
+      fetch(file)
+        .then(r => {
+          if (!r.ok) throw new Error('Not found');
+          return r.text();
+        })
+        .then(md => {
+          document.getElementById('content').innerHTML = 
+            window.markdownit().render(md);
+        })
+        .catch(() => {
+          document.getElementById('content').innerHTML = 
+            '<p>Page not found.</p>';
+        });
+    }
+    
+    const page = getPageParam();
+
+if (page === 'jots') {
+  loadJots();
+} else if (page === 'archive') {
+  loadArchive();
+} else if (page === 'projects') {
+  loadProjects();
+} else {
+  loadMarkdown(page);
+}
+  </script>
+</body>
+</html>

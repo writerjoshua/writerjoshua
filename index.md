@@ -14,7 +14,7 @@ I've been reading since before pre-school and have been actively writing since K
 
 While I have been fascinated with the English language from an early age, it is more accurate to call myself a student of life. There is not much about this life that I would not eagerly seek to understand more about.
 
-- #### [Read Joshua Lucero's Full Bio](assets/pages/about-josh.md)
+- #### [Read Joshua Lucero's Full Bio](index.html?page=about-josh)
 
 <img src="assets/media/joshua-lucero.jpg" alt="Joshua Lucero, 2024" style="width:45%; height:auto;" />
 
@@ -22,23 +22,21 @@ While I have been fascinated with the English language from an early age, it is 
 
 ### Recent Blog Posts
 #### February 2026
-- 02/11/2026: *[Reallocate Socials: Online Brand Management](blog/2026/02-10-reallocate-socials.md) ~ Is your brand's portfolio overweight on social media? Building an online brand presence can work without it. Five Keys.*  
+- 02/11/2026: *[Reallocate Socials: Online Brand Management](index.html?page=02-10-reallocate-socials) ~ Is your brand's portfolio overweight on social media? Building an online brand presence can work without it. Five Keys.*  
 
-- 02/07/2026: *[Don't Be Intimidated by AI](blog/2026/02-07-dont-fear-ai.md) ~ It's okay to be concerned about the hype. It's legitimately exciting but, it's not quite living up to the dream, as it were. However, I believe it will, and relatively quickly.*
+- 02/07/2026: *[Don't Be Intimidated by AI](index.html?page=02-07-dont-fear-ai) ~ It's okay to be concerned about the hype. It's legitimately exciting but, it's not quite living up to the dream, as it were. However, I believe it will, and relatively quickly.*
 
-- [Full Archive Since 02/2026](blog/archive.md)
+- [Full Archive Since 02/2026](index.html?page=archive)
   
 
 ---
 <img src="assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner Logo" style="width:100%; height:auto;" />
 
 ### Projects
-- #### [AI Architecture Lab](assets/pages/ai-architecture-lab.md) - Artificial Intelligence and Tech Study
-- #### [SoulSeesBest](assets/pages/soulseesbest.md) - IDM Experimental Electronica
-- #### [SeeJoshsPhotos](assets/pages/seejoshsphotos.md) - Photography and Multimedia
-- #### [The Inkwell](assets/pages/the-inkwell.md) - Romantic Poetry and Sentiment by Beau Holliday
+- #### [AI Architecture Lab](index.html?page=ai-architecture-lab) - Artificial Intelligence and Tech Study
+- #### [SoulSeesBest](index.html?page=soulseesbest) - IDM Experimental Electronica
+- #### [SeeJoshsPhotos](index.html?page=seejoshsphotos) - Photography and Multimedia
+- #### [The Inkwell](index.html?page=the-inkwell) - Romantic Poetry and Sentiment by Beau Holliday
 ---
 
-### [Contact Joshua Lucero](assets/pages/contact.md)
-
-*writerjoshua.com - Since 2024 - github pages hosted*
+### [Contact Joshua Lucero](index.html?page=contact)
