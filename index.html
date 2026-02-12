@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>WriterJoshua</title>
   <description>Author, Researcher, Artist</description>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>📚</text></svg>">
   <link rel="stylesheet" href="assets/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it@14/dist/markdown-it.min.js"></script>
 </head>
@@ -158,7 +159,21 @@
             '<p>Page not found.</p>';
         });
     }
-    
+    function shareCurrentPage() {
+  const title = document.querySelector('h1')?.innerText || document.title;
+  const url = window.location.href;
+  const text = `${title} - Check it out!`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: title,
+      text: text,
+      url: url
+    });
+  } else {
+    alert('Share not supported on this device');
+  }
+} s
     const page = getPageParam();
 
 if (page === 'jots') {
