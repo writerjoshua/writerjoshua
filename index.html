@@ -38,7 +38,7 @@
   
   <script>
     function loadProjects() {
-  fetch('/assets/pages/projects.json')
+  fetch('projects')
     .then(r => r.json())
     .then(data => {
       let html = '<h1>Projects</h1>';
@@ -75,7 +75,7 @@
     });
 }
     function loadJots() {
-      fetch('/assets/pages/jots.json')
+      fetch('jots')
       .then(r => r.json())
       .then(jots => {
         const sorted = jots.sort((a, b) => 
@@ -139,7 +139,7 @@
 
     function getPageParam() {
       const params = new URLSearchParams(window.location.search);
-      return params.get('page') || 'index.md';
+      return params.get('page') || 'index';
     }
     
     function loadMarkdown(page) {
