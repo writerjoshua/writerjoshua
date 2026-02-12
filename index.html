@@ -136,7 +136,21 @@
     });
 }
 
-
+function shareCurrentPage() {
+  const title = document.querySelector('h1')?.innerText || document.title;
+  const url = window.location.href;
+  const text = `${title} - Check it out!`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: title,
+      text: text,
+      url: url
+    });
+  } else {
+    alert('Share not supported on this device');
+  }
+}
 
     function getPageParam() {
       const params = new URLSearchParams(window.location.search);
