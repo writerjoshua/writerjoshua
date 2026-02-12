@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>WriterJoshua</title>
   <description>Author, Researcher, Artist</description>
-  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="assets/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/markdown-it@14/dist/markdown-it.min.js"></script>
 </head>
 <body>
   <header>
     <a href="?page=index" class="header-logo-link">
-      <img src="writerjoshua.jpg" alt="WriterJoshua" class="profile-pic">
+      <img src="assets/media/writerjoshua.jpg" alt="WriterJoshua" class="profile-pic">
     </a>
     <h1>WriterJoshua</h1>
     <p>Author, Researcher, Artist</p>
@@ -29,7 +29,7 @@
   <div id="content"></div>
   
   <footer>
-  <img src="assets/media/projects-footer.jpg" alt="Footer banner" class="footer-banner">
+  <img src="assets/media/writerjoshua-banner.jpg" alt="Footer banner" class="footer-banner">
   <div class="footer-controls">
     <button onclick="shareCurrentPage()" class="share-btn">Share</button>
   </div>
@@ -139,7 +139,7 @@
 
     function getPageParam() {
       const params = new URLSearchParams(window.location.search);
-      return params.get('page') || 'index';
+      return params.get('page') || 'index.md';
     }
     
     function loadMarkdown(page) {
