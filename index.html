@@ -37,12 +37,15 @@
   <p class="footer-copyright">&copy; 2026 Joshua Lucero</p>
 </footer>
   
-  <script>
+/* JAVASCRIPT */
+<script>
+
+    /* PROJECTS */
     function loadProjects() {
-  fetch('/assets/pages/projects.json')
-    .then(r => r.json())
-    .then(data => {
-      let html = '<h1>Projects</h1>';
+      fetch('/assets/pages/projects.json')
+      .then(r => r.json())
+      .then(data => {
+        let html = '<h1>Projects</h1>';
       
       if (data.intro) {
         html += `<p>${data.intro}</p>`;
@@ -75,6 +78,8 @@
       document.getElementById('content').innerHTML = html;
     });
 }
+
+      /* JOTS */
     function loadJots() {
       fetch('/assets/pages/jots.json')
       .then(r => r.json())

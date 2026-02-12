@@ -47,7 +47,7 @@ header {
 .header-logo {
   width: 25px;
   height: 25px;
-  object-fit: cover;
+  object-fit: scale-down;
   border-radius: 4px;
 }
 
