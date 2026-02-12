@@ -40,13 +40,13 @@
 
 header {
   display: flex;
-  align-items: center;
+  align-items: left;
   gap: 20px;
 }
 
 .header-logo {
-  width: 25px;
-  height: 25px;
+  width: 15px;
+  height: 15px;
   object-fit: scale-down;
   border-radius: 4px;
 }
