@@ -1,286 +1,554 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Author, Researcher, Artist">
-  <title>WriterJoshua</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>📚</text></svg>">
-  <link rel="stylesheet" href="./assets/styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/markdown-it@14/dist/markdown-it.min.js"></script>
-</head>
-<body>
-  <!-- STATIC HEADER -->
-  <header>
-    <a href="?page=home" class="header-link">
-      <img src="./assets/media/writerjoshua.jpg" alt="WriterJoshua" class="profile-pic">
-    </a>
-    <div class="header-text">
-      <h1>WriterJoshua</h1>
-      <p>Author, Researcher, Artist</p>
-    </div>
-  </header>
+/* ==========================================
+   WRITERJOSHUA — MAIN STYLESHEET
+   ========================================== */
 
-  <!-- STATIC NAVIGATION -->
-  <nav>
-    <a href="?page=home" class="nav-link">Home</a>
-    <a href="?page=about-josh" class="nav-link">About Josh</a>
-    <a href="?page=jots" class="nav-link">Jots</a>
-    <a href="?page=archive" class="nav-link">Blog</a>
-    <a href="?page=projects" class="nav-link">Projects</a>
-    <a href="?page=contact" class="nav-link">Contact</a>
-  </nav>
+/* ===== CSS VARIABLES ===== */
+:root {
+  /* Colors — Light Mode */
+  --primary: #0066cc;
+  --primary-hover: #0052a3;
+  --primary-light: #e6f2ff;
+  
+  --text: #333;
+  --text-light: #666;
+  --text-lighter: #999;
+  
+  --border: #ddd;
+  --bg: #fff;
+  --bg-light: #f9f9f9;
+  --bg-code: #f4f4f4;
+  
+  --link-visited: #551a8b;
+  
+  /* Spacing */
+  --sp-xs: 5px;
+  --sp-sm: 10px;
+  --sp-md: 15px;
+  --sp-lg: 20px;
+  --sp-xl: 40px;
+  
+  /* Typography */
+  --ff-serif: Georgia, serif;
+  --ff-mono: "Monaco", "Courier New", monospace;
+  --lh: 1.6;
+  
+  /* Layout */
+  --max-width: 800px;
+  --radius: 4px;
+  
+  /* Transitions */
+  --trans: 0.2s ease;
+}
 
-  <!-- DYNAMIC CONTENT AREA -->
-  <main id="content"></main>
+/* Dark mode color overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #66b3ff;
+    --primary-hover: #4d9eff;
+    --primary-light: rgba(102, 179, 255, 0.15);
+    
+    --text: #e0e0e0;
+    --text-light: #999;
+    --text-lighter: #666;
+    
+    --border: #444;
+    --bg: #1e1e1e;
+    --bg-light: #2d2d2d;
+    --bg-code: #2d2d2d;
+    
+    --link-visited: #b399d4;
+  }
+}
 
-  <!-- STATIC FOOTER -->
-  <footer>
-    <img src="./assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner" class="footer-banner" onerror="this.style.display='none';">
-    <div class="footer-controls">
-      <button class="share-btn" onclick="shareCurrentPage()">Share</button>
-    </div>
-    <p class="footer-copyright">&copy; 2026 Joshua Lucero</p>
-  </footer>
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-<script>
-  // ===== MARKDOWN-IT INITIALIZATION =====
-  const md = window.markdownit ? window.markdownit() : null;
+/* ===== BASE TYPOGRAPHY ===== */
+body {
+  font-family: var(--ff-serif);
+  font-size: 16px;
+  line-height: var(--lh);
+  color: var(--text);
+  background: var(--bg);
+}
 
-  // ===== UTILITIES =====
-  function getPageParam() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('page') || 'home';
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+h1 { font-size: 2em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.25em; }
+
+p {
+  margin-bottom: 1em;
+}
+
+/* ===== LINKS ===== */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--trans);
+}
+
+a:visited {
+  color: var(--link-visited);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+/* ===== CODE ===== */
+code {
+  font-family: var(--ff-mono);
+  font-size: 0.9em;
+  background: var(--bg-code);
+  color: var(--text);
+  padding: 2px 6px;
+  border-radius: var(--radius);
+}
+
+pre {
+  background: var(--bg-code);
+  color: var(--text);
+  padding: var(--sp-lg);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  margin: 1em 0;
+  line-height: 1.4;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.95em;
+}
+
+/* ===== LISTS ===== */
+ul, ol {
+  margin-left: 2em;
+  margin-bottom: 1em;
+}
+
+li {
+  margin-bottom: 0.5em;
+}
+
+/* ===== BLOCKQUOTES ===== */
+blockquote {
+  border-left: 4px solid var(--border);
+  padding-left: 1em;
+  margin: 1em 0;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+/* ===== LAYOUT ===== */
+html {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  flex-shrink: 0;
+}
+
+nav {
+  flex-shrink: 0;
+}
+
+main {
+  flex: 1;
+  max-width: var(--max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--sp-lg);
+}
+
+footer {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+/* ===== HEADER ===== */
+header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-lg);
+  padding: var(--sp-md);
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  margin-top: 0;
+  margin-bottom: 0.2em;
+  font-size: 1.8em;
+}
+
+header p {
+  margin: 0;
+  color: var(--text-light);
+  font-size: 0.95em;
+}
+
+.profile-pic {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.header-link {
+  display: block;
+  border-radius: var(--radius);
+}
+
+.header-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ===== NAVIGATION ===== */
+nav {
+  background: var(--bg-light);
+  border-bottom: 1px solid var(--border);
+  padding: var(--sp-md) var(--sp-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-lg);
+}
+
+nav a {
+  color: var(--primary);
+  font-weight: 500;
+  transition: all var(--trans);
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+
+nav a:hover,
+nav a.active {
+  border-bottom-color: var(--primary);
+  text-decoration: none;
+}
+
+nav a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  margin-top: var(--sp-xl);
+  padding-top: var(--sp-lg);
+  border-top: 1px solid var(--border);
+}
+
+.footer-banner {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  display: block;
+  margin-bottom: var(--sp-lg);
+}
+
+.footer-controls {
+  text-align: center;
+  margin: var(--sp-lg) 0;
+}
+
+.share-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: var(--sp-sm) var(--sp-lg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  transition: background var(--trans), transform var(--trans);
+}
+
+.share-btn:hover {
+  background: var(--primary-hover);
+}
+
+.share-btn:active {
+  transform: scale(0.98);
+}
+
+.share-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.footer-copyright {
+  text-align: center;
+  font-size: 0.85em;
+  font-style: italic;
+  color: var(--text-lighter);
+  margin: 0;
+}
+
+/* ===== JOTS ===== */
+.jot {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--sp-lg);
+  margin-bottom: var(--sp-lg);
+  background: var(--bg-light);
+  transition: box-shadow var(--trans);
+}
+
+.jot:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.jot h2 {
+  margin-top: 0;
+  font-size: 1.3em;
+}
+
+.jot-meta {
+  font-size: 0.85em;
+  color: var(--text-lighter);
+  margin: -0.5em 0 1em 0;
+}
+
+.jot-image {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin-top: var(--sp-md);
+  display: block;
+}
+
+/* ===== ARCHIVE ===== */
+.archive-image {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin: var(--sp-lg) 0;
+  display: block;
+}
+
+.post-excerpt {
+  margin: var(--sp-xs) 0 0 0;
+  font-size: 0.95em;
+  color: var(--text-light);
+}
+
+/* ===== PROJECTS ===== */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--sp-lg);
+  margin: var(--sp-xl) 0;
+}
+
+.project-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg);
+  transition: transform var(--trans), box-shadow var(--trans);
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.project-card a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-card a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.project-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.project-card h2 {
+  margin: var(--sp-md) var(--sp-md) 0 var(--sp-md);
+  font-size: 1.2em;
+}
+
+.project-excerpt {
+  padding: 0 var(--sp-md) var(--sp-md) var(--sp-md);
+  font-size: 0.95em;
+  color: var(--text-light);
+}
+
+.projects-image {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin: var(--sp-lg) 0;
+  display: block;
+}
+
+/* ===== UTILITIES ===== */
+.error {
+  background: rgba(211, 47, 47, 0.1);
+  border-left: 4px solid #d32f2f;
+  color: #d32f2f;
+  padding: var(--sp-lg);
+  border-radius: var(--radius);
+  margin: var(--sp-lg) 0;
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
   }
 
-  function highlightActiveNav() {
-    const currentPage = getPageParam();
-    document.querySelectorAll('.nav-link').forEach(link => {
-      const page = new URLSearchParams(link.search).get('page');
-      if (page === currentPage) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
-    });
+  header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--sp-md);
   }
 
-  function showError(message = 'Unable to load content. Please try again.') {
-    document.getElementById('content').innerHTML = `<div class="error"><p>${escapeHtml(message)}</p></div>`;
+  header h1 {
+    font-size: 1.5em;
   }
 
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  nav {
+    justify-content: center;
+    gap: var(--sp-md);
+    padding: var(--sp-md);
   }
 
-  // ===== MARKDOWN LOADER =====
-  function loadMarkdown(page) {
-    if (!md) {
-      showError('Markdown processor unavailable. Please refresh the page.');
-      return;
-    }
-
-    const paths = [
-      `./assets/pages/${page}.md`,
-      `./${page}.md`
-    ];
-
-    function tryPaths(pathIndex) {
-      if (pathIndex >= paths.length) {
-        showError(`Page not found: ${page}`);
-        return;
-      }
-
-      fetch(paths[pathIndex])
-        .then(response => {
-          if (!response.ok) throw new Error('Not found');
-          return response.text();
-        })
-        .then(markdown => {
-          document.getElementById('content').innerHTML = md.render(markdown);
-          highlightActiveNav();
-        })
-        .catch(() => {
-          tryPaths(pathIndex + 1);
-        });
-    }
-
-    tryPaths(0);
+  nav a {
+    font-size: 0.9em;
   }
 
-  // ===== JSON LOADERS =====
-  function loadProjects() {
-    fetch('./assets/pages/projects.json')
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then(data => renderProjects(data))
-      .catch(err => {
-        console.error('Projects load failed:', err);
-        showError('Error loading projects.');
-      });
+  h1 { font-size: 1.6em; }
+  h2 { font-size: 1.25em; }
+
+  #content, main {
+    padding: var(--sp-md);
   }
 
-  function renderProjects(data) {
-    let html = '<h1>Projects</h1>';
-
-    if (data.intro) {
-      html += `<p>${escapeHtml(data.intro)}</p>`;
-    }
-    if (data.introImage) {
-      html += `<img src="${escapeHtml(data.introImage)}" alt="Projects intro" class="projects-image">`;
-    }
-
-    html += '<div class="projects-grid">';
-    (data.projects || []).forEach(project => {
-      html += `
-        <div class="project-card">
-          <a href="?page=${encodeURIComponent(project.slug)}">
-            <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" class="project-image">
-            <h2>${escapeHtml(project.title)}</h2>
-          </a>
-          <div class="project-excerpt">${escapeHtml(project.excerpt)}</div>
-        </div>
-      `;
-    });
-    html += '</div>';
-
-    if (data.outro) {
-      html += `<p>${escapeHtml(data.outro)}</p>`;
-    }
-    if (data.outroImage) {
-      html += `<img src="${escapeHtml(data.outroImage)}" alt="Projects outro" class="projects-image">`;
-    }
-
-    document.getElementById('content').innerHTML = html;
-    highlightActiveNav();
+  .jot {
+    padding: var(--sp-md);
   }
 
-  function loadJots() {
-    fetch('./assets/pages/jots.json')
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then(jots => renderJots(jots))
-      .catch(err => {
-        console.error('Jots load failed:', err);
-        showError('Error loading jots.');
-      });
+  .projects-grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-md);
   }
 
-  function renderJots(jots) {
-    const sorted = jots.sort((a, b) =>
-      new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
-    );
-
-    let html = '<h1>Jots</h1>';
-    sorted.forEach(jot => {
-      html += `
-        <div class="jot">
-          <h2>${escapeHtml(jot.title)}</h2>
-          <p class="jot-meta">${escapeHtml(jot.date)} at ${escapeHtml(jot.time)}</p>
-          <p>${escapeHtml(jot.content)}</p>
-          ${jot.image ? `<img src="${escapeHtml(jot.image)}" alt="${escapeHtml(jot.title)}" class="jot-image">` : ''}
-        </div>
-      `;
-    });
-
-    document.getElementById('content').innerHTML = html;
-    highlightActiveNav();
+  .project-card h2 {
+    margin: var(--sp-sm) var(--sp-sm) 0 var(--sp-sm);
   }
 
-  function loadArchive() {
-    fetch('./assets/pages/archive.json')
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then(data => renderArchive(data))
-      .catch(err => {
-        console.error('Archive load failed:', err);
-        showError('Error loading archive.');
-      });
+  .project-excerpt {
+    padding: 0 var(--sp-sm) var(--sp-sm) var(--sp-sm);
+  }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
   }
 
-  function renderArchive(data) {
-    let html = '<h1>Archive</h1>';
-
-    if (data.intro) {
-      html += `<p>${escapeHtml(data.intro)}</p>`;
-    }
-    if (data.introImage) {
-      html += `<img src="${escapeHtml(data.introImage)}" alt="Archive intro" class="archive-image">`;
-    }
-
-    (data.years || []).forEach(yearMonth => {
-      const monthName = new Date(yearMonth.year, yearMonth.month - 1).toLocaleString('default', { month: 'long' });
-      html += `<h2>${monthName} ${yearMonth.year}</h2><ul>`;
-
-      (yearMonth.posts || []).forEach(post => {
-        const slug = post.slug.replace(/^\/+/, '');
-        html += `
-          <li>
-            <a href="?page=${encodeURIComponent(slug)}">${escapeHtml(post.title)}</a> — ${escapeHtml(post.date)}
-            <p class="post-excerpt">${escapeHtml(post.excerpt)}</p>
-          </li>
-        `;
-      });
-
-      html += '</ul>';
-    });
-
-    if (data.outro) {
-      html += `<p>${escapeHtml(data.outro)}</p>`;
-    }
-    if (data.outroImage) {
-      html += `<img src="${escapeHtml(data.outroImage)}" alt="Archive outro" class="archive-image">`;
-    }
-
-    document.getElementById('content').innerHTML = html;
-    highlightActiveNav();
+  header {
+    padding: var(--sp-sm);
   }
 
-  // ===== SHARING =====
-  function shareCurrentPage() {
-    const title = document.querySelector('h1')?.innerText || document.title;
-    const url = window.location.href;
-    const text = `${title} - WriterJoshua`;
-
-    if (navigator.share) {
-      navigator.share({ title, text, url }).catch(err => console.log('Share failed:', err));
-    } else {
-      alert('Share not supported on this device');
-    }
+  header h1 {
+    font-size: 1.3em;
   }
 
-  // ===== ROUTE HANDLER =====
-  function handleRoute() {
-    const page = getPageParam();
-
-    if (page === 'jots') {
-      loadJots();
-    } else if (page === 'archive') {
-      loadArchive();
-    } else if (page === 'projects') {
-      loadProjects();
-    } else {
-      loadMarkdown(page);
-    }
-
-    highlightActiveNav();
-    window.scrollTo(0, 0); // Scroll to top on page change
+  header p {
+    font-size: 0.9em;
   }
 
-  // ===== INITIALIZATION =====
-  document.addEventListener('DOMContentLoaded', handleRoute);
-  window.addEventListener('popstate', handleRoute);
+  .profile-pic {
+    width: 40px;
+    height: 40px;
+  }
 
-  // Listen for hash/query changes
-  window.addEventListener('hashchange', handleRoute);
-</script>
-</body>
-</html>
+  nav {
+    gap: var(--sp-sm);
+    padding: var(--sp-sm);
+  }
+
+  nav a {
+    font-size: 0.8em;
+    padding-bottom: 1px;
+  }
+
+  h1 { font-size: 1.4em; }
+  h2 { font-size: 1.1em; }
+
+  #content, main {
+    padding: var(--sp-sm);
+  }
+
+  code {
+    font-size: 0.85em;
+  }
+
+  pre {
+    padding: var(--sp-md);
+    font-size: 0.85em;
+  }
+
+  .jot {
+    padding: var(--sp-sm);
+    margin-bottom: var(--sp-md);
+  }
+
+  .footer-banner {
+    margin-bottom: var(--sp-md);
+  }
+
+  .share-btn {
+    padding: var(--sp-sm) var(--sp-md);
+    font-size: 0.9em;
+  }
+}
