@@ -106,6 +106,12 @@
     return imagePath;
   }
 
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   // ===== MARKDOWN LOADER =====
   function loadMarkdown(page) {
     if (!md) {
