@@ -416,6 +416,27 @@ footer {
   display: block;
 }
 
+/* ===== MARKDOWN IMAGES ===== */
+#content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin: var(--sp-lg) 0;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  #content img {
+    margin: var(--sp-md) 0;
+  }
+}
+
+@media (max-width: 480px) {
+  #content img {
+    margin: var(--sp-sm) 0;
+  }
+}
+
 /* ===== UTILITIES ===== */
 .error {
   background: rgba(211, 47, 47, 0.1);
@@ -433,6 +454,19 @@ footer {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ===== CONTENT IMAGES (Markdown) ===== */
+#content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin: var(--sp-lg) 0;
+  display: block;
+}
+
+#content img:first-child {
+  margin-top: 0;
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
