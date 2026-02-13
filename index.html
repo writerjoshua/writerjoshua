@@ -47,6 +47,42 @@
   // ===== MARKDOWN-IT INITIALIZATION =====
   const md = window.markdownit ? window.markdownit() : null;
 
+  // ===== CACHE HELPERS =====
+  function getCache(key) {
+    try {
+      const cached = sessionStorage.getItem(key);
+      return cached ? JSON.parse(cached) : null;
+    } catch (e) {
+      console.warn('Cache read failed:', e);
+      return null;
+    }
+  }
+
+  function setCache(key, value) {
+    try {
+      sessionStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.warn('Cache write failed:', e);
+    }
+  }
+
+  function getCachedHTML(key) {
+    try {
+      return sessionStorage.getItem(key);
+    } catch (e) {
+      console.warn('Cache read failed:', e);
+      return null;
+    }
+  }
+
+  function setCachedHTML(key, html) {
+    try {
+      sessionStorage.setItem(key, html);
+    } catch (e) {
+      console.warn('Cache write failed:', e);
+    }
+  }
+
   // ===== UTILITIES =====
   function getPageParam() {
     const params = new URLSearchParams(window.location.search);
@@ -119,6 +155,16 @@
       return;
     }
 
+    const cacheKey = `cache_${page}`;
+    const cachedHTML = getCachedHTML(cacheKey);
+    
+    // If cached, use immediately
+    if (cachedHTML) {
+      document.getElementById('content').innerHTML = cachedHTML;
+      highlightActiveNav();
+      return;
+    }
+
     // Build paths array with current year and previous years
     const currentYear = new Date().getFullYear();
     const paths = [`./assets/pages/${page}.md`, `./${page}.md`];
@@ -141,7 +187,12 @@
           return response.text();
         })
         .then(markdown => {
-          document.getElementById('content').innerHTML = md.render(markdown);
+          const html = md.render(markdown);
+          document.getElementById('content').innerHTML = html;
+          
+          // Cache rendered HTML
+          setCachedHTML(cacheKey, html);
+          
           highlightActiveNav();
         })
         .catch(() => {
@@ -152,87 +203,34 @@
     tryPaths(0);
   }
 
-  // ===== LOAD ITEM FROM JSON =====
-  function tryLoadFromJSON(slug) {
-    // Try to find in projects first
-    fetch('./assets/pages/projects.json')
-      .then(r => r.json())
-      .then(data => {
-        const project = (data.projects || []).find(p => p.slug === slug);
-        if (project) {
-          renderSingleProject(project);
-          return;
-        }
-        // If not found in projects, try archive
-        return fetch('./assets/pages/archive.json');
-      })
-      .then(r => r.json())
-      .then(data => {
-        let post = null;
-        (data.years || []).forEach(yearMonth => {
-          const found = (yearMonth.posts || []).find(p => p.slug === slug);
-          if (found) post = found;
-        });
-        if (post) {
-          renderSingleArchivePost(post);
-        } else {
-          showError(`Page not found: ${slug}`);
-        }
-      })
-      .catch(err => {
-        console.error('Error finding page:', err);
-        showError(`Page not found: ${slug}`);
-      });
-  }
-
-  function renderSingleProject(project) {
-    let html = `
-      <h1>${escapeHtml(project.title)}</h1>
-      <p>${escapeHtml(project.excerpt)}</p>
-    `;
-    
-    if (project.image) {
-      html += `<img src="${getImagePath(project.image)}" alt="${escapeHtml(project.title)}" class="projects-image">`;
-    }
-    
-    if (project.content) {
-      html += md.render(project.content);
-    }
-    
-    document.getElementById('content').innerHTML = html;
-    highlightActiveNav();
-  }
-
-  function renderSingleArchivePost(post) {
-    let html = `
-      <h1>${escapeHtml(post.title)}</h1>
-      <p class="post-excerpt">${escapeHtml(post.excerpt)}</p>
-    `;
-    
-    if (post.content) {
-      html += md.render(post.content);
-    }
-    
-    document.getElementById('content').innerHTML = html;
-    highlightActiveNav();
-  }
 
   // ===== JSON LOADERS =====
   // ===== GENERIC JSON LOADER & RENDERER =====
   function loadJSON(filename, itemsKey) {
+    const cacheKey = `cache_${filename}`;
+    const cachedHTML = getCachedHTML(cacheKey);
+    
+    // If cached, use immediately
+    if (cachedHTML) {
+      document.getElementById('content').innerHTML = cachedHTML;
+      highlightActiveNav();
+      return;
+    }
+    
+    // Otherwise fetch and cache
     fetch(`./assets/pages/${filename}.json`)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       })
-      .then(data => renderJSON(data, itemsKey))
+      .then(data => renderJSON(data, itemsKey, cacheKey))
       .catch(err => {
         console.error(`${filename} load failed:`, err);
         showError(`Error loading ${filename}.`);
       });
   }
 
-  function renderJSON(data, itemsKey) {
+  function renderJSON(data, itemsKey, cacheKey) {
     let html = '';
 
     // Render intro section with markdown support
@@ -328,6 +326,12 @@
     }
 
     document.getElementById('content').innerHTML = html;
+    
+    // Cache rendered HTML if cacheKey provided
+    if (cacheKey) {
+      setCachedHTML(cacheKey, html);
+    }
+    
     highlightActiveNav();
   }
 
