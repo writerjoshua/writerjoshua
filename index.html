@@ -297,73 +297,7 @@
     tryPaths(0);
   }
 
-  // ===== FRONTMATTER PARSER =====
-  function parseFrontmatter(markdown) {
-    const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
-    const match = markdown.match(frontmatterRegex);
-    
-    if (!match) {
-      return { metadata: {}, content: markdown };
-    }
-    
-    const frontmatterText = match[1];
-    const content = match[2];
-    const metadata = {};
-    
-    // Parse YAML frontmatter (simple key: value format)
-    frontmatterText.split('\n').forEach(line => {
-      const [key, ...valueParts] = line.split(':');
-      if (key && valueParts.length) {
-        const value = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
-        metadata[key.trim()] = value;
-      }
-    });
-    
-    return { metadata, content };
-  }
-
-  // ===== META TAG INJECTION =====
-  function injectMetaTags(metadata) {
-    const head = document.head;
-    
-    // Update page title
-    if (metadata.title) {
-      document.title = `${metadata.title} | WriterJoshua`;
-    }
-    
-    // Remove old meta tags we might have set
-    document.querySelectorAll('meta[data-dynamic="true"]').forEach(tag => tag.remove());
-    
-    // Inject meta tags
-    const metaFields = {
-      'description': 'description',
-      'excerpt': 'description',
-      'keywords': 'keywords',
-      'image': 'og:image',
-      'twitter-title': 'twitter:title',
-      'twitter-description': 'twitter:description'
-    };
-    
-    Object.entries(metaFields).forEach(([sourceKey, metaName]) => {
-      if (metadata[sourceKey]) {
-        const meta = document.createElement('meta');
-        meta.setAttribute('data-dynamic', 'true');
-        
-        if (metaName.startsWith('og:')) {
-          meta.setAttribute('property', metaName);
-        } else {
-          meta.setAttribute('name', metaName);
-        }
-        
-        meta.setAttribute('content', metadata[sourceKey]);
-        head.appendChild(meta);
-      }
-    });
-  }
-    if (!md) {
-      showError('Markdown processor unavailable. Please refresh the page.');
-      return;
-    }
+  // ===== JSON LOADERS =====    }
 
     const cacheKey = `cache_${page}`;
     const cachedHTML = getCachedHTML(cacheKey);
@@ -420,7 +354,7 @@
     }
 
     tryPaths(0);
-  
+  }
 
 
   // ===== JSON LOADERS =====
