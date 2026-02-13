@@ -69,10 +69,41 @@
     document.getElementById('content').innerHTML = `<div class="error"><p>${escapeHtml(message)}</p></div>`;
   }
 
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  function formatDateTime(dateStr, timeStr) {
+    try {
+      const [year, month, day] = dateStr.split('-');
+      const [hours, minutes] = timeStr.split(':');
+      
+      // Create date object
+      const date = new Date(year, month - 1, day, hours, minutes);
+      
+      // Format date as Month Day, Year
+      const monthName = date.toLocaleString('default', { month: 'long' });
+      const dayNum = date.getDate();
+      const yearNum = date.getFullYear();
+      
+      // Format time as H:MM AM/PM PST
+      const timeObj = new Date(2000, 0, 1, hours, minutes);
+      const timeFormatted = timeObj.toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'America/Los_Angeles'
+      });
+      
+      return `${monthName} ${dayNum}, ${yearNum} at ${timeFormatted} PST`;
+    } catch (e) {
+      return `${dateStr} at ${timeStr}`;
+    }
+  }
+
+  function getImagePath(imagePath) {
+    if (!imagePath) return '';
+    // If path doesn't start with ./, add it
+    if (!imagePath.startsWith('./') && !imagePath.startsWith('http')) {
+      return './' + imagePath;
+    }
+    return imagePath;
   }
 
   // ===== MARKDOWN LOADER =====
@@ -82,10 +113,15 @@
       return;
     }
 
-    const paths = [
-      `./assets/pages/${page}.md`,
-      `./${page}.md`
-    ];
+    // Build paths array with current year and previous years
+    const currentYear = new Date().getFullYear();
+    const paths = [`./assets/pages/${page}.md`, `./${page}.md`];
+    
+    // Add blog paths for current year and up to 10 years back
+    for (let i = 0; i <= 10; i++) {
+      const year = currentYear - i;
+      paths.push(`./blog/${year}/${page}.md`);
+    }
 
     function tryPaths(pathIndex) {
       if (pathIndex >= paths.length) {
@@ -110,134 +146,179 @@
     tryPaths(0);
   }
 
-  // ===== JSON LOADERS =====
-  function loadProjects() {
+  // ===== LOAD ITEM FROM JSON =====
+  function tryLoadFromJSON(slug) {
+    // Try to find in projects first
     fetch('./assets/pages/projects.json')
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
+      .then(r => r.json())
+      .then(data => {
+        const project = (data.projects || []).find(p => p.slug === slug);
+        if (project) {
+          renderSingleProject(project);
+          return;
+        }
+        // If not found in projects, try archive
+        return fetch('./assets/pages/archive.json');
       })
-      .then(data => renderProjects(data))
+      .then(r => r.json())
+      .then(data => {
+        let post = null;
+        (data.years || []).forEach(yearMonth => {
+          const found = (yearMonth.posts || []).find(p => p.slug === slug);
+          if (found) post = found;
+        });
+        if (post) {
+          renderSingleArchivePost(post);
+        } else {
+          showError(`Page not found: ${slug}`);
+        }
+      })
       .catch(err => {
-        console.error('Projects load failed:', err);
-        showError('Error loading projects.');
+        console.error('Error finding page:', err);
+        showError(`Page not found: ${slug}`);
       });
   }
 
-  function renderProjects(data) {
-    let html = '<h1>Projects</h1>';
-
-    if (data.intro) {
-      html += `<p>${escapeHtml(data.intro)}</p>`;
+  function renderSingleProject(project) {
+    let html = `
+      <h1>${escapeHtml(project.title)}</h1>
+      <p>${escapeHtml(project.excerpt)}</p>
+    `;
+    
+    if (project.image) {
+      html += `<img src="${getImagePath(project.image)}" alt="${escapeHtml(project.title)}" class="projects-image">`;
     }
-    if (data.introImage) {
-      html += `<img src="${escapeHtml(data.introImage)}" alt="Projects intro" class="projects-image">`;
+    
+    if (project.content) {
+      html += md.render(project.content);
     }
-
-    html += '<div class="projects-grid">';
-    (data.projects || []).forEach(project => {
-      html += `
-        <div class="project-card">
-          <a href="?page=${encodeURIComponent(project.slug)}">
-            <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" class="project-image">
-            <h2>${escapeHtml(project.title)}</h2>
-          </a>
-          <div class="project-excerpt">${escapeHtml(project.excerpt)}</div>
-        </div>
-      `;
-    });
-    html += '</div>';
-
-    if (data.outro) {
-      html += `<p>${escapeHtml(data.outro)}</p>`;
-    }
-    if (data.outroImage) {
-      html += `<img src="${escapeHtml(data.outroImage)}" alt="Projects outro" class="projects-image">`;
-    }
-
+    
     document.getElementById('content').innerHTML = html;
     highlightActiveNav();
   }
 
-  function loadJots() {
-    fetch('./assets/pages/jots.json')
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then(jots => renderJots(jots))
-      .catch(err => {
-        console.error('Jots load failed:', err);
-        showError('Error loading jots.');
-      });
-  }
-
-  function renderJots(jots) {
-    const sorted = jots.sort((a, b) =>
-      new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
-    );
-
-    let html = '<h1>Jots</h1>';
-    sorted.forEach(jot => {
-      html += `
-        <div class="jot">
-          <h2>${escapeHtml(jot.title)}</h2>
-          <p class="jot-meta">${escapeHtml(jot.date)} at ${escapeHtml(jot.time)}</p>
-          <p>${escapeHtml(jot.content)}</p>
-          ${jot.image ? `<img src="${escapeHtml(jot.image)}" alt="${escapeHtml(jot.title)}" class="jot-image">` : ''}
-        </div>
-      `;
-    });
-
+  function renderSingleArchivePost(post) {
+    let html = `
+      <h1>${escapeHtml(post.title)}</h1>
+      <p class="post-excerpt">${escapeHtml(post.excerpt)}</p>
+    `;
+    
+    if (post.content) {
+      html += md.render(post.content);
+    }
+    
     document.getElementById('content').innerHTML = html;
     highlightActiveNav();
   }
 
-  function loadArchive() {
-    fetch('./assets/pages/archive.json')
+  // ===== JSON LOADERS =====
+  // ===== GENERIC JSON LOADER & RENDERER =====
+  function loadJSON(filename, itemsKey) {
+    fetch(`./assets/pages/${filename}.json`)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       })
-      .then(data => renderArchive(data))
+      .then(data => renderJSON(data, itemsKey))
       .catch(err => {
-        console.error('Archive load failed:', err);
-        showError('Error loading archive.');
+        console.error(`${filename} load failed:`, err);
+        showError(`Error loading ${filename}.`);
       });
   }
 
-  function renderArchive(data) {
-    let html = '<h1>Archive</h1>';
+  function renderJSON(data, itemsKey) {
+    let html = '';
 
+    // Render intro section with markdown support
     if (data.intro) {
-      html += `<p>${escapeHtml(data.intro)}</p>`;
+      html += md.render(data.intro);
     }
     if (data.introImage) {
-      html += `<img src="${escapeHtml(data.introImage)}" alt="Archive intro" class="archive-image">`;
+      html += `<img src="${getImagePath(data.introImage)}" alt="Intro" class="projects-image">`;
     }
 
-    (data.years || []).forEach(yearMonth => {
-      const monthName = new Date(yearMonth.year, yearMonth.month - 1).toLocaleString('default', { month: 'long' });
-      html += `<h2>${monthName} ${yearMonth.year}</h2><ul>`;
-
-      (yearMonth.posts || []).forEach(post => {
-        const slug = post.slug.replace(/^\/+/, '');
+    // Render items based on type
+    if (itemsKey === 'projects') {
+      html = '<h1>Projects</h1>' + html;
+      html += '<div class="projects-grid">';
+      
+      // Sort projects by order if available, otherwise keep as-is
+      const projects = (data.projects || []).sort((a, b) => {
+        if (a.order !== undefined && b.order !== undefined) {
+          return a.order - b.order;
+        }
+        return 0;
+      });
+      
+      projects.forEach(project => {
         html += `
-          <li>
-            <a href="?page=${encodeURIComponent(slug)}">${escapeHtml(post.title)}</a> — ${escapeHtml(post.date)}
-            <p class="post-excerpt">${escapeHtml(post.excerpt)}</p>
-          </li>
+          <div class="project-card">
+            <a href="?page=${encodeURIComponent(project.slug)}">
+              <img src="${getImagePath(project.image)}" alt="${escapeHtml(project.title)}" class="project-image">
+              <h2>${escapeHtml(project.title)}</h2>
+            </a>
+            <div class="project-excerpt">${escapeHtml(project.excerpt)}</div>
+          </div>
         `;
       });
+      html += '</div>';
+    } else if (itemsKey === 'jots') {
+      html = '<h1>Jots</h1>' + html;
+      
+      // Sort jots by date (newest to oldest)
+      const sorted = (data.jots || []).sort((a, b) =>
+        new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
+      );
+      
+      sorted.forEach(jot => {
+        const formattedDateTime = formatDateTime(jot.date, jot.time);
+        html += `
+          <div class="jot">
+            <h2>${escapeHtml(jot.title)}</h2>
+            <p class="jot-meta">${formattedDateTime}</p>
+            <p>${escapeHtml(jot.content)}</p>
+            ${jot.image ? `<img src="${getImagePath(jot.image)}" alt="${escapeHtml(jot.title)}" class="jot-image">` : ''}
+          </div>
+        `;
+      });
+    } else if (itemsKey === 'archive') {
+      html = '<h1>Archive</h1>' + html;
+      
+      // Sort years from newest to oldest
+      const sortedYears = (data.years || []).sort((a, b) => {
+        if (a.year !== b.year) return b.year - a.year;
+        return b.month - a.month;
+      });
+      
+      sortedYears.forEach(yearMonth => {
+        const monthName = new Date(yearMonth.year, yearMonth.month - 1).toLocaleString('default', { month: 'long' });
+        html += `<h2>${monthName} ${yearMonth.year}</h2><ul>`;
+        
+        // Sort posts within each month by date (newest to oldest)
+        const sortedPosts = (yearMonth.posts || []).sort((a, b) =>
+          new Date(b.date) - new Date(a.date)
+        );
+        
+        sortedPosts.forEach(post => {
+          const slug = post.slug.replace(/^\/+/, '');
+          html += `
+            <li>
+              <a href="?page=${encodeURIComponent(slug)}">${escapeHtml(post.title)}</a> — ${escapeHtml(post.date)}
+              <p class="post-excerpt">${escapeHtml(post.excerpt)}</p>
+            </li>
+          `;
+        });
 
-      html += '</ul>';
-    });
+        html += '</ul>';
+      });
+    }
 
+    // Render outro section with markdown support
     if (data.outro) {
-      html += `<p>${escapeHtml(data.outro)}</p>`;
+      html += md.render(data.outro);
     }
     if (data.outroImage) {
-      html += `<img src="${escapeHtml(data.outroImage)}" alt="Archive outro" class="archive-image">`;
+      html += `<img src="${getImagePath(data.outroImage)}" alt="Outro" class="projects-image">`;
     }
 
     document.getElementById('content').innerHTML = html;
@@ -262,17 +343,17 @@
     const page = getPageParam();
 
     if (page === 'jots') {
-      loadJots();
+      loadJSON('jots', 'jots');
     } else if (page === 'archive') {
-      loadArchive();
+      loadJSON('archive', 'archive');
     } else if (page === 'projects') {
-      loadProjects();
+      loadJSON('projects', 'projects');
     } else {
       loadMarkdown(page);
     }
 
     highlightActiveNav();
-    window.scrollTo(0, 0); // Scroll to top on page change
+    window.scrollTo(0, 0);
   }
 
   // ===== INITIALIZATION =====
