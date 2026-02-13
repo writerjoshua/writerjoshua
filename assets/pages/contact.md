@@ -1,5 +1,5 @@
 # Contact
-![writerjoshua.com](../../assets/media/joshua-lucero.jpg)  
+![writerjoshua.com](./assets/media/joshua-lucero.jpg)  
 
 **Joshua Lucero**  
     - Menifee, California  

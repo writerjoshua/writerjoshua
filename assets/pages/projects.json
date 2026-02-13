@@ -1,33 +1,31 @@
 {
-  "intro": "As you you might have gathered, if you've known me at all, is that I have a very wide variety of interests. (*You can get to know me by reading [About Josh](index.html?page=about-josh))* I've begun, attempted, or am currently planning ventures in such fields as: cinematography, culinary arts, veterinary science, regenerative agriculture, video game development, holistic sound therapy, financial advisory, higher education, coaching, literary publishing, music production, animal husbandry...honestly, I could go on.</p><p>I was blessed with a natural desire to understand how things work. When I'm fascinated by something, I want to figure how it's done, and attempt to do it at a high level. As we speak, I'm teaching myself how to code from almost no experience, to create this very website. I hope by the time you read this, it will look even more presentable but, if I'm being honest, I kind of like these throwback, 1980-something vibes.</p><p>My obsession with organization has lent itself well to social media and the internet. I often refer to the web as one big filing cabinet. Very quickly, I began making multiple accounts with various themes. I think it's why social has all but shadowbanned from the whole thing. (*I haven't confirmed it but, I think they've tagged me as 'spam'*) That's why I've been reinvigorated with this new GitHub hosted website.</p><p>Without coding experience, I was satisfied enough with automatic site building sites like Google Sites, Blogger, or Wordpress. However, there's so many variables that are simply out of our control. Whether it's their ad practices, or simple lack of functionality, having total access to the code, and the freedom to publish without repulsive advertising, is already worth the effort it's taken to figure this out.</p><p>So, on this page, you will find a collection of my most polished projects. If anything intrigues you, take a look at the latest developments and consider making a donation using the services listed below.</p>",
-  
-  "introImage": "assets/media/projects-header.jpg",
+  "intro": "As you you might have gathered, if you've known me at all, is that I have a very wide variety of interests. (*You can get to know me by reading [About Josh](index.html?page=about-josh))* I've begun, attempted, or am currently planning ventures in such fields as: cinematography, culinary arts, veterinary science, regenerative agriculture, video game development, holistic sound therapy, financial advisory, higher education, coaching, literary publishing, music production, animal husbandry...honestly, I could go on. I was blessed with a natural desire to understand how things work. When I'm fascinated by something, I want to figure how it's done, and attempt to do it at a high level. As we speak, I'm teaching myself how to code from almost no experience, to create this very website. I hope by the time you read this, it will look even more presentable but, if I'm being honest, I kind of like these throwback, 1980-something vibes. My obsession with organization has lent itself well to social media and the internet. I often refer to the web as one big filing cabinet. Very quickly, I began making multiple accounts with various themes. I think it's why social has all but shadowbanned from the whole thing. (*I haven't confirmed it but, I think they've tagged me as 'spam'*) That's why I've been reinvigorated with this new GitHub hosted website. Without coding experience, I was satisfied enough with automatic site building sites like Google Sites, Blogger, or Wordpress. However, there's so many variables that are simply out of our control. Whether it's their ad practices, or simple lack of functionality, having total access to the code, and the freedom to publish without repulsive advertising, is already worth the effort it's taken to figure this out. So, on this page, you will find a collection of my most polished projects. If anything intrigues you, take a look at the latest developments and consider making a donation using the services listed below.",
   "projects": [
     {
       "title": "SeeJoshsPhotos",
-      "slug": "projects/seejoshsphotos",
-      "image": "assets/media/writerjoshua.jpg",
+      "slug": "seejoshsphotos",
+      "image": "./assets/media/writerjoshua.jpg",
       "excerpt": "Photography and Multimedia"
     },
     {
       "title": "SoulSeesBest",
-      "slug": "projects/soulseesbest",
-      "image": "assets/media/writerjoshua.jpg",
+      "slug": "soulseesbest",
+      "image": "./assets/media/writerjoshua.jpg",
       "excerpt": "IDM Electronica Music Rooted in the Southwestern US by a Man Whose Soul Sees Better Than His Eyes Do"
     },
     {
       "title": "AI Architecture Lab",
-      "slug": "projects/ai-architecture-lab",
-      "image": "assets/media/writerjoshua.jpg",
+      "slug": "ai-architecture-lab",
+      "image": "./assets/media/writerjoshua.jpg",
       "excerpt": "Building with AI Architecture with a focus on Token Efficiency, Sustainability, and Best Practices for the Future of the Field"
     },
     {
       "title": "The Inkwell",
-      "slug": "projects/the-inkwell",
-      "image": "assets/media/beauholliday.jpg",
+      "slug": "the-inkwell",
+      "image": "./assets/media/beau-holliday.jpg",
       "excerpt": "Romantic Poetry and Prose in a WebApp by American Romance Writer, Beau Holliday"
     }
   ],
   "outro": "[Contact](index.html?page=contact) | [Cash App](https://cash.app/$WriterJoshua) | [Venmo](https://venmo.com/WriterJoshua) | [PayPal](https://paypal.me/WriterJoshua)",
-  "outroImage": "assets/media/projects-header.jpg"
+  "outroImage": "./assets/media/projects-header.jpg"
 }
