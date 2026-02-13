@@ -1,5 +1,3 @@
-.DS_Store
-.DS_Store?
-._*
-.AppleDouble
-.LSOverride
+# DNS Files
+*.dns
+CNAME
