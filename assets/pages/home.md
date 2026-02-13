@@ -1,5 +1,6 @@
 
 ![Joshua Lucero, WriterJoshua](./assets/media/joshua-lucero.jpg)
+
 # Author, Researcher, Artist
 I've been reading since before pre-school and have been actively writing since Kindergarten. I was born in 1984, and you may expect that, by now, I'd have a fancy writing job or have published books. That's not quite the case. My web domain is WriterJoshua.com but, to label myself, simply as a writer, would be insufficient. 
 

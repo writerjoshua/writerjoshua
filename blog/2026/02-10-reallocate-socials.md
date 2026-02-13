@@ -3,7 +3,7 @@ title: Reallocate Your Socials: Five-Point Online Brand Checklist
 date: 2026-02-10
 time: 15:00
 excerpt: Is your brand's portfolio overweight on social media? Building an online brand presence can work without it. Five Keys.
-image: ../../assets/media/slc-int-worldmap.jpeg
+image: ./assets/media/slc-int-worldmap.jpeg
 twitter-title: "Reallocate Your Socials: Five-Point Online Brand Checklist"
 twitter-description: "Is your brand's portfolio overweight on social media? Building an online brand presence can work without it. Five Keys."
 keywords: "@JoshWritesWell, brand management, social media, trending, going viral, followers, likes, engagement, shadowbanned, facebook, instagram, twitter, x, meta, threads, algorithms, paid posts, advertising, marketing, tech, software, ai, #wj_ai"
@@ -22,10 +22,7 @@ keywords: "@JoshWritesWell, brand management, social media, trending, going vira
 
 ---
 
-<img src="../../assets/media/slc-int-worldmap.jpeg"
-     alt="World Map at SLC International, 2026. By SeeJoshsPhotos"
-     style="max-width:100%;height:auto;display:block;margin:0 auto;">
-
+![World Map at SLC International, 2026 by SeeJoshsPhotos](./assets/media/slc-int-worldmap.jpeg)
 
 ### Likes, Shares, and Engagement are valuable to your brand but, only so much as they drive traffic to it.
 
@@ -114,10 +111,11 @@ I look forward to you mentioning me in your blog about how this helped ;)
 Joshua Lucero  
 *[connect@writerjoshua.com](mailto:connect@writerjoshua.com)*
 
+photo credit: [SeeJoshsPhotos](./assets/pages/seejoshsphotos.md)
 ---
 
 ### Also Read:
-- [About Joshua Lucero](../../assets/pages/about-josh.md)
-- [WriterJoshua Blog Archive](../archive.md)
-- [WriterJoshua Project List](../../assets/pages/projects.md)
-- [Contact Joshua Lucero](../../assets/pages/contact.md)
+- [About Joshua Lucero](./assets/pages/about-josh.md)
+- [WriterJoshua Blog Archive](./assets/pages/archive.md)
+- [WriterJoshua Project List](./assets/pages/projects.md)
+- [Contact Joshua Lucero](./assets/pages/contact.md)

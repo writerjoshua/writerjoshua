@@ -21,4 +21,4 @@ Under Construction
 ### Visit The Inkwell, hosted on GitHub Pages
 Under Construction
 
-[img]: ../../assets/media/beau-holliday.jpg
+[img]: ./assets/media/beau-holliday.jpg
