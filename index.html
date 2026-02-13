@@ -148,6 +148,70 @@
     return div.innerHTML;
   }
 
+  // ===== FRONTMATTER PARSER =====
+  function parseFrontmatter(markdown) {
+    const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
+    const match = markdown.match(frontmatterRegex);
+    
+    if (!match) {
+      return { metadata: {}, content: markdown };
+    }
+    
+    const frontmatterText = match[1];
+    const content = match[2];
+    const metadata = {};
+    
+    // Parse YAML frontmatter (simple key: value format)
+    frontmatterText.split('\n').forEach(line => {
+      const [key, ...valueParts] = line.split(':');
+      if (key && valueParts.length) {
+        const value = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
+        metadata[key.trim()] = value;
+      }
+    });
+    
+    return { metadata, content };
+  }
+
+  // ===== META TAG INJECTION =====
+  function injectMetaTags(metadata) {
+    const head = document.head;
+    
+    // Update page title
+    if (metadata.title) {
+      document.title = `${metadata.title} | WriterJoshua`;
+    }
+    
+    // Remove old meta tags we might have set
+    document.querySelectorAll('meta[data-dynamic="true"]').forEach(tag => tag.remove());
+    
+    // Inject meta tags
+    const metaFields = {
+      'description': 'description',
+      'excerpt': 'description',
+      'keywords': 'keywords',
+      'image': 'og:image',
+      'twitter-title': 'twitter:title',
+      'twitter-description': 'twitter:description'
+    };
+    
+    Object.entries(metaFields).forEach(([sourceKey, metaName]) => {
+      if (metadata[sourceKey]) {
+        const meta = document.createElement('meta');
+        meta.setAttribute('data-dynamic', 'true');
+        
+        if (metaName.startsWith('og:')) {
+          meta.setAttribute('property', metaName);
+        } else {
+          meta.setAttribute('name', metaName);
+        }
+        
+        meta.setAttribute('content', metadata[sourceKey]);
+        head.appendChild(meta);
+      }
+    });
+  }
+
   // ===== MARKDOWN LOADER =====
   function loadMarkdown(page) {
     if (!md) {
@@ -181,13 +245,43 @@
         return;
       }
 
-      fetch(paths[pathIndex])
+      const currentPath = paths[pathIndex];
+      
+      fetch(currentPath)
         .then(response => {
           if (!response.ok) throw new Error('Not found');
           return response.text();
         })
         .then(markdown => {
-          const html = md.render(markdown);
+          // Parse frontmatter
+          const { metadata, content } = parseFrontmatter(markdown);
+          
+          // Inject meta tags for SEO
+          injectMetaTags(metadata);
+          
+          // Build HTML with frontmatter metadata displayed
+          let html = '';
+          
+          if (metadata.title) {
+            html += `<h1>${escapeHtml(metadata.title)}</h1>`;
+          }
+          
+          if (metadata.date && metadata.time) {
+            const formattedDateTime = formatDateTime(metadata.date, metadata.time);
+            html += `<p class="post-meta">${formattedDateTime}</p>`;
+          }
+          
+          if (metadata.image) {
+            html += `<img src="${getImagePath(metadata.image)}" alt="${escapeHtml(metadata.title || 'Post image')}" class="post-image">`;
+          }
+          
+          if (metadata.excerpt) {
+            html += `<p class="post-excerpt"><em>${escapeHtml(metadata.excerpt)}</em></p>`;
+          }
+          
+          // Render markdown content
+          html += md.render(content);
+          
           document.getElementById('content').innerHTML = html;
           
           // Cache rendered HTML
@@ -202,6 +296,131 @@
 
     tryPaths(0);
   }
+
+  // ===== FRONTMATTER PARSER =====
+  function parseFrontmatter(markdown) {
+    const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
+    const match = markdown.match(frontmatterRegex);
+    
+    if (!match) {
+      return { metadata: {}, content: markdown };
+    }
+    
+    const frontmatterText = match[1];
+    const content = match[2];
+    const metadata = {};
+    
+    // Parse YAML frontmatter (simple key: value format)
+    frontmatterText.split('\n').forEach(line => {
+      const [key, ...valueParts] = line.split(':');
+      if (key && valueParts.length) {
+        const value = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
+        metadata[key.trim()] = value;
+      }
+    });
+    
+    return { metadata, content };
+  }
+
+  // ===== META TAG INJECTION =====
+  function injectMetaTags(metadata) {
+    const head = document.head;
+    
+    // Update page title
+    if (metadata.title) {
+      document.title = `${metadata.title} | WriterJoshua`;
+    }
+    
+    // Remove old meta tags we might have set
+    document.querySelectorAll('meta[data-dynamic="true"]').forEach(tag => tag.remove());
+    
+    // Inject meta tags
+    const metaFields = {
+      'description': 'description',
+      'excerpt': 'description',
+      'keywords': 'keywords',
+      'image': 'og:image',
+      'twitter-title': 'twitter:title',
+      'twitter-description': 'twitter:description'
+    };
+    
+    Object.entries(metaFields).forEach(([sourceKey, metaName]) => {
+      if (metadata[sourceKey]) {
+        const meta = document.createElement('meta');
+        meta.setAttribute('data-dynamic', 'true');
+        
+        if (metaName.startsWith('og:')) {
+          meta.setAttribute('property', metaName);
+        } else {
+          meta.setAttribute('name', metaName);
+        }
+        
+        meta.setAttribute('content', metadata[sourceKey]);
+        head.appendChild(meta);
+      }
+    });
+  }
+    if (!md) {
+      showError('Markdown processor unavailable. Please refresh the page.');
+      return;
+    }
+
+    const cacheKey = `cache_${page}`;
+    const cachedHTML = getCachedHTML(cacheKey);
+    
+    // If cached, use immediately
+    if (cachedHTML) {
+      document.getElementById('content').innerHTML = cachedHTML;
+      highlightActiveNav();
+      return;
+    }
+
+    // Build paths array with current year and previous years
+    const currentYear = new Date().getFullYear();
+    const paths = [`./assets/pages/${page}.md`, `./${page}.md`];
+    
+    // Add blog paths for current year and up to 10 years back
+    for (let i = 0; i <= 10; i++) {
+      const year = currentYear - i;
+      paths.push(`./blog/${year}/${page}.md`);
+    }
+
+    console.log(`Loading page: ${page}`);
+    console.log('Trying paths:', paths);
+
+    function tryPaths(pathIndex) {
+      if (pathIndex >= paths.length) {
+        showError(`Page not found: ${page}`);
+        console.error(`All paths exhausted for: ${page}`);
+        return;
+      }
+
+      const currentPath = paths[pathIndex];
+      console.log(`Attempt ${pathIndex + 1}: ${currentPath}`);
+      
+      fetch(currentPath)
+        .then(response => {
+          if (!response.ok) throw new Error('Not found');
+          return response.text();
+        })
+        .then(markdown => {
+          console.log(`✓ Found at: ${currentPath}`);
+          const html = md.render(markdown);
+          document.getElementById('content').innerHTML = html;
+          
+          // Cache rendered HTML
+          setCachedHTML(cacheKey, html);
+          
+          highlightActiveNav();
+        })
+        .catch(() => {
+          console.log(`✗ Not found: ${currentPath}`);
+          tryPaths(pathIndex + 1);
+        });
+    }
+
+    tryPaths(0);
+  
 
 
   // ===== JSON LOADERS =====

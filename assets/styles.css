@@ -469,6 +469,28 @@ footer {
   margin-top: 0;
 }
 
+/* ===== POST METADATA ===== */
+.post-meta {
+  color: var(--text-light);
+  font-size: 0.95em;
+  font-style: italic;
+  margin: -0.5em 0 1em 0;
+}
+
+.post-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin: var(--sp-lg) 0;
+  display: block;
+}
+
+.post-excerpt {
+  color: var(--text-light);
+  font-size: 1em;
+  margin: var(--sp-md) 0;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 
 /* Tablet (768px and below) */
