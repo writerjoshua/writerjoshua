@@ -45,7 +45,7 @@
 
 <script>
   // ===== MARKDOWN-IT INITIALIZATION =====
-  const md = window.markdownit ? window.markdownit() : null;
+  const md = window.markdownit ? window.markdownit({ html: true }) : null;
 
   // ===== GLOBAL PAGE METADATA =====
   let currentPageMetadata = {
@@ -205,11 +205,13 @@
     const cachedMetadata = getCachedHTML(metadataKey);
     
     if (cachedHTML) {
+      console.log('Loading from cache:', cacheKey);
       document.getElementById('content').innerHTML = cachedHTML;
       
       // Restore cached metadata
       if (cachedMetadata) {
         window.currentPageMetadata = JSON.parse(cachedMetadata);
+        console.log('Restored cached metadata:', window.currentPageMetadata);
       }
       
       highlightActiveNav();
@@ -239,6 +241,9 @@
         })
         .then(markdown => {
           const { metadata, content } = parseFrontmatter(markdown);
+          console.log('Parsed frontmatter:', metadata);
+          console.log('Page:', page);
+          
           injectMetaTags(metadata);
           
           // Store metadata for sharing
@@ -247,7 +252,7 @@
             description: metadata.excerpt || metadata.description || ''
           };
           window.currentPageMetadata = currentPageMetadata;
-          console.log('Updated metadata:', window.currentPageMetadata);
+          console.log('Updated window.currentPageMetadata:', window.currentPageMetadata);
           
           let html = '';
           
