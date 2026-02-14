@@ -37,15 +37,19 @@
   <!-- STATIC FOOTER -->
   <footer>
     <img src="./assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner" class="footer-banner" onerror="this.style.display='none';">
-    <div class="footer-controls">
-      <button class="share-btn" onclick="shareCurrentPage()">Share</button>
-    </div>
     <p class="footer-copyright">&copy; 2026 Joshua Lucero</p>
   </footer>
 
 <script>
   // ===== MARKDOWN-IT INITIALIZATION =====
   const md = window.markdownit ? window.markdownit() : null;
+
+  // ===== GLOBAL PAGE METADATA =====
+  let currentPageMetadata = {
+    title: 'WriterJoshua',
+    description: 'Author, Researcher, Artist'
+  };
+  window.currentPageMetadata = currentPageMetadata;
 
   // ===== CACHE HELPERS =====
   function getCachedHTML(key) {
@@ -226,6 +230,13 @@
           const { metadata, content } = parseFrontmatter(markdown);
           injectMetaTags(metadata);
           
+          // Store metadata for sharing
+          currentPageMetadata = {
+            title: metadata.title || page,
+            description: metadata.excerpt || metadata.description || ''
+          };
+          window.currentPageMetadata = currentPageMetadata;
+          
           let html = '';
           
           if (metadata.title) {
@@ -284,6 +295,8 @@
 
   function renderJSON(data, itemsKey, cacheKey) {
     let html = '';
+    let pageTitle = '';
+    let pageDescription = '';
 
     if (data.intro) {
       html += md.render(data.intro);
@@ -293,6 +306,8 @@
     }
 
     if (itemsKey === 'projects') {
+      pageTitle = 'Projects';
+      pageDescription = data.intro || 'My projects';
       html = '<h1>Projects</h1>' + html;
       html += '<div class="projects-grid">';
       
@@ -316,6 +331,8 @@
       });
       html += '</div>';
     } else if (itemsKey === 'jots') {
+      pageTitle = 'Jots';
+      pageDescription = data.intro || 'My jots and thoughts';
       html = '<h1>Jots</h1>' + html;
       
       const sorted = (data.jots || []).sort((a, b) =>
@@ -333,6 +350,8 @@
         `;
       });
     } else if (itemsKey === 'archive') {
+      pageTitle = 'Archive';
+      pageDescription = data.intro || 'Blog archive';
       html = '<h1>Archive</h1>' + html;
       
       const sortedYears = (data.years || []).sort((a, b) => {
@@ -371,6 +390,13 @@
 
     document.getElementById('content').innerHTML = html;
     
+    // Store metadata for sharing
+    currentPageMetadata = {
+      title: pageTitle,
+      description: pageDescription
+    };
+    window.currentPageMetadata = currentPageMetadata;
+    
     if (cacheKey) {
       setCachedHTML(cacheKey, html);
     }
@@ -380,12 +406,17 @@
 
   // ===== SHARING =====
   function shareCurrentPage() {
-    const title = document.querySelector('h1')?.innerText || document.title;
+    const title = currentPageMetadata.title || document.querySelector('h1')?.innerText || document.title;
+    const description = currentPageMetadata.description || '';
     const url = window.location.href;
-    const text = `${title} - WriterJoshua`;
+    const text = description ? `${description}` : title;
 
     if (navigator.share) {
-      navigator.share({ title, text, url }).catch(err => console.log('Share failed:', err));
+      navigator.share({ 
+        title: title,
+        text: text,
+        url: url 
+      }).catch(err => console.log('Share failed:', err));
     } else {
       alert('Share not supported on this device');
     }
