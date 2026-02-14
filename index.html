@@ -37,6 +37,9 @@
   <!-- STATIC FOOTER -->
   <footer>
     <img src="./assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner" class="footer-banner" onerror="this.style.display='none';">
+    <div class="footer-controls">
+      <button class="share-btn" onclick="shareCurrentPage()">Share</button>
+    </div>
     <p class="footer-copyright">&copy; 2026 Joshua Lucero</p>
   </footer>
 
@@ -236,6 +239,7 @@
             description: metadata.excerpt || metadata.description || ''
           };
           window.currentPageMetadata = currentPageMetadata;
+          console.log('Updated metadata:', window.currentPageMetadata);
           
           let html = '';
           
