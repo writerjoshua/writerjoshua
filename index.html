@@ -48,24 +48,6 @@
   const md = window.markdownit ? window.markdownit() : null;
 
   // ===== CACHE HELPERS =====
-  function getCache(key) {
-    try {
-      const cached = sessionStorage.getItem(key);
-      return cached ? JSON.parse(cached) : null;
-    } catch (e) {
-      console.warn('Cache read failed:', e);
-      return null;
-    }
-  }
-
-  function setCache(key, value) {
-    try {
-      sessionStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-      console.warn('Cache write failed:', e);
-    }
-  }
-
   function getCachedHTML(key) {
     try {
       return sessionStorage.getItem(key);
@@ -110,15 +92,11 @@
       const [year, month, day] = dateStr.split('-');
       const [hours, minutes] = timeStr.split(':');
       
-      // Create date object
       const date = new Date(year, month - 1, day, hours, minutes);
-      
-      // Format date as Month Day, Year
       const monthName = date.toLocaleString('default', { month: 'long' });
       const dayNum = date.getDate();
       const yearNum = date.getFullYear();
       
-      // Format time as H:MM AM/PM PST
       const timeObj = new Date(2000, 0, 1, hours, minutes);
       const timeFormatted = timeObj.toLocaleString('en-US', {
         hour: 'numeric',
@@ -135,7 +113,6 @@
 
   function getImagePath(imagePath) {
     if (!imagePath) return '';
-    // If path doesn't start with ./, add it
     if (!imagePath.startsWith('./') && !imagePath.startsWith('http')) {
       return './' + imagePath;
     }
@@ -161,7 +138,6 @@
     const content = match[2];
     const metadata = {};
     
-    // Parse YAML frontmatter (simple key: value format)
     frontmatterText.split('\n').forEach(line => {
       const [key, ...valueParts] = line.split(':');
       if (key && valueParts.length) {
@@ -177,15 +153,12 @@
   function injectMetaTags(metadata) {
     const head = document.head;
     
-    // Update page title
     if (metadata.title) {
       document.title = `${metadata.title} | WriterJoshua`;
     }
     
-    // Remove old meta tags we might have set
     document.querySelectorAll('meta[data-dynamic="true"]').forEach(tag => tag.remove());
     
-    // Inject meta tags
     const metaFields = {
       'description': 'description',
       'excerpt': 'description',
@@ -222,18 +195,15 @@
     const cacheKey = `cache_${page}`;
     const cachedHTML = getCachedHTML(cacheKey);
     
-    // If cached, use immediately
     if (cachedHTML) {
       document.getElementById('content').innerHTML = cachedHTML;
       highlightActiveNav();
       return;
     }
 
-    // Build paths array with current year and previous years
     const currentYear = new Date().getFullYear();
     const paths = [`./assets/pages/${page}.md`, `./${page}.md`];
     
-    // Add blog paths for current year and up to 10 years back
     for (let i = 0; i <= 10; i++) {
       const year = currentYear - i;
       paths.push(`./blog/${year}/${page}.md`);
@@ -253,13 +223,9 @@
           return response.text();
         })
         .then(markdown => {
-          // Parse frontmatter
           const { metadata, content } = parseFrontmatter(markdown);
-          
-          // Inject meta tags for SEO
           injectMetaTags(metadata);
           
-          // Build HTML with frontmatter metadata displayed
           let html = '';
           
           if (metadata.title) {
@@ -279,14 +245,10 @@
             html += `<p class="post-excerpt"><em>${escapeHtml(metadata.excerpt)}</em></p>`;
           }
           
-          // Render markdown content
           html += md.render(content);
           
           document.getElementById('content').innerHTML = html;
-          
-          // Cache rendered HTML
           setCachedHTML(cacheKey, html);
-          
           highlightActiveNav();
         })
         .catch(() => {
@@ -297,80 +259,17 @@
     tryPaths(0);
   }
 
-  // ===== JSON LOADERS =====    }
-
-    const cacheKey = `cache_${page}`;
-    const cachedHTML = getCachedHTML(cacheKey);
-    
-    // If cached, use immediately
-    if (cachedHTML) {
-      document.getElementById('content').innerHTML = cachedHTML;
-      highlightActiveNav();
-      return;
-    }
-
-    // Build paths array with current year and previous years
-    const currentYear = new Date().getFullYear();
-    const paths = [`./assets/pages/${page}.md`, `./${page}.md`];
-    
-    // Add blog paths for current year and up to 10 years back
-    for (let i = 0; i <= 10; i++) {
-      const year = currentYear - i;
-      paths.push(`./blog/${year}/${page}.md`);
-    }
-
-    console.log(`Loading page: ${page}`);
-    console.log('Trying paths:', paths);
-
-    function tryPaths(pathIndex) {
-      if (pathIndex >= paths.length) {
-        showError(`Page not found: ${page}`);
-        console.error(`All paths exhausted for: ${page}`);
-        return;
-      }
-
-      const currentPath = paths[pathIndex];
-      console.log(`Attempt ${pathIndex + 1}: ${currentPath}`);
-      
-      fetch(currentPath)
-        .then(response => {
-          if (!response.ok) throw new Error('Not found');
-          return response.text();
-        })
-        .then(markdown => {
-          console.log(`✓ Found at: ${currentPath}`);
-          const html = md.render(markdown);
-          document.getElementById('content').innerHTML = html;
-          
-          // Cache rendered HTML
-          setCachedHTML(cacheKey, html);
-          
-          highlightActiveNav();
-        })
-        .catch(() => {
-          console.log(`✗ Not found: ${currentPath}`);
-          tryPaths(pathIndex + 1);
-        });
-    }
-
-    tryPaths(0);
-  }
-
-
-  // ===== JSON LOADERS =====
   // ===== GENERIC JSON LOADER & RENDERER =====
   function loadJSON(filename, itemsKey) {
     const cacheKey = `cache_${filename}`;
     const cachedHTML = getCachedHTML(cacheKey);
     
-    // If cached, use immediately
     if (cachedHTML) {
       document.getElementById('content').innerHTML = cachedHTML;
       highlightActiveNav();
       return;
     }
     
-    // Otherwise fetch and cache
     fetch(`./assets/pages/${filename}.json`)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -386,7 +285,6 @@
   function renderJSON(data, itemsKey, cacheKey) {
     let html = '';
 
-    // Render intro section with markdown support
     if (data.intro) {
       html += md.render(data.intro);
     }
@@ -394,12 +292,10 @@
       html += `<img src="${getImagePath(data.introImage)}" alt="Intro" class="projects-image">`;
     }
 
-    // Render items based on type
     if (itemsKey === 'projects') {
       html = '<h1>Projects</h1>' + html;
       html += '<div class="projects-grid">';
       
-      // Sort projects by order if available, otherwise keep as-is
       const projects = (data.projects || []).sort((a, b) => {
         if (a.order !== undefined && b.order !== undefined) {
           return a.order - b.order;
@@ -422,17 +318,15 @@
     } else if (itemsKey === 'jots') {
       html = '<h1>Jots</h1>' + html;
       
-      // Sort jots by date (newest to oldest)
       const sorted = (data.jots || []).sort((a, b) =>
         new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
       );
       
       sorted.forEach(jot => {
-        const formattedDateTime = formatDateTime(jot.date, jot.time);
         html += `
           <div class="jot">
             <h2>${escapeHtml(jot.title)}</h2>
-            <p class="jot-meta">${formattedDateTime}</p>
+            <p class="jot-meta">${formatDateTime(jot.date, jot.time)}</p>
             <p>${escapeHtml(jot.content)}</p>
             ${jot.image ? `<img src="${getImagePath(jot.image)}" alt="${escapeHtml(jot.title)}" class="jot-image">` : ''}
           </div>
@@ -441,7 +335,6 @@
     } else if (itemsKey === 'archive') {
       html = '<h1>Archive</h1>' + html;
       
-      // Sort years from newest to oldest
       const sortedYears = (data.years || []).sort((a, b) => {
         if (a.year !== b.year) return b.year - a.year;
         return b.month - a.month;
@@ -451,7 +344,6 @@
         const monthName = new Date(yearMonth.year, yearMonth.month - 1).toLocaleString('default', { month: 'long' });
         html += `<h2>${monthName} ${yearMonth.year}</h2><ul>`;
         
-        // Sort posts within each month by date (newest to oldest)
         const sortedPosts = (yearMonth.posts || []).sort((a, b) =>
           new Date(b.date) - new Date(a.date)
         );
@@ -470,7 +362,6 @@
       });
     }
 
-    // Render outro section with markdown support
     if (data.outro) {
       html += md.render(data.outro);
     }
@@ -480,7 +371,6 @@
 
     document.getElementById('content').innerHTML = html;
     
-    // Cache rendered HTML if cacheKey provided
     if (cacheKey) {
       setCachedHTML(cacheKey, html);
     }
@@ -522,8 +412,6 @@
   // ===== INITIALIZATION =====
   document.addEventListener('DOMContentLoaded', handleRoute);
   window.addEventListener('popstate', handleRoute);
-
-  // Listen for hash/query changes
   window.addEventListener('hashchange', handleRoute);
 </script>
 </body>
