@@ -201,9 +201,17 @@
 
     const cacheKey = `cache_${page}`;
     const cachedHTML = getCachedHTML(cacheKey);
+    const metadataKey = `meta_${page}`;
+    const cachedMetadata = getCachedHTML(metadataKey);
     
     if (cachedHTML) {
       document.getElementById('content').innerHTML = cachedHTML;
+      
+      // Restore cached metadata
+      if (cachedMetadata) {
+        window.currentPageMetadata = JSON.parse(cachedMetadata);
+      }
+      
       highlightActiveNav();
       return;
     }
@@ -264,6 +272,11 @@
           
           document.getElementById('content').innerHTML = html;
           setCachedHTML(cacheKey, html);
+          
+          // Cache metadata separately
+          const metadataKey = `meta_${page}`;
+          setCachedHTML(metadataKey, JSON.stringify(window.currentPageMetadata));
+          
           highlightActiveNav();
         })
         .catch(() => {
