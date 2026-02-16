@@ -179,10 +179,9 @@
     return imagePath;
   }
 
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  function unescapeNewlines(text) {
+    if (!text) return '';
+    return text.replace(/\\n/g, '\n');
   }
 
   // ===== FRONTMATTER PARSER =====
@@ -384,7 +383,7 @@
     let pageDescription = '';
 
     if (data.intro) {
-      html += md.render(data.intro);
+      html += md.render(unescapeNewlines(data.intro));
     }
     if (data.introImage) {
       html += `<img src="${getImagePath(data.introImage)}" alt="Intro" class="projects-image">`;
@@ -467,7 +466,7 @@
     }
 
     if (data.outro) {
-      html += md.render(data.outro);
+      html += md.render(unescapeNewlines(data.outro));
     }
     if (data.outroImage) {
       html += `<img src="${getImagePath(data.outroImage)}" alt="Outro" class="projects-image">`;
