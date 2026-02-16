@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 <head>
   <meta charset="UTF-8">
@@ -23,7 +22,6 @@
   </header>
 
   <!-- STATIC NAVIGATION -->
-
   <nav>
     <a href="?page=home" class="nav-link">Home</a>
     <a href="?page=about-josh" class="nav-link">About Josh</a>
@@ -34,11 +32,9 @@
   </nav>
 
   <!-- DYNAMIC CONTENT AREA -->
-
   <main id="content"></main>
 
   <!-- STATIC FOOTER -->
-
   <footer>
     <img src="./assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner" class="footer-banner" onerror="this.style.display='none';">
     <div class="footer-controls">
@@ -147,6 +143,12 @@
     document.getElementById('content').innerHTML = `<div class="error"><p>${escapeHtml(message)}</p></div>`;
   }
 
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   function formatDateTime(dateStr, timeStr) {
     try {
       const [year, month, day] = dateStr.split('-');
@@ -181,7 +183,10 @@
 
   function unescapeNewlines(text) {
     if (!text) return '';
-    return text.replace(/\\n/g, '\n');
+    const unescaped = text.replace(/\\n/g, '\n');
+    console.log('Original:', text.substring(0, 100));
+    console.log('Unescaped:', unescaped.substring(0, 100));
+    return unescaped;
   }
 
   // ===== FRONTMATTER PARSER =====
@@ -382,12 +387,13 @@
     let pageTitle = '';
     let pageDescription = '';
 
-    if (data.intro) {
-      html += md.render(unescapeNewlines(data.intro));
-    }
-    if (data.introImage) {
-      html += `<img src="${getImagePath(data.introImage)}" alt="Intro" class="projects-image">`;
-    }
+    try {
+      if (data.intro) {
+        html += md.render(data.intro);
+      }
+      if (data.introImage) {
+        html += `<img src="${getImagePath(data.introImage)}" alt="Intro" class="projects-image">`;
+      }
 
     if (itemsKey === 'projects') {
       pageTitle = 'Projects';
@@ -466,7 +472,7 @@
     }
 
     if (data.outro) {
-      html += md.render(unescapeNewlines(data.outro));
+      html += md.render(data.outro);
     }
     if (data.outroImage) {
       html += `<img src="${getImagePath(data.outroImage)}" alt="Outro" class="projects-image">`;
@@ -486,6 +492,10 @@
     }
     
     highlightActiveNav();
+    } catch (err) {
+      console.error('renderJSON error:', err);
+      showError('Error rendering page');
+    }
   }
 
   // ===== SHARING =====
@@ -531,6 +541,5 @@
   window.addEventListener('popstate', handleRoute);
   window.addEventListener('hashchange', handleRoute);
 </script>
-
 </body>
 </html>
