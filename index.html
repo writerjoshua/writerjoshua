@@ -781,7 +781,7 @@
       return;
     }
 
-    window.firebase.auth.signInWithEmailAndPassword(email, password)
+    window.firebase.signInWithEmailAndPassword(email, password)
       .then(userCredential => {
         currentUser = userCredential.user;
         loadUserProfile(currentUser.uid);
@@ -804,7 +804,7 @@
       return;
     }
 
-    window.firebase.auth.createUserWithEmailAndPassword(email, password)
+    window.firebase.createUserWithEmailAndPassword(email, password)
       .then(userCredential => {
         currentUser = userCredential.user;
         const role = isAdmin(email) ? 'Admin' : 'User';
@@ -830,7 +830,7 @@
   }
 
   function signOutUser() {
-    window.firebase.auth.signOut()
+    window.firebase.signOut()
       .then(() => {
         currentUser = null;
         currentUserProfile = null;
@@ -1144,12 +1144,12 @@
   window.firebase = { 
     auth, 
     database, 
-    signInWithPopup, 
-    GoogleAuthProvider, 
-    signOut, 
     ref, 
     onValue, 
-    set
+    set,
+    signInWithEmailAndPassword: (email, password) => auth.signInWithEmailAndPassword(email, password),
+    createUserWithEmailAndPassword: (email, password) => auth.createUserWithEmailAndPassword(email, password),
+    signOut: () => auth.signOut()
   };
   
   // ===== CHECK AUTH STATE ON LOAD =====
