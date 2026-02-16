@@ -49,7 +49,10 @@
 
 <script>
   // ===== MARKDOWN-IT INITIALIZATION =====
-  const md = window.markdownit ? window.markdownit({ html: true }) : null;
+  const md = window.markdownit ? window.markdownit({ 
+    html: true,
+    breaks: true 
+  }) : null;
 
   // ===== GLOBAL PAGE METADATA =====
   let currentPageMetadata = {
