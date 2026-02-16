@@ -31,7 +31,7 @@ function loadMarkdown(page) {
       window.currentPageMetadata = metadata;
       
       const contentWithoutMeta = content.replace(/^---\n[\s\S]*?\n---\n/, '');
-      let html = md.render(contentWithoutMeta);
+      let html = window.md.render(contentWithoutMeta);
       html += renderLikesAndComments(page, 'blog-posts');
       
       document.getElementById('content').innerHTML = html;
@@ -69,7 +69,7 @@ function renderJSON(data, filename, type, cacheKey, expiryHours) {
   
   if (data.intro) {
     const intro = data.intro.replace(/\\n/g, '\n');
-    html += md.render(intro);
+    html += window.md.render(intro);
   }
 
   const sorted = (data.items || []).sort((a, b) => {
@@ -84,7 +84,7 @@ function renderJSON(data, filename, type, cacheKey, expiryHours) {
       <div class="${type.slice(0, -1)}">
         <h2>${escapeHtml(item.title)}</h2>
         <p class="item-meta">${formatDateTime(item.date, item.time)}</p>
-        ${md.render(item.content)}
+        ${window.md.render(item.content)}
         ${item.image ? `<img src="${getImagePath(item.image)}" alt="${escapeHtml(item.title)}" class="item-image">` : ''}
         ${renderLikesAndComments(itemId, type)}
       </div>
@@ -93,7 +93,7 @@ function renderJSON(data, filename, type, cacheKey, expiryHours) {
 
   if (data.outro) {
     const outro = data.outro.replace(/\\n/g, '\n');
-    html += md.render(outro);
+    html += window.md.render(outro);
   }
 
   document.getElementById('content').innerHTML = html;
