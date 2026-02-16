@@ -131,6 +131,29 @@
   };
   window.currentPageMetadata = currentPageMetadata;
 
+  // ===== MODAL FUNCTIONS (EARLY DEFINITION) =====
+  function openAuthModal() {
+    document.getElementById('authModal').style.display = 'flex';
+  }
+
+  function closeAuthModal() {
+    document.getElementById('authModal').style.display = 'none';
+    document.getElementById('authError').textContent = '';
+  }
+
+  function openProfileModal() {
+    if (!currentUser) return;
+    document.getElementById('profileModal').style.display = 'flex';
+    document.getElementById('editUsername').value = currentUserProfile?.username || '';
+    document.getElementById('avatarStyle').value = currentUserProfile?.avatar_style || 'retro';
+    document.getElementById('editBio').value = currentUserProfile?.bio || '';
+  }
+
+  function closeProfileModal() {
+    document.getElementById('profileModal').style.display = 'none';
+    document.getElementById('profileError').textContent = '';
+  }
+
   // ===== CACHE HELPERS =====
   function getCachedHTML(key) {
     try {
@@ -727,36 +750,6 @@
   }
 
   // ===== MODAL FUNCTIONS =====
-  function openAuthModal() {
-    document.getElementById('authModal').style.display = 'flex';
-  }
-
-  function closeAuthModal() {
-    document.getElementById('authModal').style.display = 'none';
-    document.getElementById('authError').textContent = '';
-  }
-
-  function openProfileModal() {
-    if (!currentUser) return;
-    document.getElementById('profileModal').style.display = 'flex';
-    document.getElementById('editUsername').value = currentUserProfile?.username || '';
-    document.getElementById('avatarStyle').value = currentUserProfile?.avatar_style || 'retro';
-    document.getElementById('editBio').value = currentUserProfile?.bio || '';
-  }
-
-  function closeProfileModal() {
-    document.getElementById('profileModal').style.display = 'none';
-    document.getElementById('profileError').textContent = '';
-  }
-
-  function switchToSignUp() {
-    // No longer needed with social auth
-  }
-
-  function switchToSignIn() {
-    // No longer needed with social auth
-  }
-
   // ===== SOCIAL AUTH FUNCTIONS =====
   function signInWithGoogle() {
     const provider = new window.firebase.GoogleAuthProvider();
