@@ -19,6 +19,13 @@
       <h1>WriterJoshua</h1>
       <p>Author, Researcher, Artist</p>
     </div>
+    <div class="header-user">
+      <button id="authBtn" onclick="openAuthModal()" class="user-btn">Sign In</button>
+      <div id="userMenu" style="display:none;" class="user-menu">
+        <div id="userInfo" class="user-info"></div>
+        <button onclick="openProfileModal()" class="user-btn">Edit Profile</button>
+      </div>
+    </div>
   </header>
 
   <!-- STATIC NAVIGATION -->
@@ -33,6 +40,58 @@
 
   <!-- DYNAMIC CONTENT AREA -->
   <main id="content"></main>
+
+  <!-- AUTH MODALS -->
+  <div id="authModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeAuthModal()">&times;</span>
+      
+      <!-- Sign In Tab -->
+      <div id="signInTab" class="auth-tab">
+        <h2>Sign In</h2>
+        <input type="email" id="signInEmail" placeholder="Email" class="auth-input">
+        <input type="password" id="signInPassword" placeholder="Password" class="auth-input">
+        <button onclick="signIn()" class="auth-btn">Sign In</button>
+        <p class="auth-toggle">New user? <a onclick="switchToSignUp()">Sign up</a></p>
+        <div id="signInError" class="auth-error"></div>
+      </div>
+      
+      <!-- Sign Up Tab -->
+      <div id="signUpTab" class="auth-tab" style="display:none;">
+        <h2>Sign Up</h2>
+        <input type="email" id="signUpEmail" placeholder="Email" class="auth-input">
+        <input type="password" id="signUpPassword" placeholder="Password" class="auth-input">
+        <input type="text" id="username" placeholder="Username (optional)" class="auth-input">
+        <div class="emoji-picker-container">
+          <label>Choose Avatar:</label>
+          <div id="emojiPicker" class="emoji-picker"></div>
+          <input type="hidden" id="selectedEmoji" value="😊">
+        </div>
+        <textarea id="bio" placeholder="Bio (200 characters max)" class="auth-input" maxlength="200"></textarea>
+        <button onclick="signUp()" class="auth-btn">Sign Up</button>
+        <p class="auth-toggle">Already have an account? <a onclick="switchToSignIn()">Sign in</a></p>
+        <div id="signUpError" class="auth-error"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div id="profileModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeProfileModal()">&times;</span>
+      <h2>Edit Profile</h2>
+      <input type="text" id="editUsername" placeholder="Username" class="auth-input">
+      <div class="emoji-picker-container">
+        <label>Choose Avatar:</label>
+        <div id="editEmojiPicker" class="emoji-picker"></div>
+        <input type="hidden" id="editSelectedEmoji" value="😊">
+      </div>
+      <textarea id="editBio" placeholder="Bio (200 characters max)" class="auth-input" maxlength="200"></textarea>
+      <button onclick="updateProfile()" class="auth-btn">Save Profile</button>
+      <button onclick="signOutUser()" class="auth-btn auth-btn-danger">Sign Out</button>
+      <div id="profileError" class="auth-error"></div>
+    </div>
+  </div>
 
   <!-- STATIC FOOTER -->
   <footer>
@@ -498,7 +557,194 @@
     }
   }
 
-  // ===== SHARING =====
+  // ===== EMOJI LIST =====
+  const allEmojis = ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😌','😍','🥰','😘','😗','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤮','🤐','🤮','🤢','🤮','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖','😺','😸','😹','😻','😼','😽','🙀','😿','😾','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','💕','💞','💓','💗','💖','💘','💝','💟','👋','🤚','🖐️','✋','🖖','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🤜','🤛','🦶','🦵','🦾','🦿','💪'];
+
+  // ===== USER STATE =====
+  let currentUser = null;
+  let currentUserProfile = null;
+
+  // ===== MODAL FUNCTIONS =====
+  function openAuthModal() {
+    document.getElementById('authModal').style.display = 'flex';
+    initEmojiPicker('emojiPicker', 'selectedEmoji');
+  }
+
+  function closeAuthModal() {
+    document.getElementById('authModal').style.display = 'none';
+    document.getElementById('signInError').textContent = '';
+    document.getElementById('signUpError').textContent = '';
+  }
+
+  function openProfileModal() {
+    if (!currentUser) return;
+    document.getElementById('profileModal').style.display = 'flex';
+    document.getElementById('editUsername').value = currentUserProfile?.username || '';
+    document.getElementById('editSelectedEmoji').value = currentUserProfile?.avatar || '😊';
+    document.getElementById('editBio').value = currentUserProfile?.bio || '';
+    initEmojiPicker('editEmojiPicker', 'editSelectedEmoji');
+  }
+
+  function closeProfileModal() {
+    document.getElementById('profileModal').style.display = 'none';
+    document.getElementById('profileError').textContent = '';
+  }
+
+  function switchToSignUp() {
+    document.getElementById('signInTab').style.display = 'none';
+    document.getElementById('signUpTab').style.display = 'block';
+  }
+
+  function switchToSignIn() {
+    document.getElementById('signUpTab').style.display = 'none';
+    document.getElementById('signInTab').style.display = 'block';
+  }
+
+  function initEmojiPicker(containerId, inputId) {
+    const container = document.getElementById(containerId);
+    if (container.children.length === 0) {
+      allEmojis.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.textContent = emoji;
+        btn.className = 'emoji-btn';
+        btn.onclick = (e) => {
+          e.preventDefault();
+          document.getElementById(inputId).value = emoji;
+          document.querySelectorAll(`#${containerId} .emoji-btn`).forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+        };
+        container.appendChild(btn);
+      });
+    }
+  }
+
+  // ===== AUTH FUNCTIONS =====
+  function signIn() {
+    const email = document.getElementById('signInEmail').value;
+    const password = document.getElementById('signInPassword').value;
+    const errorDiv = document.getElementById('signInError');
+
+    if (!email || !password) {
+      errorDiv.textContent = 'Please enter email and password';
+      return;
+    }
+
+    window.firebase.auth.signInWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        currentUser = userCredential.user;
+        loadUserProfile(currentUser.uid);
+        closeAuthModal();
+        updateUserUI();
+      })
+      .catch(error => {
+        errorDiv.textContent = error.message;
+      });
+  }
+
+  function signUp() {
+    const email = document.getElementById('signUpEmail').value;
+    const password = document.getElementById('signUpPassword').value;
+    let username = document.getElementById('username').value || `User_${Math.random().toString(36).substring(7)}`;
+    const avatar = document.getElementById('selectedEmoji').value;
+    const bio = document.getElementById('bio').value;
+    const errorDiv = document.getElementById('signUpError');
+
+    if (!email || !password) {
+      errorDiv.textContent = 'Please enter email and password';
+      return;
+    }
+
+    window.firebase.auth.createUserWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        currentUser = userCredential.user;
+        currentUserProfile = { username, avatar, bio, email };
+        saveUserProfile(currentUser.uid, currentUserProfile);
+        closeAuthModal();
+        updateUserUI();
+      })
+      .catch(error => {
+        errorDiv.textContent = error.message;
+      });
+  }
+
+  function signOutUser() {
+    window.firebase.auth.signOut()
+      .then(() => {
+        currentUser = null;
+        currentUserProfile = null;
+        closeProfileModal();
+        updateUserUI();
+      })
+      .catch(error => {
+        console.error('Sign out error:', error);
+      });
+  }
+
+  function updateProfile() {
+    if (!currentUser) return;
+    
+    const username = document.getElementById('editUsername').value || currentUserProfile.username;
+    const avatar = document.getElementById('editSelectedEmoji').value;
+    const bio = document.getElementById('editBio').value;
+
+    currentUserProfile = { ...currentUserProfile, username, avatar, bio };
+    saveUserProfile(currentUser.uid, currentUserProfile);
+    closeProfileModal();
+    updateUserUI();
+  }
+
+  function saveUserProfile(uid, profileData) {
+    const { ref, set } = window.firebase;
+    set(ref(window.firebase.database, `users/${uid}`), {
+      email: profileData.email,
+      username: profileData.username,
+      avatar: profileData.avatar,
+      bio: profileData.bio
+    });
+  }
+
+  function loadUserProfile(uid) {
+    const { ref, onValue } = window.firebase;
+    onValue(ref(window.firebase.database, `users/${uid}`), (snapshot) => {
+      if (snapshot.exists()) {
+        currentUserProfile = snapshot.val();
+      } else {
+        currentUserProfile = {
+          username: `User_${Math.random().toString(36).substring(7)}`,
+          avatar: '😊',
+          bio: ''
+        };
+      }
+      updateUserUI();
+    });
+  }
+
+  function updateUserUI() {
+    const authBtn = document.getElementById('authBtn');
+    const userMenu = document.getElementById('userMenu');
+    const userInfo = document.getElementById('userInfo');
+
+    if (currentUser && currentUserProfile) {
+      authBtn.style.display = 'none';
+      userMenu.style.display = 'block';
+      userInfo.innerHTML = `<div class="user-avatar">${currentUserProfile.avatar}</div><div class="user-name">${currentUserProfile.username}</div>`;
+    } else {
+      authBtn.style.display = 'block';
+      userMenu.style.display = 'none';
+    }
+  }
+
+  // ===== CHECK AUTH STATE ON LOAD =====
+  window.firebase.auth.onAuthStateChanged((user) => {
+    if (user) {
+      currentUser = user;
+      loadUserProfile(user.uid);
+    } else {
+      currentUser = null;
+      currentUserProfile = null;
+      updateUserUI();
+    }
+  });
   function shareCurrentPage() {
     const title = currentPageMetadata.title || document.querySelector('h1')?.innerText || document.title;
     const description = currentPageMetadata.description || '';
@@ -540,6 +786,31 @@
   document.addEventListener('DOMContentLoaded', handleRoute);
   window.addEventListener('popstate', handleRoute);
   window.addEventListener('hashchange', handleRoute);
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyAb-vp5qS_aaqJPF-jF6I5DDxfMp5mCnfI",
+    authDomain: "writerjoshua.firebaseapp.com",
+    databaseURL: "https://writerjoshua-default-rtdb.firebaseio.com",
+    projectId: "writerjoshua",
+    storageBucket: "writerjoshua.firebasestorage.app",
+    messagingSenderId: "850256602450",
+    appId: "1:850256602450:web:00a4d551f5326dfe01c68b",
+    measurementId: "G-W7SNVRK7WB"
+  };
+  
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+  const database = getDatabase(app);
+  
+  window.firebase = { auth, database, signInWithPopup, GoogleAuthProvider, signOut, ref, onValue, set };
 </script>
 </body>
 </html>
