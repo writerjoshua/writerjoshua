@@ -807,6 +807,10 @@
     window.firebase.createUserWithEmailAndPassword(email, password)
       .then(userCredential => {
         currentUser = userCredential.user;
+        
+        // Send email verification
+        sendEmailVerification(currentUser);
+        
         const role = isAdmin(email) ? 'Admin' : 'User';
         const gravatarUrl = `https://www.gravatar.com/avatar/${md5(email.toLowerCase())}?d=retro`;
         
@@ -817,15 +821,29 @@
           bio: '',
           email,
           role,
+          email_verified: false,
           created_at: Date.now()
         };
         
         saveUserProfile(currentUser.uid, currentUserProfile);
         closeAuthModal();
+        
+        alert('Verification email sent! Please check your inbox and verify your email to complete sign-up.');
         updateUserUI();
       })
       .catch(error => {
         errorDiv.textContent = error.message;
+      });
+  }
+
+  function sendEmailVerification(user) {
+    const { sendEmailVerification } = window.firebase;
+    sendEmailVerification(user)
+      .then(() => {
+        console.log('Verification email sent');
+      })
+      .catch(error => {
+        console.error('Error sending verification email:', error);
       });
   }
 
@@ -1033,7 +1051,6 @@
     } else {
       alert('Share not supported on this device');
     }
-  
 
   function shareCurrentPage() {
     const title = currentPageMetadata.title || document.querySelector('h1')?.innerText || document.title;
@@ -1122,7 +1139,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
   import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
   
   const firebaseConfig = {
@@ -1149,7 +1166,8 @@
     set,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    signOut
+    signOut,
+    sendEmailVerification
   };
   
   // ===== CHECK AUTH STATE ON LOAD =====
