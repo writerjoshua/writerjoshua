@@ -77,9 +77,15 @@
       <h2>Edit Profile</h2>
       <input type="text" id="editUsername" placeholder="Username" class="auth-input">
       <div class="emoji-picker-container">
-        <label>Choose Avatar:</label>
-        <div id="editEmojiPicker" class="emoji-picker"></div>
-        <input type="hidden" id="editSelectedEmoji" value="😊">
+        <label>Avatar Style:</label>
+        <select id="avatarStyle" class="auth-input">
+          <option value="retro">Retro 8-bit</option>
+          <option value="identicon">Geometric Pattern</option>
+          <option value="monsterid">Monster</option>
+          <option value="wavatar">Face</option>
+          <option value="robohash">Robot</option>
+          <option value="blank">Blank</option>
+        </select>
       </div>
       <textarea id="editBio" placeholder="Bio (200 characters max)" class="auth-input" maxlength="200"></textarea>
       <button onclick="updateProfile()" class="auth-btn">Save Profile</button>
@@ -719,7 +725,9 @@
   }
   const allEmojis = ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😌','😍','🥰','😘','😗','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤮','🤐','🤮','🤢','🤮','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖','😺','😸','😹','😻','😼','😽','🙀','😿','😾','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','💕','💞','💓','💗','💖','💘','💝','💟','👋','🤚','🖐️','✋','🖖','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🤜','🤛','🦶','🦵','🦾','🦿','💪'];
 
-  // ===== ADMIN CONFIGURATION =====
+  // ===== USER STATE =====
+  let currentUser = null;
+  let currentUserProfile = null;
   const ADMIN_EMAILS = ['connect@writerjoshua.com', 'artscience84@icloud.com'];
 
   function isAdmin(email) {
@@ -731,9 +739,6 @@
     document.getElementById('authModal').style.display = 'flex';
     document.getElementById('signInTab').style.display = 'block';
     document.getElementById('signUpTab').style.display = 'none';
-    setTimeout(() => {
-      initEmojiPicker('emojiPicker', 'selectedEmoji');
-    }, 100);
   }
 
   function closeAuthModal() {
@@ -746,11 +751,8 @@
     if (!currentUser) return;
     document.getElementById('profileModal').style.display = 'flex';
     document.getElementById('editUsername').value = currentUserProfile?.username || '';
-    document.getElementById('editSelectedEmoji').value = currentUserProfile?.avatar || '😊';
+    document.getElementById('avatarStyle').value = currentUserProfile?.avatar_style || 'retro';
     document.getElementById('editBio').value = currentUserProfile?.bio || '';
-    setTimeout(() => {
-      initEmojiPicker('editEmojiPicker', 'editSelectedEmoji');
-    }, 100);
   }
 
   function closeProfileModal() {
@@ -766,27 +768,6 @@
   function switchToSignIn() {
     document.getElementById('signUpTab').style.display = 'none';
     document.getElementById('signInTab').style.display = 'block';
-  }
-
-  function initEmojiPicker(containerId, inputId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = ''; // Clear first
-    const selectedValue = document.getElementById(inputId).value;
-    
-    allEmojis.forEach(emoji => {
-      const btn = document.createElement('button');
-      btn.textContent = emoji;
-      btn.className = 'emoji-btn';
-      if (emoji === selectedValue) btn.classList.add('selected');
-      
-      btn.onclick = (e) => {
-        e.preventDefault();
-        document.getElementById(inputId).value = emoji;
-        document.querySelectorAll(`#${containerId} .emoji-btn`).forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-      };
-      container.appendChild(btn);
-    });
   }
 
   // ===== AUTH FUNCTIONS =====
@@ -827,44 +808,18 @@
       .then(userCredential => {
         currentUser = userCredential.user;
         const role = isAdmin(email) ? 'Admin' : 'User';
-        const gravatarUrl = `https://www.gravatar.com/avatar/${md5(email.toLowerCase())}?d=identicon`;
+        const gravatarUrl = `https://www.gravatar.com/avatar/${md5(email.toLowerCase())}?d=retro`;
         
         currentUserProfile = { 
           username, 
           avatar: gravatarUrl,
-          avatar_type: 'gravatar',
+          avatar_style: 'retro',
           bio: '',
           email,
           role,
           created_at: Date.now()
         };
         
-        saveUserProfile(currentUser.uid, currentUserProfile);
-        closeAuthModal();
-        updateUserUI();
-      })
-      .catch(error => {
-        errorDiv.textContent = error.message;
-      });
-  }
-      .then(userCredential => {
-        currentUser = userCredential.user;
-        
-        // Check if user is admin
-        const adminEmails = ['connect@writerjoshua.com', 'artscience84@icloud.com'];
-        const isAdmin = adminEmails.includes(email);
-        const role = isAdmin ? 'Admin' : 'User';
-        
-        // Use Gravatar
-        const gravatarUrl = generateGravatarUrl(email);
-        
-        currentUserProfile = { 
-          username, 
-          avatar: gravatarUrl,
-          bio: '',
-          email,
-          role
-        };
         saveUserProfile(currentUser.uid, currentUserProfile);
         closeAuthModal();
         updateUserUI();
@@ -891,10 +846,18 @@
     if (!currentUser) return;
     
     const username = document.getElementById('editUsername').value || currentUserProfile.username;
-    const avatar = document.getElementById('editSelectedEmoji').value;
+    const avatarStyle = document.getElementById('avatarStyle').value;
     const bio = document.getElementById('editBio').value;
+    const gravatarUrl = `https://www.gravatar.com/avatar/${md5(currentUser.email.toLowerCase())}?d=${avatarStyle}`;
 
-    currentUserProfile = { ...currentUserProfile, username, avatar, bio };
+    currentUserProfile = { 
+      ...currentUserProfile, 
+      username, 
+      avatar_style: avatarStyle,
+      avatar: gravatarUrl,
+      bio 
+    };
+    
     saveUserProfile(currentUser.uid, currentUserProfile);
     closeProfileModal();
     updateUserUI();
@@ -1038,21 +1001,6 @@
   }
 
   function renderLikesAndComments(contentId, contentType) {
-    if (!currentUser) {
-      return `
-        <div class="interactions">
-          <div class="likes-section">
-            <button class="like-btn" onclick="openAuthModal()">🤍 Like</button>
-            <span class="like-count">0 likes</span>
-          </div>
-          <div class="comments-section">
-            <h4>Comments</h4>
-            <p class="comment-prompt"><a onclick="openAuthModal()">Sign in</a> to like and comment</p>
-          </div>
-        </div>
-      `;
-    }
-    
     return `
       <div class="interactions">
         <div class="likes-section">
@@ -1085,7 +1033,7 @@
     } else {
       alert('Share not supported on this device');
     }
-  }
+  
 
   function shareCurrentPage() {
     const title = currentPageMetadata.title || document.querySelector('h1')?.innerText || document.title;
