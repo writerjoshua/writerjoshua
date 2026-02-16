@@ -10,7 +10,7 @@ function loadMarkdown(page) {
     return;
   }
 
-  fetch(`./content/${page}.md`)
+  fetch(`./assets/pages/${page}.md`)
     .then(response => {
       if (!response.ok) throw new Error('Page not found');
       return response.text();
@@ -54,7 +54,7 @@ function loadJSON(filename, type) {
     return;
   }
 
-  fetch(`./content/${filename}.json`)
+  fetch(`./ assets/pages/${filename}.json`)
     .then(response => {
       if (!response.ok) throw new Error('Data not found');
       return response.json();
@@ -122,7 +122,14 @@ function handleRoute() {
     loadJSON('archive', 'archive');
   } else if (page === 'projects') {
     loadJSON('projects', 'projects');
+  } else if (page.match(/^\d{4}-\d{2}-\d{2}-/)) {
+    // Blog post: YYYY-MM-DD-slug format
+    const year = page.substring(0, 4);
+    const month = page.substring(5, 7);
+    const slug = page.substring(11); // Skip "YYYY-MM-DD-"
+    loadMarkdown(`../../../blog/${year}/${month}-${page.substring(5)}`);
   } else {
+    // Regular page
     loadMarkdown(page);
   }
 
