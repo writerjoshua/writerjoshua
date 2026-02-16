@@ -434,7 +434,7 @@
           <div class="jot">
             <h2>${escapeHtml(jot.title)}</h2>
             <p class="jot-meta">${formatDateTime(jot.date, jot.time)}</p>
-            <p>${escapeHtml(jot.content)}</p>
+            ${md.render(jot.content)}
             ${jot.image ? `<img src="${getImagePath(jot.image)}" alt="${escapeHtml(jot.title)}" class="jot-image">` : ''}
           </div>
         `;
