@@ -4,19 +4,19 @@
     {
       "title": "SeeJoshsPhotos",
       "slug": "seejoshsphotos",
-      "image": "./assets/media/writerjoshua.jpg",
+      "image": "./assets/media/joshua-lucero-miami-nikon.jpg",
       "excerpt": "Photography and Multimedia"
     },
     {
       "title": "SoulSeesBest",
       "slug": "soulseesbest",
-      "image": "./assets/media/writerjoshua.jpg",
+      "image": "./assets/media/soulseesbest-logo.png",
       "excerpt": "IDM Electronica Music Rooted in the Southwestern US by a Man Whose Soul Sees Better Than His Eyes Do"
     },
     {
       "title": "AI Architecture Lab",
       "slug": "ai-architecture-lab",
-      "image": "./assets/media/writerjoshua.jpg",
+      "image": "./assets/media/slc-int-art.jpeg",
       "excerpt": "Building with AI Architecture with a focus on Token Efficiency, Sustainability, and Best Practices for the Future of the Field"
     },
     {
@@ -26,6 +26,6 @@
       "excerpt": "Romantic Poetry and Prose in a WebApp by American Romance Writer, Beau Holliday"
     }
   ],
-  "outro": "<div style="text-align: center;">[Contact](index.html?page=contact) | [Cash App](https://cash.app/$WriterJoshua) | [Venmo](https://venmo.com/WriterJoshua) | [PayPal](https://paypal.me/WriterJoshua)",
-  "outroImage": "./assets/media/projects-header.jpg"</div>
+  "outro": "[Contact](index.html?page=contact) | [Cash App](https://cash.app/$WriterJoshua) | [Venmo](https://venmo.com/WriterJoshua) | [PayPal](https://paypal.me/WriterJoshua)",
+  "outroImage": "./assets/media/projects-header.jpg"
 }

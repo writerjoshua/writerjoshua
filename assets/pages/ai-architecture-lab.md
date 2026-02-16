@@ -2,16 +2,10 @@
 title: AI Architecture Lab
 date: 2026-02-05
 excerpt: This living repo documents academic exploration of AI architecture, token efficiency, and prompt engineering best practices.
-image: assets/media/writerjoshua.jpg
+image: assets/media/slc-int-art.jpeg
 twitter-title: "AI Architecture Lab"
 twitter-description: ":#wj_ai: This living repo documents academic exploration of AI architecture, token efficiency, and prompt engineering best practices."
 keywords: "Joshua Lucero, @JoshWritesWell, ai, blog, claude, writerjoshua, technology, computers, claude, haiku, token efficiency, sustainability, anthropic, google, microsoft, visual code studio, github, repo, academic, archive, prompt engineer"
----
-
-# AI Architecture Lab
-
-## Building efficient, transparent AI systems in the Generative Artificial Intelligence space, with a primary focus on efficiency, sustainability, and ethics.
-
 ---
 
 Early in 2026, I became drawn back to the world of AI Chatbots. After following the markets, it was hard not to be aware of the massive growth potential of AI. While I had heard many of the names, it wasn't until I started reading Karen Hao's Empire of AI, that I became more aware of the players. I learned that Anthropic was committed to more sustainable, ethical, and efficient AI development and I was instantly attracted to their Claude model. 
