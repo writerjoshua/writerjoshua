@@ -823,7 +823,30 @@
       return;
     }
 
-    window.firebase.createUserWithEmailAndPassword(email, password)
+    window.firebase.auth.createUserWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        currentUser = userCredential.user;
+        const role = isAdmin(email) ? 'Admin' : 'User';
+        const gravatarUrl = `https://www.gravatar.com/avatar/${md5(email.toLowerCase())}?d=identicon`;
+        
+        currentUserProfile = { 
+          username, 
+          avatar: gravatarUrl,
+          avatar_type: 'gravatar',
+          bio: '',
+          email,
+          role,
+          created_at: Date.now()
+        };
+        
+        saveUserProfile(currentUser.uid, currentUserProfile);
+        closeAuthModal();
+        updateUserUI();
+      })
+      .catch(error => {
+        errorDiv.textContent = error.message;
+      });
+  }
       .then(userCredential => {
         currentUser = userCredential.user;
         
@@ -1015,6 +1038,21 @@
   }
 
   function renderLikesAndComments(contentId, contentType) {
+    if (!currentUser) {
+      return `
+        <div class="interactions">
+          <div class="likes-section">
+            <button class="like-btn" onclick="openAuthModal()">🤍 Like</button>
+            <span class="like-count">0 likes</span>
+          </div>
+          <div class="comments-section">
+            <h4>Comments</h4>
+            <p class="comment-prompt"><a onclick="openAuthModal()">Sign in</a> to like and comment</p>
+          </div>
+        </div>
+      `;
+    }
+    
     return `
       <div class="interactions">
         <div class="likes-section">
@@ -1024,14 +1062,10 @@
         
         <div class="comments-section">
           <h4>Comments</h4>
-          ${currentUser ? `
-            <div class="comment-input-group">
-              <input type="text" id="comment-input-${contentId}" placeholder="Add a comment..." class="comment-input" maxlength="500">
-              <button onclick="addComment('${contentId}', '${contentType}')" class="comment-btn">Post</button>
-            </div>
-          ` : `
-            <p class="comment-prompt"><a onclick="openAuthModal()">Sign in</a> to comment</p>
-          `}
+          <div class="comment-input-group">
+            <input type="text" id="comment-input-${contentId}" placeholder="Add a comment..." class="comment-input" maxlength="500">
+            <button onclick="addComment('${contentId}', '${contentType}')" class="comment-btn">Post</button>
+          </div>
           <div id="comments-${contentId}" class="comments-list"></div>
         </div>
       </div>
@@ -1051,6 +1085,7 @@
     } else {
       alert('Share not supported on this device');
     }
+  }
 
   function shareCurrentPage() {
     const title = currentPageMetadata.title || document.querySelector('h1')?.innerText || document.title;
@@ -1166,10 +1201,7 @@
     signOut, 
     ref, 
     onValue, 
-    set,
-    createUserWithEmailAndPassword: auth.createUserWithEmailAndPassword.bind(auth),
-    signInWithEmailAndPassword: auth.signInWithEmailAndPassword.bind(auth),
-    push: (path) => window.firebase.database && window.firebase.database.ref ? window.firebase.database.ref(path).push() : null
+    set
   };
   
   // ===== CHECK AUTH STATE ON LOAD =====
