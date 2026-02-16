@@ -46,27 +46,19 @@
   <div id="authModal" class="modal" style="display:none;">
     <div class="modal-content">
       <span class="modal-close" onclick="closeAuthModal()">&times;</span>
-      
-      <!-- Sign In Tab -->
-      <div id="signInTab" class="auth-tab">
-        <h2>Sign In</h2>
-        <input type="email" id="signInEmail" placeholder="Email" class="auth-input">
-        <input type="password" id="signInPassword" placeholder="Password" class="auth-input">
-        <button onclick="signIn()" class="auth-btn">Sign In</button>
-        <p class="auth-toggle">New user? <a onclick="switchToSignUp()">Sign up</a></p>
-        <div id="signInError" class="auth-error"></div>
+      <h2>Sign In</h2>
+      <div class="social-auth">
+        <button onclick="signInWithGoogle()" class="social-btn google-btn">
+          <span>🔍</span> Sign in with Google
+        </button>
+        <button onclick="signInWithTwitter()" class="social-btn twitter-btn">
+          <span>𝕏</span> Sign in with X
+        </button>
+        <button onclick="signInAnon()" class="social-btn anon-btn">
+          <span>👤</span> Continue Anonymously
+        </button>
       </div>
-      
-      <!-- Sign Up Tab -->
-      <div id="signUpTab" class="auth-tab" style="display:none;">
-        <h2>Sign Up</h2>
-        <input type="email" id="signUpEmail" placeholder="Email" class="auth-input">
-        <input type="password" id="signUpPassword" placeholder="Password" class="auth-input">
-        <input type="text" id="username" placeholder="Username" class="auth-input">
-        <button onclick="signUp()" class="auth-btn">Sign Up</button>
-        <p class="auth-toggle">Already have an account? <a onclick="switchToSignIn()">Sign in</a></p>
-        <div id="signUpError" class="auth-error"></div>
-      </div>
+      <div id="authError" class="auth-error"></div>
     </div>
   </div>
 
@@ -737,14 +729,11 @@
   // ===== MODAL FUNCTIONS =====
   function openAuthModal() {
     document.getElementById('authModal').style.display = 'flex';
-    document.getElementById('signInTab').style.display = 'block';
-    document.getElementById('signUpTab').style.display = 'none';
   }
 
   function closeAuthModal() {
     document.getElementById('authModal').style.display = 'none';
-    document.getElementById('signInError').textContent = '';
-    document.getElementById('signUpError').textContent = '';
+    document.getElementById('authError').textContent = '';
   }
 
   function openProfileModal() {
@@ -761,79 +750,86 @@
   }
 
   function switchToSignUp() {
-    document.getElementById('signInTab').style.display = 'none';
-    document.getElementById('signUpTab').style.display = 'block';
+    // No longer needed with social auth
   }
 
   function switchToSignIn() {
-    document.getElementById('signUpTab').style.display = 'none';
-    document.getElementById('signInTab').style.display = 'block';
+    // No longer needed with social auth
   }
 
-  // ===== AUTH FUNCTIONS =====
-  function signIn() {
-    const email = document.getElementById('signInEmail').value;
-    const password = document.getElementById('signInPassword').value;
-    const errorDiv = document.getElementById('signInError');
-
-    if (!email || !password) {
-      errorDiv.textContent = 'Please enter email and password';
-      return;
-    }
-
-    window.firebase.signInWithEmailAndPassword(email, password)
+  // ===== SOCIAL AUTH FUNCTIONS =====
+  function signInWithGoogle() {
+    const provider = new window.firebase.GoogleAuthProvider();
+    window.firebase.signInWithPopup(window.firebase.auth, provider)
       .then(userCredential => {
         currentUser = userCredential.user;
-        loadUserProfile(currentUser.uid);
+        createOrLoadUserProfile(currentUser);
         closeAuthModal();
         updateUserUI();
       })
       .catch(error => {
-        errorDiv.textContent = error.message;
+        document.getElementById('authError').textContent = error.message;
       });
   }
 
-  function signUp() {
-    const email = document.getElementById('signUpEmail').value;
-    const password = document.getElementById('signUpPassword').value;
-    const username = document.getElementById('username').value.trim();
-    const errorDiv = document.getElementById('signUpError');
-
-    if (!email || !password || !username) {
-      errorDiv.textContent = 'Please fill in all fields';
-      return;
-    }
-
-    window.firebase.createUserWithEmailAndPassword(email, password)
+  function signInWithTwitter() {
+    const provider = new window.firebase.TwitterAuthProvider();
+    window.firebase.signInWithPopup(window.firebase.auth, provider)
       .then(userCredential => {
         currentUser = userCredential.user;
-        
-        // Send email verification
-        sendEmailVerification(currentUser);
-        
-        const role = isAdmin(email) ? 'Admin' : 'User';
-        const gravatarUrl = `https://www.gravatar.com/avatar/${md5(email.toLowerCase())}?d=retro`;
-        
-        currentUserProfile = { 
-          username, 
+        createOrLoadUserProfile(currentUser);
+        closeAuthModal();
+        updateUserUI();
+      })
+      .catch(error => {
+        document.getElementById('authError').textContent = error.message;
+      });
+  }
+
+  function signInAnon() {
+    window.firebase.signInAnonymously(window.firebase.auth)
+      .then(userCredential => {
+        currentUser = userCredential.user;
+        currentUserProfile = {
+          username: 'Anonymous',
+          avatar: `https://www.gravatar.com/avatar/anonymous?d=retro`,
+          avatar_style: 'retro',
+          bio: '',
+          email: 'anonymous@writerjoshua.local',
+          role: 'User',
+          is_anonymous: true,
+          created_at: Date.now()
+        };
+        closeAuthModal();
+        updateUserUI();
+      })
+      .catch(error => {
+        document.getElementById('authError').textContent = error.message;
+      });
+  }
+
+  function createOrLoadUserProfile(user) {
+    // Check if profile exists
+    const { ref, onValue } = window.firebase;
+    onValue(ref(window.firebase.database, `users/${user.uid}`), (snapshot) => {
+      if (snapshot.exists()) {
+        // Profile exists, load it
+        currentUserProfile = snapshot.val();
+      } else {
+        // New user, create profile
+        const gravatarUrl = `https://www.gravatar.com/avatar/${md5(user.email.toLowerCase())}?d=retro`;
+        currentUserProfile = {
+          username: user.displayName || user.email.split('@')[0],
           avatar: gravatarUrl,
           avatar_style: 'retro',
           bio: '',
-          email,
-          role,
-          email_verified: false,
+          email: user.email,
+          role: isAdmin(user.email) ? 'Admin' : 'User',
           created_at: Date.now()
         };
-        
-        saveUserProfile(currentUser.uid, currentUserProfile);
-        closeAuthModal();
-        
-        alert('Verification email sent! Please check your inbox and verify your email to complete sign-up.');
-        updateUserUI();
-      })
-      .catch(error => {
-        errorDiv.textContent = error.message;
-      });
+        saveUserProfile(user.uid, currentUserProfile);
+      }
+    }, { onlyOnce: true });
   }
 
   function sendEmailVerification(user) {
@@ -1053,17 +1049,29 @@
     }
 
   function shareCurrentPage() {
-    const title = currentPageMetadata.title || document.querySelector('h1')?.innerText || document.title;
+    // Don't allow share if modals are open
+    if (document.getElementById('authModal').style.display !== 'none' || 
+        document.getElementById('profileModal').style.display !== 'none' ||
+        document.getElementById('adminModal').style.display !== 'none') {
+      return;
+    }
+    
+    if (!currentPageMetadata) {
+      alert('Page not fully loaded. Please try again.');
+      return;
+    }
+    
+    const title = currentPageMetadata.title || document.title;
     const description = currentPageMetadata.description || '';
     const url = window.location.href;
-    const text = description ? `${description}` : title;
+    const text = description || title;
 
     if (navigator.share) {
       navigator.share({ 
         title: title,
         text: text,
         url: url 
-      }).catch(err => console.log('Share failed:', err));
+      }).catch(err => console.log('Share cancelled or failed'));
     } else {
       alert('Share not supported on this device');
     }
@@ -1139,7 +1147,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInWithPopup, GoogleAuthProvider, TwitterAuthProvider, signInAnonymously, sendEmailVerification } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
   import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
   
   const firebaseConfig = {
@@ -1167,7 +1175,11 @@
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signOut,
-    sendEmailVerification
+    sendEmailVerification,
+    signInWithPopup,
+    GoogleAuthProvider,
+    TwitterAuthProvider,
+    signInAnonymously
   };
   
   // ===== CHECK AUTH STATE ON LOAD =====

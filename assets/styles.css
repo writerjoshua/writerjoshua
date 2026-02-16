@@ -579,6 +579,60 @@ footer {
   background: var(--bg);
 }
 
+/* ===== SOCIAL AUTH ===== */
+.social-auth {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+  margin: var(--sp-lg) 0;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-md);
+  padding: var(--sp-md) var(--sp-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-light);
+  color: var(--text);
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--trans);
+}
+
+.social-btn:hover {
+  background: var(--bg);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.google-btn {
+  border-color: #4285F4;
+}
+
+.google-btn:hover {
+  background: rgba(66, 133, 244, 0.1);
+}
+
+.twitter-btn {
+  border-color: #000;
+}
+
+.twitter-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.anon-btn {
+  border-color: var(--primary);
+}
+
+.anon-btn:hover {
+  background: var(--primary-light);
+}
+
 .auth-btn {
   width: 100%;
   padding: var(--sp-md);
