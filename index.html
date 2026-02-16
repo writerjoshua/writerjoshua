@@ -734,17 +734,6 @@
     }
   }
 
-  // ===== CHECK AUTH STATE ON LOAD =====
-  window.firebase.auth.onAuthStateChanged((user) => {
-    if (user) {
-      currentUser = user;
-      loadUserProfile(user.uid);
-    } else {
-      currentUser = null;
-      currentUserProfile = null;
-      updateUserUI();
-    }
-  });
   function shareCurrentPage() {
     const title = currentPageMetadata.title || document.querySelector('h1')?.innerText || document.title;
     const description = currentPageMetadata.description || '';
@@ -811,6 +800,18 @@
   const database = getDatabase(app);
   
   window.firebase = { auth, database, signInWithPopup, GoogleAuthProvider, signOut, ref, onValue, set };
+  
+  // ===== CHECK AUTH STATE ON LOAD =====
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      currentUser = user;
+      loadUserProfile(user.uid);
+    } else {
+      currentUser = null;
+      currentUserProfile = null;
+      updateUserUI();
+    }
+  });
 </script>
 </body>
 </html>

@@ -469,18 +469,19 @@ footer {
 }
 
 .user-btn {
-  background: var(--primary);
+  background: #999;
   color: #fff;
-  border: none;
+  border: 2px solid var(--primary);
   padding: var(--sp-sm) var(--sp-md);
   border-radius: var(--radius);
   cursor: pointer;
   font-weight: 500;
-  transition: background var(--trans);
+  transition: all var(--trans);
 }
 
 .user-btn:hover {
-  background: var(--primary-hover);
+  background: #777;
+  border-color: var(--primary-hover);
 }
 
 .user-menu {
