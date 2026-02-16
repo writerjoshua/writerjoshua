@@ -844,7 +844,7 @@
   }
 
   function signOutUser() {
-    window.firebase.signOut()
+    window.firebase.signOut(window.firebase.auth)
       .then(() => {
         currentUser = null;
         currentUserProfile = null;
@@ -1047,6 +1047,7 @@
     } else {
       alert('Share not supported on this device');
     }
+  }
 
   function shareCurrentPage() {
     // Don't allow share if modals are open
