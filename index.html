@@ -1122,7 +1122,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
   import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
   
   const firebaseConfig = {
@@ -1147,9 +1147,9 @@
     ref, 
     onValue, 
     set,
-    signInWithEmailAndPassword: (email, password) => auth.signInWithEmailAndPassword(email, password),
-    createUserWithEmailAndPassword: (email, password) => auth.createUserWithEmailAndPassword(email, password),
-    signOut: () => auth.signOut()
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut
   };
   
   // ===== CHECK AUTH STATE ON LOAD =====
