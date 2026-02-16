@@ -24,6 +24,7 @@
       <div id="userMenu" style="display:none;" class="user-menu">
         <div id="userInfo" class="user-info"></div>
         <button onclick="openProfileModal()" class="user-btn">Edit Profile</button>
+        <button id="adminBtn" onclick="openAdminPanel()" class="user-btn" style="display:none; background: #ff6b00;">Admin</button>
       </div>
     </div>
   </header>
@@ -61,13 +62,7 @@
         <h2>Sign Up</h2>
         <input type="email" id="signUpEmail" placeholder="Email" class="auth-input">
         <input type="password" id="signUpPassword" placeholder="Password" class="auth-input">
-        <input type="text" id="username" placeholder="Username (optional)" class="auth-input">
-        <div class="emoji-picker-container">
-          <label>Choose Avatar:</label>
-          <div id="emojiPicker" class="emoji-picker"></div>
-          <input type="hidden" id="selectedEmoji" value="😊">
-        </div>
-        <textarea id="bio" placeholder="Bio (200 characters max)" class="auth-input" maxlength="200"></textarea>
+        <input type="text" id="username" placeholder="Username" class="auth-input">
         <button onclick="signUp()" class="auth-btn">Sign Up</button>
         <p class="auth-toggle">Already have an account? <a onclick="switchToSignIn()">Sign in</a></p>
         <div id="signUpError" class="auth-error"></div>
@@ -90,6 +85,28 @@
       <button onclick="updateProfile()" class="auth-btn">Save Profile</button>
       <button onclick="signOutUser()" class="auth-btn auth-btn-danger">Sign Out</button>
       <div id="profileError" class="auth-error"></div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL MODAL -->
+  <div id="adminModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeAdminModal()">&times;</span>
+      <h2>Admin Panel</h2>
+      <div id="adminTabs" class="admin-tabs">
+        <button class="admin-tab-btn active" onclick="switchAdminTab('users')">Users</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('comments')">Comments</button>
+      </div>
+      
+      <div id="usersTab" class="admin-tab-content">
+        <h3>User Management</h3>
+        <div id="usersList" class="users-list"></div>
+      </div>
+      
+      <div id="commentsTab" class="admin-tab-content" style="display:none;">
+        <h3>Moderate Comments</h3>
+        <div id="commentsList" class="comments-moderation"></div>
+      </div>
     </div>
   </div>
 
@@ -566,12 +583,148 @@
     }
   }
 
-  // ===== EMOJI LIST =====
+  // ===== MD5 HASH FOR GRAVATAR =====
+  function md5(str) {
+    // Proper MD5 implementation for Gravatar
+    let x = [], s = str.toLowerCase().trim(), i = 0;
+    while (i < s.length) x[i >> 2] |= s.charCodeAt(i) << ((i++ & 3) << 3);
+    x[s.length >> 2] |= 0x80 << (((s.length) & 3) << 3);
+    x[(((s.length + 8) >> 6) << 4) + 14] = s.length << 3;
+    
+    for (i = 1, s = 0; i < x.length; i += 16) {
+      let a = x[i - 1], b = -271733879, c = -1732584194, d = 271733878;
+      for (let j = 0; j < 64; j++) {
+        let f, g;
+        if (j < 16) f = (b & c) | (~b & d), g = j;
+        else if (j < 32) f = (d & b) | (~d & c), g = 5 * j + 1;
+        else if (j < 48) f = b ^ c ^ d, g = 3 * j + 5;
+        else f = c ^ (b | ~d), g = 7 * j;
+        let t = d;
+        d = c;
+        c = b;
+        b = b + ((a << 5 | a >> 27) + f + 0x67452301 + [0,0,0,0,271733879,1732584193,0,0,1732584194,0,0,0,271733878,0,0,0][g >> 4] + x[i + (g & 15)]) | 0;
+        a = t;
+      }
+      x[i - 1] = a + x[i - 1] | 0;
+    }
+    return [x[1], x[2], x[3], x[4]].map(x => ((x >> 24) & 255).toString(16).padStart(2, '0') + ((x >> 16) & 255).toString(16).padStart(2, '0') + ((x >> 8) & 255).toString(16).padStart(2, '0') + (x & 255).toString(16).padStart(2, '0')).join('');
+  }
+
+  // ===== ADMIN FUNCTIONS =====
+  function openAdminPanel() {
+    if (!currentUser || !isAdmin(currentUser.email)) return;
+    document.getElementById('adminModal').style.display = 'flex';
+    loadAllUsers();
+    loadAllComments();
+  }
+
+  function closeAdminModal() {
+    document.getElementById('adminModal').style.display = 'none';
+  }
+
+  function switchAdminTab(tab) {
+    document.querySelectorAll('.admin-tab-content').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tab + 'Tab').style.display = 'block';
+    event.target.classList.add('active');
+  }
+
+  function loadAllUsers() {
+    const { ref, onValue } = window.firebase;
+    onValue(ref(window.firebase.database, 'users'), (snapshot) => {
+      const users = snapshot.val() || {};
+      const usersList = document.getElementById('usersList');
+      usersList.innerHTML = '';
+      
+      Object.entries(users).forEach(([uid, user]) => {
+        const userEl = document.createElement('div');
+        userEl.className = 'user-item';
+        userEl.innerHTML = `
+          <div class="user-item-header">
+            <span>${user.avatar ? `<img src="${user.avatar}" class="user-avatar-thumb">` : '👤'}</span>
+            <span class="user-item-name">${escapeHtml(user.username)}</span>
+            <span class="user-item-role">${user.role || 'User'}</span>
+          </div>
+          <p class="user-item-email">${user.email}</p>
+          <div class="user-item-actions">
+            <button onclick="changeUserRole('${uid}', 'Admin')" class="admin-action-btn">Make Admin</button>
+            <button onclick="changeUserRole('${uid}', 'User')" class="admin-action-btn">Make User</button>
+            <button onclick="deactivateUser('${uid}')" class="admin-action-btn danger">Deactivate</button>
+          </div>
+        `;
+        usersList.appendChild(userEl);
+      });
+    });
+  }
+
+  function loadAllComments() {
+    const { ref, onValue } = window.firebase;
+    const commentsList = document.getElementById('commentsList');
+    commentsList.innerHTML = '';
+    
+    // Load comments from both jots and blog posts
+    ['jots', 'blog-posts'].forEach(type => {
+      onValue(ref(window.firebase.database, type), (snapshot) => {
+        const items = snapshot.val() || {};
+        Object.entries(items).forEach(([itemId, item]) => {
+          const comments = item.comments || {};
+          Object.entries(comments).forEach(([commentId, comment]) => {
+            const commentEl = document.createElement('div');
+            commentEl.className = 'comment-item';
+            commentEl.innerHTML = `
+              <div class="comment-item-header">
+                <span class="comment-item-user">${escapeHtml(comment.username)}</span>
+                <span class="comment-item-type">${type}</span>
+                <span class="comment-item-date">${new Date(comment.timestamp).toLocaleDateString()}</span>
+              </div>
+              <p class="comment-item-text">${escapeHtml(comment.text)}</p>
+              <div class="comment-item-actions">
+                <button onclick="flagComment('${type}', '${itemId}', '${commentId}')" class="admin-action-btn">Flag</button>
+                <button onclick="deleteComment('${type}', '${itemId}', '${commentId}')" class="admin-action-btn danger">Delete</button>
+              </div>
+            `;
+            commentsList.appendChild(commentEl);
+          });
+        });
+      });
+    });
+  }
+
+  function changeUserRole(uid, newRole) {
+    const { ref, set } = window.firebase;
+    set(ref(window.firebase.database, `users/${uid}/role`), newRole);
+    alert(`User role changed to ${newRole}`);
+  }
+
+  function deactivateUser(uid) {
+    if (confirm('Are you sure? This will deactivate the user.')) {
+      const { ref, set } = window.firebase;
+      set(ref(window.firebase.database, `users/${uid}/active`), false);
+      alert('User deactivated');
+    }
+  }
+
+  function deleteComment(type, itemId, commentId) {
+    if (confirm('Delete this comment?')) {
+      const { ref, set } = window.firebase;
+      set(ref(window.firebase.database, `${type}/${itemId}/comments/${commentId}`), null);
+      alert('Comment deleted');
+    }
+  }
+
+  function flagComment(type, itemId, commentId) {
+    const { ref, set } = window.firebase;
+    set(ref(window.firebase.database, `${type}/${itemId}/comments/${commentId}/flagged`), true);
+    alert('Comment flagged for review');
+  }
   const allEmojis = ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😌','😍','🥰','😘','😗','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤮','🤐','🤮','🤢','🤮','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖','😺','😸','😹','😻','😼','😽','🙀','😿','😾','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','💕','💞','💓','💗','💖','💘','💝','💟','👋','🤚','🖐️','✋','🖖','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🤜','🤛','🦶','🦵','🦾','🦿','💪'];
 
-  // ===== USER STATE =====
-  let currentUser = null;
-  let currentUserProfile = null;
+  // ===== ADMIN CONFIGURATION =====
+  const ADMIN_EMAILS = ['connect@writerjoshua.com', 'artscience84@icloud.com'];
+
+  function isAdmin(email) {
+    return ADMIN_EMAILS.includes(email);
+  }
 
   // ===== MODAL FUNCTIONS =====
   function openAuthModal() {
@@ -662,20 +815,33 @@
   function signUp() {
     const email = document.getElementById('signUpEmail').value;
     const password = document.getElementById('signUpPassword').value;
-    let username = document.getElementById('username').value || `User_${Math.random().toString(36).substring(7)}`;
-    const avatar = document.getElementById('selectedEmoji').value;
-    const bio = document.getElementById('bio').value;
+    const username = document.getElementById('username').value.trim();
     const errorDiv = document.getElementById('signUpError');
 
-    if (!email || !password) {
-      errorDiv.textContent = 'Please enter email and password';
+    if (!email || !password || !username) {
+      errorDiv.textContent = 'Please fill in all fields';
       return;
     }
 
-    window.firebase.auth.createUserWithEmailAndPassword(email, password)
+    window.firebase.createUserWithEmailAndPassword(email, password)
       .then(userCredential => {
         currentUser = userCredential.user;
-        currentUserProfile = { username, avatar, bio, email };
+        
+        // Check if user is admin
+        const adminEmails = ['connect@writerjoshua.com', 'artscience84@icloud.com'];
+        const isAdmin = adminEmails.includes(email);
+        const role = isAdmin ? 'Admin' : 'User';
+        
+        // Use Gravatar
+        const gravatarUrl = generateGravatarUrl(email);
+        
+        currentUserProfile = { 
+          username, 
+          avatar: gravatarUrl,
+          bio: '',
+          email,
+          role
+        };
         saveUserProfile(currentUser.uid, currentUserProfile);
         closeAuthModal();
         updateUserUI();
@@ -741,11 +907,18 @@
     const authBtn = document.getElementById('authBtn');
     const userMenu = document.getElementById('userMenu');
     const userInfo = document.getElementById('userInfo');
+    const adminBtn = document.getElementById('adminBtn');
 
     if (currentUser && currentUserProfile) {
       authBtn.style.display = 'none';
-      userMenu.style.display = 'block';
-      userInfo.innerHTML = `<div class="user-avatar">${currentUserProfile.avatar}</div><div class="user-name">${currentUserProfile.username}</div>`;
+      userMenu.style.display = 'flex';
+      userInfo.innerHTML = `<div class="user-avatar">${currentUserProfile.avatar ? `<img src="${currentUserProfile.avatar}" style="width:32px; height:32px; border-radius: 50%;">` : '👤'}</div><div class="user-name">${currentUserProfile.username}</div>`;
+      
+      if (isAdmin(currentUser.email)) {
+        adminBtn.style.display = 'block';
+      } else {
+        adminBtn.style.display = 'none';
+      }
     } else {
       authBtn.style.display = 'block';
       userMenu.style.display = 'none';
@@ -878,7 +1051,23 @@
     } else {
       alert('Share not supported on this device');
     }
-  
+
+  function shareCurrentPage() {
+    const title = currentPageMetadata.title || document.querySelector('h1')?.innerText || document.title;
+    const description = currentPageMetadata.description || '';
+    const url = window.location.href;
+    const text = description ? `${description}` : title;
+
+    if (navigator.share) {
+      navigator.share({ 
+        title: title,
+        text: text,
+        url: url 
+      }).catch(err => console.log('Share failed:', err));
+    } else {
+      alert('Share not supported on this device');
+    }
+  }
 
   // ===== ROUTE HANDLER =====
   function handleRoute() {
@@ -969,7 +1158,19 @@
   const auth = getAuth(app);
   const database = getDatabase(app);
   
-  window.firebase = { auth, database, signInWithPopup, GoogleAuthProvider, signOut, ref, onValue, set };
+  window.firebase = { 
+    auth, 
+    database, 
+    signInWithPopup, 
+    GoogleAuthProvider, 
+    signOut, 
+    ref, 
+    onValue, 
+    set,
+    createUserWithEmailAndPassword: auth.createUserWithEmailAndPassword.bind(auth),
+    signInWithEmailAndPassword: auth.signInWithEmailAndPassword.bind(auth),
+    push: (path) => window.firebase.database && window.firebase.database.ref ? window.firebase.database.ref(path).push() : null
+  };
   
   // ===== CHECK AUTH STATE ON LOAD =====
   auth.onAuthStateChanged((user) => {
