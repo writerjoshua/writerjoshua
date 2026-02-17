@@ -10,7 +10,7 @@ keywords: "SoulSeesBest, mixed media, artist, clay, paint, handcrafted, idm, ele
 
 # 🌵 IDM Experimental Electronica from the Southwest 
 
-<iframe width="100%" height="100%" src="https://www.bandlab.com/embed/?id=8586239f-e6a2-f011-8e64-6045bd354e91" allowfullscreen></iframe>
+<iframe style="border: 0; width: 100%; height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/track=3799102373/size=large/bgcol=ffffff/linkcol=7137dc/tracklist=false/artwork=small/transparent=true/" seamless><a href="https://soulseesbest.bandcamp.com/track/signal-intercept-february-2026-sampler">Signal Intercept: February 2026 (Sampler) by SoulSeesBest</a></iframe>
 
 ## Since 2009
 One of my favorite art forms has always been music. I spent most of my life listenting to music. I always wanted to make it a point to have the right song for every situation. I love a wide range of genres including country music, jazz, alternative, metal, funk, classical, and more. In the 90's, I enjoyed recording my new favorite tracks on the radio and writing down the lyrics to study them. Once I got online, I learned how to make my own music in my bedroom. I haven't made that collection available to streaming sites, yet but, I use much of it in all of my multimedia projects. 
