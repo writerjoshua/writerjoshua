@@ -19,14 +19,6 @@
       <h1>WriterJoshua</h1>
       <p>Author, Researcher, Artist</p>
     </div>
-    <div class="header-user">
-      <button id="authBtn" onclick="openAuthModal()" class="user-btn">Sign In</button>
-      <div id="userMenu" style="display:none;" class="user-menu">
-        <div id="userInfo" class="user-info"></div>
-        <button onclick="openProfileModal()" class="user-btn">Edit Profile</button>
-        <button id="adminBtn" onclick="openAdminPanel()" class="user-btn" style="display:none; background: #ff6b00;">Admin</button>
-      </div>
-    </div>
   </header>
 
   <!-- STATIC NAVIGATION -->
@@ -42,72 +34,6 @@
   <!-- DYNAMIC CONTENT AREA -->
   <main id="content"></main>
 
-  <!-- AUTH MODALS -->
-  <div id="authModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="modal-close" onclick="closeAuthModal()">&times;</span>
-      <h2>Sign In</h2>
-      <div class="social-auth">
-        <button onclick="signInWithGoogle()" class="social-btn google-btn">
-          <span>🔍</span> Sign in with Google
-        </button>
-        <button onclick="signInWithTwitter()" class="social-btn twitter-btn">
-          <span>𝕏</span> Sign in with X
-        </button>
-        <button onclick="signInAnon()" class="social-btn anon-btn">
-          <span>👤</span> Continue Anonymously
-        </button>
-      </div>
-      <div id="authError" class="auth-error"></div>
-    </div>
-  </div>
-
-  <!-- PROFILE MODAL -->
-  <div id="profileModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="modal-close" onclick="closeProfileModal()">&times;</span>
-      <h2>Edit Profile</h2>
-      <input type="text" id="editUsername" placeholder="Username" class="auth-input">
-      <div class="emoji-picker-container">
-        <label>Avatar Style:</label>
-        <select id="avatarStyle" class="auth-input">
-          <option value="retro">Retro 8-bit</option>
-          <option value="identicon">Geometric Pattern</option>
-          <option value="monsterid">Monster</option>
-          <option value="wavatar">Face</option>
-          <option value="robohash">Robot</option>
-          <option value="blank">Blank</option>
-        </select>
-      </div>
-      <textarea id="editBio" placeholder="Bio (200 characters max)" class="auth-input" maxlength="200"></textarea>
-      <button onclick="updateProfile()" class="auth-btn">Save Profile</button>
-      <button onclick="signOutUser()" class="auth-btn auth-btn-danger">Sign Out</button>
-      <div id="profileError" class="auth-error"></div>
-    </div>
-  </div>
-
-  <!-- ADMIN PANEL MODAL -->
-  <div id="adminModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="modal-close" onclick="closeAdminModal()">&times;</span>
-      <h2>Admin Panel</h2>
-      <div id="adminTabs" class="admin-tabs">
-        <button class="admin-tab-btn active" onclick="switchAdminTab('users')">Users</button>
-        <button class="admin-tab-btn" onclick="switchAdminTab('comments')">Comments</button>
-      </div>
-      
-      <div id="usersTab" class="admin-tab-content">
-        <h3>User Management</h3>
-        <div id="usersList" class="users-list"></div>
-      </div>
-      
-      <div id="commentsTab" class="admin-tab-content" style="display:none;">
-        <h3>Moderate Comments</h3>
-        <div id="commentsList" class="comments-moderation"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- STATIC FOOTER -->
   <footer>
     <img src="./assets/media/writerjoshua-banner.jpg" alt="WriterJoshua Banner" class="footer-banner" onerror="this.style.display='none';">
@@ -118,86 +44,508 @@
   </footer>
 
 <script>
-  // ===== GLOBAL STATE =====
-  window.md = window.markdownit ? window.markdownit({ 
+  // ===== MARKDOWN-IT INITIALIZATION =====
+  const md = window.markdownit ? window.markdownit({ 
     html: true,
     breaks: true 
   }) : null;
 
+  // ===== GLOBAL PAGE METADATA =====
   let currentPageMetadata = {
     title: 'WriterJoshua',
     description: 'Author, Researcher, Artist'
   };
   window.currentPageMetadata = currentPageMetadata;
 
-  let currentUser = null;
-  let currentUserProfile = null;
-
-  // ===== MODAL FUNCTIONS (EARLY DEFINITION) =====
-  function openAuthModal() {
-    document.getElementById('authModal').style.display = 'flex';
+  // ===== CACHE HELPERS =====
+  function getCachedHTML(key) {
+    try {
+      const cached = sessionStorage.getItem(key);
+      if (!cached) return null;
+      
+      const data = JSON.parse(cached);
+      return data.html || null;
+    } catch (e) {
+      console.warn('Cache read failed:', e);
+      return null;
+    }
   }
 
-  function closeAuthModal() {
-    document.getElementById('authModal').style.display = 'none';
-    document.getElementById('authError').textContent = '';
+  function setCachedHTML(key, html, expiryHours = 24) {
+    try {
+      const data = {
+        html: html,
+        timestamp: Date.now(),
+        expiryHours: expiryHours
+      };
+      sessionStorage.setItem(key, JSON.stringify(data));
+    } catch (e) {
+      console.warn('Cache write failed:', e);
+    }
   }
 
-  function openProfileModal() {
-    if (!currentUser) return;
-    document.getElementById('profileModal').style.display = 'flex';
-    document.getElementById('editUsername').value = currentUserProfile?.username || '';
-    document.getElementById('avatarStyle').value = currentUserProfile?.avatar_style || 'retro';
-    document.getElementById('editBio').value = currentUserProfile?.bio || '';
+  function isCacheExpired(key) {
+    try {
+      const cached = sessionStorage.getItem(key);
+      if (!cached) return true;
+      
+      const data = JSON.parse(cached);
+      const ageHours = (Date.now() - data.timestamp) / (1000 * 60 * 60);
+      const expiryHours = data.expiryHours || 24;
+      
+      return ageHours > expiryHours;
+    } catch (e) {
+      return true;
+    }
   }
 
-  function closeProfileModal() {
-    document.getElementById('profileModal').style.display = 'none';
-    document.getElementById('profileError').textContent = '';
+  function clearCache(keys) {
+    keys.forEach(key => {
+      try {
+        sessionStorage.removeItem(key);
+        sessionStorage.removeItem(`meta_${key.replace('cache_', '')}`);
+      } catch (e) {
+        console.warn('Cache clear failed:', e);
+      }
+    });
   }
 
-  // Share button logic
+  function detectPageRefresh() {
+    // Check if this is a refresh (not back/forward)
+    const isRefresh = performance.navigation.type === 1 || 
+                      (window.performance && window.performance.getEntriesByType('navigation')[0]?.type === 'reload');
+    
+    if (isRefresh) {
+      // Clear time-sensitive caches on refresh
+      clearCache(['cache_jots', 'cache_archive', 'cache_projects']);
+    }
+  }
+
+  // ===== UTILITIES =====
+  function getPageParam() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('page') || 'home';
+  }
+
+  function highlightActiveNav() {
+    const currentPage = getPageParam();
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const page = new URLSearchParams(link.search).get('page');
+      if (page === currentPage) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+
+  function showError(message = 'Unable to load content. Please try again.') {
+    document.getElementById('content').innerHTML = `<div class="error"><p>${escapeHtml(message)}</p></div>`;
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function formatDateTime(dateStr, timeStr) {
+    try {
+      const [year, month, day] = dateStr.split('-');
+      const [hours, minutes] = timeStr.split(':');
+      
+      const date = new Date(year, month - 1, day, hours, minutes);
+      const monthName = date.toLocaleString('default', { month: 'long' });
+      const dayNum = date.getDate();
+      const yearNum = date.getFullYear();
+      
+      const timeObj = new Date(2000, 0, 1, hours, minutes);
+      const timeFormatted = timeObj.toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'America/Los_Angeles'
+      });
+      
+      return `${monthName} ${dayNum}, ${yearNum} at ${timeFormatted} PST`;
+    } catch (e) {
+      return `${dateStr} at ${timeStr}`;
+    }
+  }
+
+  function getImagePath(imagePath) {
+    if (!imagePath) return '';
+    if (!imagePath.startsWith('./') && !imagePath.startsWith('http')) {
+      return './' + imagePath;
+    }
+    return imagePath;
+  }
+
+  function unescapeNewlines(text) {
+    if (!text) return '';
+    const unescaped = text.replace(/\\n/g, '\n');
+    console.log('Original:', text.substring(0, 100));
+    console.log('Unescaped:', unescaped.substring(0, 100));
+    return unescaped;
+  }
+
+  // ===== FRONTMATTER PARSER =====
+  function parseFrontmatter(markdown) {
+    const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
+    const match = markdown.match(frontmatterRegex);
+    
+    if (!match) {
+      return { metadata: {}, content: markdown };
+    }
+    
+    const frontmatterText = match[1];
+    const content = match[2];
+    const metadata = {};
+    
+    frontmatterText.split('\n').forEach(line => {
+      const [key, ...valueParts] = line.split(':');
+      if (key && valueParts.length) {
+        const value = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
+        metadata[key.trim()] = value;
+      }
+    });
+    
+    return { metadata, content };
+  }
+
+  // ===== META TAG INJECTION =====
+  function injectMetaTags(metadata) {
+    const head = document.head;
+    
+    if (metadata.title) {
+      document.title = `${metadata.title} | WriterJoshua`;
+    }
+    
+    document.querySelectorAll('meta[data-dynamic="true"]').forEach(tag => tag.remove());
+    
+    const metaFields = {
+      'description': 'description',
+      'excerpt': 'description',
+      'keywords': 'keywords',
+      'image': 'og:image',
+      'twitter-title': 'twitter:title',
+      'twitter-description': 'twitter:description'
+    };
+    
+    Object.entries(metaFields).forEach(([sourceKey, metaName]) => {
+      if (metadata[sourceKey]) {
+        const meta = document.createElement('meta');
+        meta.setAttribute('data-dynamic', 'true');
+        
+        if (metaName.startsWith('og:')) {
+          meta.setAttribute('property', metaName);
+        } else {
+          meta.setAttribute('name', metaName);
+        }
+        
+        meta.setAttribute('content', metadata[sourceKey]);
+        head.appendChild(meta);
+      }
+    });
+  }
+
+  // ===== MARKDOWN LOADER =====
+  function loadMarkdown(page) {
+    if (!md) {
+      showError('Markdown processor unavailable. Please refresh the page.');
+      return;
+    }
+
+    const cacheKey = `cache_${page}`;
+    const cachedHTML = getCachedHTML(cacheKey);
+    const metadataKey = `meta_${page}`;
+    const cachedMetadata = getCachedHTML(metadataKey);
+    
+    if (cachedHTML) {
+      console.log('Loading from cache:', cacheKey);
+      document.getElementById('content').innerHTML = cachedHTML;
+      
+      // Restore cached metadata
+      if (cachedMetadata) {
+        window.currentPageMetadata = JSON.parse(cachedMetadata);
+        console.log('Restored cached metadata:', window.currentPageMetadata);
+      }
+      
+      highlightActiveNav();
+      return;
+    }
+
+    const currentYear = new Date().getFullYear();
+    const paths = [`./assets/pages/${page}.md`, `./${page}.md`];
+    
+    for (let i = 0; i <= 10; i++) {
+      const year = currentYear - i;
+      paths.push(`./blog/${year}/${page}.md`);
+    }
+
+    function tryPaths(pathIndex) {
+      if (pathIndex >= paths.length) {
+        showError(`Page not found: ${page}`);
+        return;
+      }
+
+      const currentPath = paths[pathIndex];
+      
+      fetch(currentPath)
+        .then(response => {
+          if (!response.ok) throw new Error('Not found');
+          return response.text();
+        })
+        .then(markdown => {
+          const { metadata, content } = parseFrontmatter(markdown);
+          console.log('Parsed frontmatter:', metadata);
+          console.log('Page:', page);
+          
+          injectMetaTags(metadata);
+          
+          // Store metadata for sharing
+          currentPageMetadata = {
+            title: metadata.title || page,
+            description: metadata.excerpt || metadata.description || ''
+          };
+          window.currentPageMetadata = currentPageMetadata;
+          console.log('Updated window.currentPageMetadata:', window.currentPageMetadata);
+          
+          let html = '';
+          
+          if (metadata.title) {
+            html += `<h1>${escapeHtml(metadata.title)}</h1>`;
+          }
+          
+          if (metadata.date && metadata.time) {
+            const formattedDateTime = formatDateTime(metadata.date, metadata.time);
+            html += `<p class="post-meta">${formattedDateTime}</p>`;
+          }
+          
+          if (metadata.image) {
+            html += `<img src="${getImagePath(metadata.image)}" alt="${escapeHtml(metadata.title || 'Post image')}" class="post-image">`;
+          }
+          
+          if (metadata.excerpt) {
+            html += `<p class="post-excerpt"><em>${escapeHtml(metadata.excerpt)}</em></p>`;
+          }
+          
+          html += md.render(content);
+          
+          document.getElementById('content').innerHTML = html;
+          setCachedHTML(cacheKey, html, 24);
+          
+          // Cache metadata separately
+          const metadataKey = `meta_${page}`;
+          setCachedHTML(metadataKey, JSON.stringify(window.currentPageMetadata), 24);
+          
+          highlightActiveNav();
+        })
+        .catch(() => {
+          tryPaths(pathIndex + 1);
+        });
+    }
+
+    tryPaths(0);
+  }
+
+  // ===== GENERIC JSON LOADER & RENDERER =====
+  function loadJSON(filename, itemsKey) {
+    const cacheKey = `cache_${filename}`;
+    
+    // Determine cache expiry based on file type
+    let expiryHours = 24; // default
+    if (itemsKey === 'jots') {
+      expiryHours = 24; // refresh daily
+    } else if (itemsKey === 'archive' || itemsKey === 'projects') {
+      expiryHours = 720; // refresh monthly (30 days)
+    }
+    
+    const cachedHTML = getCachedHTML(cacheKey);
+    const cacheExpired = isCacheExpired(cacheKey);
+    
+    if (cachedHTML && !cacheExpired) {
+      document.getElementById('content').innerHTML = cachedHTML;
+      highlightActiveNav();
+      return;
+    }
+    
+    fetch(`./assets/pages/${filename}.json`)
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(data => renderJSON(data, itemsKey, cacheKey, expiryHours))
+      .catch(err => {
+        console.error(`${filename} load failed:`, err);
+        showError(`Error loading ${filename}.`);
+      });
+  }
+
+  function renderJSON(data, itemsKey, cacheKey, expiryHours = 24) {
+    let html = '';
+    let pageTitle = '';
+    let pageDescription = '';
+
+    try {
+      if (data.intro) {
+        html += md.render(data.intro);
+      }
+      if (data.introImage) {
+        html += `<img src="${getImagePath(data.introImage)}" alt="Intro" class="projects-image">`;
+      }
+
+    if (itemsKey === 'projects') {
+      pageTitle = 'Projects';
+      pageDescription = data.intro || 'My projects';
+      html = '<h1>Projects</h1>' + html;
+      html += '<div class="projects-grid">';
+      
+      const projects = (data.projects || []).sort((a, b) => {
+        if (a.order !== undefined && b.order !== undefined) {
+          return a.order - b.order;
+        }
+        return 0;
+      });
+      
+      projects.forEach(project => {
+        html += `
+          <div class="project-card">
+            <a href="?page=${encodeURIComponent(project.slug)}">
+              <img src="${getImagePath(project.image)}" alt="${escapeHtml(project.title)}" class="project-image">
+              <h2>${escapeHtml(project.title)}</h2>
+            </a>
+            <div class="project-excerpt">${escapeHtml(project.excerpt)}</div>
+          </div>
+        `;
+      });
+      html += '</div>';
+    } else if (itemsKey === 'jots') {
+      pageTitle = 'Jots';
+      pageDescription = data.intro || 'My jots and thoughts';
+      html = '<h1>Jots</h1>' + html;
+      
+      const sorted = (data.jots || []).sort((a, b) =>
+        new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
+      );
+      
+      sorted.forEach(jot => {
+        html += `
+          <div class="jot">
+            <h2>${escapeHtml(jot.title)}</h2>
+            <p class="jot-meta">${formatDateTime(jot.date, jot.time)}</p>
+            ${md.render(jot.content)}
+            ${jot.image ? `<img src="${getImagePath(jot.image)}" alt="${escapeHtml(jot.title)}" class="jot-image">` : ''}
+          </div>
+        `;
+      });
+    } else if (itemsKey === 'archive') {
+      pageTitle = 'Archive';
+      pageDescription = data.intro || 'Blog archive';
+      html = '<h1>Archive</h1>' + html;
+      
+      const sortedYears = (data.years || []).sort((a, b) => {
+        if (a.year !== b.year) return b.year - a.year;
+        return b.month - a.month;
+      });
+      
+      sortedYears.forEach(yearMonth => {
+        const monthName = new Date(yearMonth.year, yearMonth.month - 1).toLocaleString('default', { month: 'long' });
+        html += `<h2>${monthName} ${yearMonth.year}</h2><ul>`;
+        
+        const sortedPosts = (yearMonth.posts || []).sort((a, b) =>
+          new Date(b.date) - new Date(a.date)
+        );
+        
+        sortedPosts.forEach(post => {
+          const slug = post.slug.replace(/^\/+/, '');
+          html += `
+            <li>
+              <a href="?page=${encodeURIComponent(slug)}">${escapeHtml(post.title)}</a> — ${escapeHtml(post.date)}
+              <p class="post-excerpt">${escapeHtml(post.excerpt)}</p>
+            </li>
+          `;
+        });
+
+        html += '</ul>';
+      });
+    }
+
+    if (data.outro) {
+      html += md.render(data.outro);
+    }
+    if (data.outroImage) {
+      html += `<img src="${getImagePath(data.outroImage)}" alt="Outro" class="projects-image">`;
+    }
+
+    document.getElementById('content').innerHTML = html;
+    
+    // Store metadata for sharing
+    currentPageMetadata = {
+      title: pageTitle,
+      description: pageDescription
+    };
+    window.currentPageMetadata = currentPageMetadata;
+    
+    if (cacheKey) {
+      setCachedHTML(cacheKey, html, expiryHours);
+    }
+    
+    highlightActiveNav();
+    } catch (err) {
+      console.error('renderJSON error:', err);
+      showError('Error rendering page');
+    }
+  }
+
+  // ===== SHARING =====
   function shareCurrentPage() {
-    if (document.getElementById('authModal').style.display !== 'none' || 
-        document.getElementById('profileModal').style.display !== 'none' ||
-        document.getElementById('adminModal').style.display !== 'none') {
-      return;
-    }
-    
-    if (!currentPageMetadata) {
-      alert('Page not fully loaded. Please try again.');
-      return;
-    }
-    
-    const title = currentPageMetadata.title || document.title;
+    const title = currentPageMetadata.title || document.querySelector('h1')?.innerText || document.title;
     const description = currentPageMetadata.description || '';
     const url = window.location.href;
-    const text = description || title;
+    const text = description ? `${description}` : title;
 
     if (navigator.share) {
       navigator.share({ 
         title: title,
         text: text,
         url: url 
-      }).catch(err => console.log('Share cancelled or failed'));
+      }).catch(err => console.log('Share failed:', err));
     } else {
       alert('Share not supported on this device');
     }
   }
+
+  // ===== ROUTE HANDLER =====
+  function handleRoute() {
+    const page = getPageParam();
+
+    if (page === 'jots') {
+      loadJSON('jots', 'jots');
+    } else if (page === 'archive') {
+      loadJSON('archive', 'archive');
+    } else if (page === 'projects') {
+      loadJSON('projects', 'projects');
+    } else {
+      loadMarkdown(page);
+    }
+
+    highlightActiveNav();
+    window.scrollTo(0, 0);
+  }
+
+  // ===== INITIALIZATION =====
+  detectPageRefresh();
+  
+  document.addEventListener('DOMContentLoaded', handleRoute);
+  window.addEventListener('popstate', handleRoute);
+  window.addEventListener('hashchange', handleRoute);
 </script>
 
-<!-- LOAD EXTERNAL JS FILES IN ORDER -->
-<script src="./assets/js/utils.js"></script>
-<script src="./assets/js/interactions.js"></script>
-<script src="./assets/js/auth.js"></script>
-<script src="./assets/js/admin.js"></script>
-<script src="./assets/js/main.js"></script>
-
-<!-- FIREBASE INITIALIZATION (LAST) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInWithPopup, GoogleAuthProvider, TwitterAuthProvider, signInAnonymously, sendEmailVerification } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
   import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
   
   const firebaseConfig = {
@@ -216,34 +564,7 @@
   const auth = getAuth(app);
   const database = getDatabase(app);
   
-  window.firebase = { 
-    auth, 
-    database, 
-    ref, 
-    onValue, 
-    set,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut,
-    sendEmailVerification,
-    signInWithPopup,
-    GoogleAuthProvider,
-    TwitterAuthProvider,
-    signInAnonymously
-  };
-  
-  // ===== CHECK AUTH STATE ON LOAD =====
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      currentUser = user;
-      loadUserProfile(user.uid);
-    } else {
-      currentUser = null;
-      currentUserProfile = null;
-      updateUserUI();
-    }
-  });
+  window.firebase = { auth, database, signInWithPopup, GoogleAuthProvider, signOut, ref, onValue, set };
 </script>
-
 </body>
 </html>
