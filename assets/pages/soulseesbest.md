@@ -2,13 +2,13 @@
 title: SoulSeesBest
 date: 2026-02-05
 excerpt: Visually Challenged Mixed Media rooted in the Southwest US
-image: assets/media/soulseesbest-logo.pn
+image: "assets/media/soulseesbest-logo.png"
 twitter-title: "SoulSeesBest"
 twitter-description: "Visually challenged mixed media rooted in the Southwest US"
 keywords: "SoulSeesBest, mixed media, artist, clay, paint, handcrafted, idm, electronica, music, keratoconus, legally blind"
 ---
 
-# 🌵 IDM Experimental Electronica from the Southwest 
+# IDM Experimental Electronica from the Southwest 🌵
 
 <iframe style="border: 0; width: 100%; height: 120px;" src="https://bandcamp.com/EmbeddedPlayer/track=3799102373/size=large/bgcol=ffffff/linkcol=7137dc/tracklist=false/artwork=small/transparent=true/" seamless><a href="https://soulseesbest.bandcamp.com/track/signal-intercept-february-2026-sampler">Signal Intercept: February 2026 (Sampler) by SoulSeesBest</a></iframe>
 
