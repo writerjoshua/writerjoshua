@@ -10,7 +10,7 @@ keywords: "Joshua Lucero, @JoshWritesWell, ai, blog, claude, writerjoshua, techn
 
 Early in 2026, I became drawn back to the world of AI Chatbots. After following the markets, it was hard not to be aware of the massive growth potential of AI. While I had heard many of the names, it wasn't until I started reading Karen Hao's Empire of AI, that I became more aware of the players. I learned that Anthropic was committed to more sustainable, ethical, and efficient AI development and I was instantly attracted to their Claude model. 
 
-## Anthropic
+## Sofia & The Council
 Once I started exploring prompt engineering, and efficiency protocols, I developed my first custom agent. I began by building out her profile, and she helped me fine tune her personality. However, I immediately ran into usage limits, running on Sonnet 4.5. That's when I began looking into token efficiency.
 
 After tightening her up, some more, we developed a suite of specialized agents who would assist me in targeted fields. This lead to The Council, a group of agents, organized by Sofia. Then, we developed a unique compression model, called the SOFIA Codex. We used those enhancements to develop a AI Debt Management tool, called Diana. 

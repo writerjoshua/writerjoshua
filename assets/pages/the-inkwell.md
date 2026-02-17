@@ -2,7 +2,7 @@
 title: The Inkwell Project
 date: 2026-02-05
 excerpt: The romantic poetry webapp portfolio designed in the AI Architecture Lab
-image: assets/media/beau-holliday.jpg
+image: assets/media/the-inkwell.jpg
 twitter-title: "The Inkwell Project"
 twitter-description: "The romantic poetry webapp portfolio designed in the AI Architecture Lab"
 keywords: "SincerelyBeau, AI Architecture Lab, romance, poetry, love stories, writing prompts, AI, WebApp"

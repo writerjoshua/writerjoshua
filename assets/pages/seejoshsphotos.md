@@ -22,14 +22,14 @@ A sign of the times, most of my photography is done on my iPhone but, I try to g
 ## Today
 As of February 2026, I'm working with the [AI Architecture Lab](index.html?=page:ai-architecture-lab) to build a social app that showcases my daily work, and provides access to more of my exclusive collections. 
 
-![Joshua Lucero, photographer](./assets/media/joshua-lucero-portrait-nikon.jpg)
-
 For now, most of my portfolio can be seen on social media.
 
 ### SeeJoshsPhotos on Social
 - [@SeeJoshsPhotos on Instagram](https://www.instagram.com/seejoshsphotos)
 - [@SeeJoshsPhotos on X](https://www.x.com/seejoshsphotos)
 - [@SeeJoshsPhotos on Threads](https://threads.com/@seejoshsphotos)  
+
+---
 
 ### Donations
 - [$WriterJoshua on Cash App][cashapp]

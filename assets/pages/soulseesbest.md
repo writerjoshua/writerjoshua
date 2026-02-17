@@ -8,7 +8,7 @@ twitter-description: "Visually challenged mixed media rooted in the Southwest US
 keywords: "SoulSeesBest, mixed media, artist, clay, paint, handcrafted, idm, electronica, music, keratoconus, legally blind"
 ---
 
-# SoulSeesBest IDM Experimental Electronica
+# 🌵 IDM Experimental Electronica from the Southwest 
 
 <iframe width="100%" height="100%" src="https://www.bandlab.com/embed/?id=8586239f-e6a2-f011-8e64-6045bd354e91" allowfullscreen></iframe>
 
@@ -36,3 +36,4 @@ The IDM (Intelligent Dance Music) Electronica elements can be traced back to man
 ### Backstage Access and Collaboration Opportunity
 - [SoulSeesBest on BandLab](https://www.bandlab.com/soulseesbest)
 - [SoulSeesBest on Soundcloud](https://soundcloud.com/soulseesbest)
+- [SoulSeesBest on Bandcamp](https://soulseesbest.bandcamp.com/)

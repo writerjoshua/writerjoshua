@@ -1,5 +1,3 @@
-# Contact
-
 ![writerjoshua.com](./assets/media/joshua-lucero.jpg)  
 
 **Joshua Lucero**  
