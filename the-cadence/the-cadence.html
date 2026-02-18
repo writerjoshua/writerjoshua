@@ -21,13 +21,12 @@
 
   <!-- STATIC NAVIGATION -->
   <nav>
-    <a href="?page=home" class="nav-link">Home</a>
-    <a href="?page=about-josh" class="nav-link">About Josh</a>
-    <a href="?page=jots" class="nav-link">Jots</a>
-    <a href="?page=archive" class="nav-link">Blog</a>
-    <a href="?page=projects" class="nav-link">Projects</a>
-    <a href="?page=contact" class="nav-link">Contact</a>
-    <a href="./the-cadence/" class="nav-link">The Cadence</a>
+    <a href="../../" class="nav-link">Home</a>
+    <a href="../../?page=about-josh" class="nav-link">About Josh</a>
+    <a href="../../?page=jots" class="nav-link">Jots</a>
+    <a href="../../?page=archive" class="nav-link">Blog</a>
+    <a href="../../?page=projects" class="nav-link">Projects</a>
+    <a href="../../?page=contact" class="nav-link">Contact</a>
   </nav>
 
   <!-- Volume Controls -->
@@ -50,7 +49,8 @@
       <div class="landing-header">
         <h1>The Cadence</h1>
         <p>Solve Yourself, Again</p>
-        <p style="font-size: 12px; margin-top: 10px; color: var(--text-lighter);">Music by <a href="https://www.youtube.com/@SoulSeesBest" target="_blank" style="color: var(--primary);">SoulSeesBest</a></p>
+        <p style="font-size: 14px; margin-top: 10px;"><strong><a href="https://www.writerjoshua.com/?page=ai-architecture-lab" target="_blank" style="color: var(--primary);">Game Suite by WriterJoshua</a></strong></p>
+        <p style="font-size: 12px; margin-top: 5px; color: var(--text-lighter);">Music by <a href="https://soulseesbest.com" target="_blank" style="color: var(--primary);">SoulSeesBest</a></p>
       </div>
       
       <div class="container">
@@ -58,6 +58,10 @@
           <h2>Current Challenge: The Answers</h2>
           <p class="description">Complete each puzzle to unlock the next. All games must be solved in sequence.</p>
           <div id="game-list" class="game-list"></div>
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button onclick="continueToNextGame()" class="game-button" style="flex: 1; background: #2ecc71;">Jump to Latest Game →</button>
+            <button onclick="hardReset()" class="game-button" style="flex: 1; background: #e74c3c;">Hard Reset</button>
+          </div>
         </div>
         
         <div class="archives-section">
@@ -115,7 +119,6 @@
         <p class="game-description">Decrypt the message like Wheel of Fortune. Numbers under blanks match letter inputs below.</p>
         <div class="game-content">
           <div id="crypto-message" class="crypto-message"></div>
-          <div id="crypto-numbers" class="crypto-numbers"></div>
           
           <div id="crypto-grid" style="margin: 30px 0;"></div>
           

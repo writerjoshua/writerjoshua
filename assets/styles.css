@@ -941,87 +941,45 @@ footer {
   padding: 30px 20px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  font-size: 28px;
-  letter-spacing: 8px;
-  margin-bottom: 10px;
-  font-family: var(--ff-mono);
-  min-height: 80px;
-  word-break: break-word;
   text-align: center;
-  font-weight: bold;
-}
-
-#crypto-numbers {
-  background: var(--bg-light);
-  padding: 10px 20px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 12px;
-  letter-spacing: 5px;
-  margin-bottom: 20px;
-  font-family: var(--ff-mono);
-  text-align: center;
-  min-height: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 20px;
+  min-height: 140px;
 }
 
 .crypto-block {
   display: inline-block;
-  width: 32px;
-  height: 40px;
+  width: 36px;
+  height: 44px;
   border: none;
   border-bottom: 3px solid var(--primary);
   text-align: center;
-  line-height: 40px;
-  margin: 0 4px;
-  font-size: 24px;
+  line-height: 44px;
+  font-size: 22px;
   font-weight: bold;
   font-family: var(--ff-mono);
   color: var(--primary);
-}
-
-.crypto-number-below {
-  display: inline-block;
-  width: 32px;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-light);
-  margin: 0 4px;
-}
-
-.crypto-number-input {
-  width: 100%;
-  aspect-ratio: 1;
-  padding: 0;
-  border: 2px solid var(--border);
-  border-radius: 4px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  font-family: var(--ff-mono);
-  text-transform: uppercase;
-  cursor: text;
   background: white;
+  cursor: pointer;
+  transition: all 0.1s;
 }
 
-.crypto-number-input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+.crypto-block:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
-.crypto-number-input.revealed {
-  background: var(--bg-light);
-  cursor: default;
-  border-color: var(--text-light);
-}
-
-.crypto-number-input.correct {
+.crypto-block.correct-letter {
   background: #d4edda;
+  color: #155724;
   border-color: #28a745;
 }
 
-.crypto-number-input.error {
+.crypto-block.error-letter {
   background: #f8d7da;
   border-color: #dc3545;
   animation: shake 0.3s;
@@ -1209,17 +1167,11 @@ footer {
   }
 
   .crypto-block {
-    width: 24px;
-    height: 32px;
-    line-height: 32px;
-    font-size: 18px;
-    margin: 0 2px;
-  }
-
-  .crypto-number-below {
-    width: 24px;
-    font-size: 10px;
-    margin: 0 2px;
+    width: 28px;
+    height: 36px;
+    line-height: 36px;
+    font-size: 20px;
+    margin: 0 3px;
   }
 
   #crypto-message {
