@@ -268,7 +268,11 @@ function hardReset() {
 function continueToNextGame() {
   if (cadenceGame.advanceGame()) {
     updateGameList();
-    showGame(cadenceGame.currentGameIndex);
+    if (cadenceGame.currentGameIndex >= 4) {
+      showFinal();
+    } else {
+      showGame(cadenceGame.currentGameIndex);
+    }
   }
 }
 
@@ -798,12 +802,20 @@ function handleSudokuSubmit() {
     feedback.textContent = '✓ Sudoku complete!';
     document.getElementById('sudoku-submit').disabled = true;
     
-    setTimeout(() => {
-      if (cadenceGame.advanceGame()) {
-        updateGameList();
-        showFinal();
-      }
-    }, 2000);
+    // Show continue button
+    if (!document.querySelector('.sudoku-continue-btn')) {
+      const continueBtn = document.createElement('button');
+      continueBtn.className = 'game-button sudoku-continue-btn';
+      continueBtn.textContent = 'Continue →';
+      continueBtn.style.marginTop = '15px';
+      continueBtn.onclick = () => {
+        if (cadenceGame.advanceGame()) {
+          updateGameList();
+          showFinal();
+        }
+      };
+      document.getElementById('sudoku-submit').parentElement.appendChild(continueBtn);
+    }
   } else {
     feedback.textContent = '✗ Sudoku is not complete yet';
   }
