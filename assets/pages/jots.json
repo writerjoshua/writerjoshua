@@ -1,10 +1,16 @@
 {
-  "intro": "A collection of my thoughts, observations, and quick notes on writing, code, and life.",
+  "intro": "When a blog is too much but, a tweet just won't do. Let me jot it down.",
   "jots": [
+    { "title": "Signal Intercept by SoulSeesBest",
+      "date": "2026-02-17",
+      "time": "17:54",
+      "content": "I released the first IDM electronica album last October. I've been working on some new tracks and wanted to share the progress. So I made a quick sampler.\n\n By making 'Signal Intercept' available on Bandcamp, it gives you an opportunity to support the project while you listen. I intend to add previously released work, already streaming on major platforms, so you can download your favorites. \n\n Bandcamp lets you name your own price. So, show me what it means to you and enjoy your favorites, whenever you want.\n\n A satellite roams the galaxy, searching for sounds of life.\n\n For the first time in ages, it picks up a signal.\n\n Perhaps, you are not alone, after all.\n\n 🌙\n\n This is your opportunity to sample the latest production.\n\n You can listen to the spacey sampler at [SoulSeesBest](index.html?page=soulseesbest)"
+
+    },
     { "title": "Grateful for Rain 🌦️",
       "date": "2026-02-17",
       "time": "11:39",
-      "content": "They say it never rains in Southern California. Around 90% of the year, that's true. It wasn't long ago that we went through a rough stretch of 4 or 5 years without any significant rain, along with average temps of 95+ all year. It was brutal.\n\n The last few years has brought more moisture, however, it's not lost on me that for many areas closer to the coast, it can be too much all at once. So, while I'm grateful for the moderate rainfall here, closer to the deserts, I'm still thinking of those prone to flood.\n\n I won't go into detail, here and now, as to be mindful of the current situation. However, I plan on going further on the impact of human infrastructure as it pertains to flooding.\n\n For now, though, I'll just be grateful that the roses get another hardy drink (more forecasted on the way) and focus on the positive.\n\n * On a related note, [AI Architecture Lab is working on a SeeJoshsPhotos app experience](index.html?=page:seejoshsphotos), as we speak. I am also considering a flowers-only experience as a companion project.\n\n In due time...",
+      "content": "They say it never rains in Southern California. Around 90% of the year, that's true. It wasn't long ago that we went through a rough stretch of 4 or 5 years without any significant rain, along with average temps of 95+ all year. It was brutal.\n\n The last few years has brought more moisture, however, it's not lost on me that for many areas closer to the coast, it can be too much all at once. So, while I'm grateful for the moderate rainfall here, closer to the deserts, I'm still thinking of those prone to flood.\n\n I won't go into detail, here and now, as to be mindful of the current situation. However, I plan on going further on the impact of human infrastructure as it pertains to flooding.\n\n For now, though, I'll just be grateful that the roses get another hardy drink (more forecasted on the way) and focus on the positive.\n\n * On a related note, [AI Architecture Lab is working on a SeeJoshsPhotos app experience](index.html?page=seejoshsphotos), as we speak. I am also considering a flowers-only experience as a companion project.\n\n In due time...",
       "image": "./assets/media/socal-rain-yellow-rose.jpg"
     },
     {
