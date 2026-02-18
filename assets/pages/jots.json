@@ -1,6 +1,14 @@
 {
   "intro": "When a blog is too much but, a tweet just won't do. Let me jot it down.",
   "jots": [
+
+    { "title": "Do You Want To Play A Game? 🎲",
+      "date": "2026-02-18",
+      "time": "04:17",
+      "content": "I'm trying to break myself of the habit of sharing everything immediately as it unfolds. I'm actually doing very well with it but, this is the most complex coding project I've ever worked on. Technically, it's all being written by AI but, with all of the adjustments, and corrections, and explaining logic, and testing, and waiting for limits to expire, it's still a LOT of work.\n\n I pulled an all nighter in the AI Architecture Lab. That's how excited I am about this newest project, The Cadence. The tagline reads, 'Solve yourself, again.'\n\n I wanted to design something that would encourage users to visit my site, outside of just reading blog posts. I wanted to give you something to actually do, here. I also wanted it to be something of value. So, it began as offering a simple word game. It was so fun building it that, the answer became a key for another game, etc.\n\n NOW, it's a suite of mind games, all designed with a theme related to content that I've posted on the site. So, it will either be familiar, or it will give you a frame of reference for reading it later. I'm also working on giving it a leaderboard so, you eggheads can show off. (We don't have to stick with 'eggheads.' What do I call you, though?) \n\n Like I said, it's still a work in progress but, I just tested it out and I think it will be challenging. I'm designing the puzzles myself and trying to teach my agent how to code it into a web app. It's not going smoothly, as of right now but, it IS taking shape, and I'm excited enough to Jot about it!\n\n If I'm quiet this afternoon, you know why.",
+      "image":"./assets/media/ailab.gif"
+
+    },
     { "title": "Signal Intercept by SoulSeesBest",
       "date": "2026-02-17",
       "time": "17:54",
@@ -41,19 +49,19 @@
       "content": "No algorithms.\n No ads.\n No bots. \n Just Jots. \nExclusively on WriterJoshua"
     },
     {
+      "id": 2,
+      "title": "Second Jot",
+      "date": "2026-02-10",
+      "time": "20:26",
+      "content": "Hey, look! Another Jot! I'm just testing out the Jots feature. It's pretty cool, right?"
+    },
+    {
       "id": 1,
       "title": "The First Jot",
       "date": "2026-02-11",
       "time": "19:15",
       "content": "This is my social media. These are Josh's Jots. I hope you'll like them. Welcome to my site.",
       "image": "./assets/media/writerjoshua.jpg"
-    },
-    {
-      "id": 2,
-      "title": "Second Jot",
-      "date": "2026-02-10",
-      "time": "20:26",
-      "content": "Hey, look! Another Jot! I'm just testing out the Jots feature. It's pretty cool, right?"
     }
   ]
 }
