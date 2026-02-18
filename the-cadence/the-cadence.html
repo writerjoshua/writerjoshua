@@ -50,6 +50,7 @@
       <div class="landing-header">
         <h1>The Cadence</h1>
         <p>Solve Yourself, Again</p>
+        <p style="font-size: 12px; margin-top: 10px; color: var(--text-lighter);">Music by <a href="https://www.youtube.com/@SoulSeesBest" target="_blank" style="color: var(--primary);">SoulSeesBest</a></p>
       </div>
       
       <div class="container">
@@ -78,6 +79,7 @@
         <div class="game-content">
           <div id="wordle-feedback" class="feedback"></div>
           <div id="wordle-attempts" class="attempts"></div>
+          <div id="wordle-history" style="margin-bottom: 20px; padding: 15px; background: var(--bg-light); border-radius: var(--radius); min-height: 20px;"></div>
           <input type="text" id="wordle-input" class="game-input" placeholder="Type a word..." maxlength="5">
           <button id="wordle-submit" class="game-button">Submit</button>
         </div>
@@ -92,17 +94,10 @@
       </div>
       
       <div class="container">
-        <p class="game-description">Complete the word chain. Each wrong guess reveals the next letter.</p>
+        <p class="game-description">Complete the word chain. Guess each word to reveal the next letter.</p>
         <div class="game-content">
-          <div class="chain-display">
-            <span class="chain-word">CLOUD</span>
-            <span class="arrow">→</span>
-            <div id="chain-display"></div>
-            <span class="arrow">→</span>
-            <span class="chain-word">PROTECT</span>
-          </div>
-          <div id="chain-progress" class="progress"></div>
-          <div id="chain-feedback" class="feedback"></div>
+          <div id="chain-display" class="chain-display-horizontal"></div>
+          <div id="chain-feedback" class="feedback" style="margin-top: 20px;"></div>
           <input type="text" id="chain-input" class="game-input" placeholder="Guess the word...">
           <button id="chain-submit" class="game-button">Submit</button>
         </div>
@@ -117,11 +112,12 @@
       </div>
       
       <div class="container">
-        <p class="game-description">Decrypt the message by guessing letter-to-number mappings. Click each number box to input the letter.</p>
+        <p class="game-description">Decrypt the message like Wheel of Fortune. Numbers under blanks match letter inputs below.</p>
         <div class="game-content">
-          <div id="crypto-message" class="game-input"></div>
+          <div id="crypto-message" class="crypto-message"></div>
+          <div id="crypto-numbers" class="crypto-numbers"></div>
           
-          <div id="crypto-grid"></div>
+          <div id="crypto-grid" style="margin: 30px 0;"></div>
           
           <div class="crypto-solve-section">
             <p>Or type the full answer here:</p>
@@ -130,10 +126,8 @@
           
           <div id="crypto-feedback" class="feedback"></div>
           
-          <div class="crypto-buttons">
-            <button id="crypto-solve-btn" class="game-button">✓ Solve</button>
-            <button id="crypto-skip-btn" class="game-button">⏭️ Skip (-200 pts)</button>
-          </div>
+          <button id="crypto-solve-btn" class="game-button">✓ Solve</button>
+          <p style="text-align: center; margin-top: 10px;"><a href="#" onclick="handleCryptoSkip(); return false;" style="color: var(--primary); font-size: 14px;">Skip (-200 pts)</a></p>
         </div>
       </div>
     </div>

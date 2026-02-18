@@ -217,12 +217,8 @@ function setupEventListeners() {
 
   // Game 3: Cryptogram
   const cryptoSolveBtn = document.getElementById('crypto-solve-btn');
-  const cryptoSkipBtn = document.getElementById('crypto-skip-btn');
   if (cryptoSolveBtn) {
     cryptoSolveBtn.addEventListener('click', handleCryptoSolve);
-  }
-  if (cryptoSkipBtn) {
-    cryptoSkipBtn.addEventListener('click', handleCryptoSkip);
   }
 
   // Game 4: Sudoku
@@ -248,7 +244,7 @@ function showLanding() {
   hideAllScreens();
   document.getElementById('landing').classList.remove('hidden');
   updateGameList();
-  audioSystem.stop();
+  audioSystem.playTrack('congratulations'); // Opening music
 }
 
 function updateGameList() {
@@ -310,9 +306,26 @@ function initWordleGame() {
   const game = cadenceGame.games[0];
   const feedback = document.getElementById('wordle-feedback');
   const attemptsLeft = document.getElementById('wordle-attempts');
+  const historyDiv = document.getElementById('wordle-history');
   
   feedback.textContent = 'Guess the word!';
   attemptsLeft.textContent = `Attempts left: ${game.maxAttempts - game.attempts}`;
+  historyDiv.innerHTML = ''; // Clear history
+  
+  // Show previous guesses
+  game.guesses.forEach(guess => {
+    const feedback = game.getFeedback(guess);
+    const matched = feedback.map((f, i) => {
+      if (f === 'correct') return '🟩';
+      if (f === 'wrong-position') return '🟨';
+      return '⬜';
+    }).join('');
+    
+    const div = document.createElement('div');
+    div.textContent = `${guess} ${matched}`;
+    div.style.marginBottom = '5px';
+    historyDiv.appendChild(div);
+  });
   
   document.getElementById('wordle-input').value = '';
   document.getElementById('wordle-input').focus();
@@ -324,6 +337,7 @@ function handleWordleGuess() {
   const game = cadenceGame.games[0];
   const feedback = document.getElementById('wordle-feedback');
   const attemptsLeft = document.getElementById('wordle-attempts');
+  const historyDiv = document.getElementById('wordle-history');
   
   const result = game.validateGuess(input);
   
@@ -331,6 +345,18 @@ function handleWordleGuess() {
     feedback.textContent = result.message;
     return;
   }
+  
+  // Update history
+  const feedbackItems = result.feedback.map((f, i) => {
+    if (f === 'correct') return '🟩';
+    if (f === 'wrong-position') return '🟨';
+    return '⬜';
+  }).join('');
+  
+  const div = document.createElement('div');
+  div.textContent = `${input} ${feedbackItems}`;
+  div.style.marginBottom = '5px';
+  historyDiv.appendChild(div);
   
   attemptsLeft.textContent = `Attempts left: ${game.maxAttempts - game.attempts}`;
   updateScoreDisplay();
@@ -347,12 +373,7 @@ function handleWordleGuess() {
       }
     }, 2000);
   } else {
-    const matched = result.feedback.map((f, i) => {
-      if (f === 'correct') return '🟩';
-      if (f === 'wrong-position') return '🟨';
-      return '⬜';
-    }).join('');
-    feedback.textContent = `Guess: ${input} ${matched}`;
+    feedback.textContent = '';
   }
   
   document.getElementById('wordle-input').value = '';
@@ -361,28 +382,57 @@ function handleWordleGuess() {
 // ===== GAME 2: WORD CHAIN =====
 function initChainGame() {
   const game = cadenceGame.games[1];
-  const display = document.getElementById('chain-display');
-  const progress = document.getElementById('chain-progress');
-  
-  display.textContent = game.getCurrentDisplay();
-  progress.textContent = `Word ${game.chainIndex + 1} of ${game.chain.length}`;
-  
+  renderChainDisplay();
+  updateScoreDisplay();
   document.getElementById('chain-input').value = '';
   document.getElementById('chain-input').focus();
-  updateScoreDisplay();
+}
+
+function renderChainDisplay() {
+  const game = cadenceGame.games[1];
+  const chainContainer = document.getElementById('chain-display');
+  chainContainer.innerHTML = '';
+  
+  // Show all words in chain
+  const words = [game.startWord, ...game.chain, game.endWord];
+  
+  words.forEach((word, index) => {
+    const span = document.createElement('span');
+    span.className = 'chain-item';
+    
+    if (index < game.chainIndex + 1) {
+      // Completed word
+      span.classList.add('chain-completed');
+      span.textContent = word;
+    } else if (index === game.chainIndex + 1) {
+      // Current word
+      span.classList.add('chain-current');
+      span.textContent = game.getCurrentDisplay();
+    } else {
+      // Future word
+      span.classList.add('chain-future');
+      span.textContent = '?'.repeat(word.length);
+    }
+    
+    chainContainer.appendChild(span);
+    
+    if (index < words.length - 1) {
+      const arrow = document.createElement('span');
+      arrow.className = 'arrow';
+      arrow.textContent = '→';
+      chainContainer.appendChild(arrow);
+    }
+  });
 }
 
 function handleChainGuess() {
   const input = document.getElementById('chain-input').value;
   const game = cadenceGame.games[1];
-  const display = document.getElementById('chain-display');
-  const progress = document.getElementById('chain-progress');
   const feedback = document.getElementById('chain-feedback');
   
   const result = game.validateGuess(input);
   
-  display.textContent = result.nextDisplay;
-  progress.textContent = `Word ${game.chainIndex + 1} of ${game.chain.length}`;
+  renderChainDisplay();
   updateScoreDisplay();
   
   if (result.error) {
@@ -393,7 +443,8 @@ function handleChainGuess() {
   
   document.getElementById('chain-input').value = '';
   
-  if (game.isComplete()) {
+  // Game complete when we reach the second-to-last word (PROTECT is auto-complete)
+  if (game.chainIndex >= game.chain.length - 1) {
     document.getElementById('chain-submit').disabled = true;
     document.getElementById('chain-input').disabled = true;
     feedback.textContent = '✓ Word chain complete!';
@@ -415,25 +466,66 @@ function initCryptoGame() {
 }
 
 function renderCryptogramGrid(game) {
-  const container = document.getElementById('crypto-grid');
   const messageDisplay = document.getElementById('crypto-message');
-  container.innerHTML = '';
+  const numbersDisplay = document.getElementById('crypto-numbers');
+  const gridContainer = document.getElementById('crypto-grid');
   
-  // Show message
-  messageDisplay.textContent = game.getCurrentDisplay();
+  messageDisplay.innerHTML = '';
+  numbersDisplay.innerHTML = '';
+  gridContainer.innerHTML = '';
   
-  // Show input fields for each unique number
+  // Render message with blocks and underlines (Wheel of Fortune style)
+  let blockIndex = 0;
+  for (let char of game.plaintext) {
+    if (char === ' ' || char === "'") {
+      const space = document.createElement('span');
+      space.style.display = 'inline-block';
+      space.style.width = '15px';
+      messageDisplay.appendChild(space);
+      
+      numbersDisplay.appendChild(document.createElement('span'));
+    } else {
+      const number = game.cipher[char];
+      const guessedLetter = game.guesses[number];
+      
+      // Message block
+      const block = document.createElement('span');
+      block.className = 'crypto-block';
+      block.textContent = guessedLetter || '_';
+      block.id = `crypto-msg-${blockIndex}`;
+      messageDisplay.appendChild(block);
+      
+      // Number below
+      const numSpan = document.createElement('span');
+      numSpan.className = 'crypto-number-below';
+      numSpan.textContent = number;
+      numbersDisplay.appendChild(numSpan);
+      
+      blockIndex++;
+    }
+  }
+  
+  // Show input fields for each unique number (smaller, just for input)
   const positions = game.getPositions();
+  gridContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); margin-bottom: 10px;">Click number below to guess letter:</p>';
+  
+  const inputGrid = document.createElement('div');
+  inputGrid.style.display = 'grid';
+  inputGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(45px, 1fr))';
+  inputGrid.style.gap = '8px';
+  inputGrid.style.marginTop = '15px';
   
   positions.forEach(pos => {
     const wrapper = document.createElement('div');
-    wrapper.className = 'crypto-cell-wrapper';
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    wrapper.style.alignItems = 'center';
     
     const input = document.createElement('input');
     input.type = 'text';
-    input.className = 'crypto-cell-input';
+    input.className = 'crypto-number-input';
     input.maxLength = '1';
-    input.placeholder = '?';
+    input.placeholder = '';
     input.id = `crypto-${pos.number}`;
     input.value = pos.playerGuess || '';
     input.disabled = pos.isRevealed;
@@ -443,7 +535,10 @@ function renderCryptogramGrid(game) {
     }
     
     const number = document.createElement('div');
-    number.className = 'crypto-cell-number';
+    number.style.fontSize = '12px';
+    number.style.color = 'var(--text-light)';
+    number.style.marginTop = '4px';
+    number.style.fontWeight = '600';
     number.textContent = pos.number;
     
     input.addEventListener('input', function(e) {
@@ -453,7 +548,7 @@ function renderCryptogramGrid(game) {
       if (letter !== '') {
         if (result.correct) {
           input.classList.add('correct');
-          messageDisplay.textContent = game.getCurrentDisplay();
+          renderCryptogramGrid(game); // Re-render to update display
           updateScoreDisplay();
         } else {
           input.classList.add('error');
@@ -461,9 +556,6 @@ function renderCryptogramGrid(game) {
             input.classList.remove('error');
           }, 500);
         }
-      } else {
-        input.classList.remove('correct', 'error');
-        messageDisplay.textContent = game.getCurrentDisplay();
       }
       
       // Check completion
@@ -474,8 +566,10 @@ function renderCryptogramGrid(game) {
     
     wrapper.appendChild(input);
     wrapper.appendChild(number);
-    container.appendChild(wrapper);
+    inputGrid.appendChild(wrapper);
   });
+  
+  gridContainer.appendChild(inputGrid);
 }
 
 function handleCryptoSolve() {
