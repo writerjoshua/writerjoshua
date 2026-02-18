@@ -950,36 +950,38 @@ footer {
   min-height: 140px;
 }
 
-.crypto-block {
-  display: inline-block;
-  width: 36px;
+.crypto-letter-box {
+  width: 40px;
   height: 44px;
-  border: none;
-  border-bottom: 3px solid var(--primary);
+  border: 2px solid var(--border);
+  border-radius: 4px;
   text-align: center;
-  line-height: 44px;
-  font-size: 22px;
-  font-weight: bold;
+  font-size: 18px;
+  font-weight: 700;
   font-family: var(--ff-mono);
-  color: var(--primary);
+  text-transform: uppercase;
+  cursor: text;
   background: white;
-  cursor: pointer;
-  transition: all 0.1s;
 }
 
-.crypto-block:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-  border-radius: 2px;
+.crypto-letter-box:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
 }
 
-.crypto-block.correct-letter {
+.crypto-letter-box:disabled {
+  background: var(--bg-light);
+  cursor: default;
+  border-color: var(--text-light);
+}
+
+.crypto-letter-box.correct {
   background: #d4edda;
-  color: #155724;
   border-color: #28a745;
 }
 
-.crypto-block.error-letter {
+.crypto-letter-box.error {
   background: #f8d7da;
   border-color: #dc3545;
   animation: shake 0.3s;
@@ -1041,6 +1043,17 @@ footer {
   background: var(--bg);
   color: var(--primary);
   font-family: var(--ff-mono);
+}
+
+/* Hide number input spinner */
+.sudoku-cell::-webkit-outer-spin-button,
+.sudoku-cell::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.sudoku-cell[type=number] {
+  -moz-appearance: textfield;
 }
 
 .sudoku-cell.puzzle-cell {

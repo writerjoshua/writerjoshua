@@ -21,12 +21,12 @@
 
   <!-- STATIC NAVIGATION -->
   <nav>
-    <a href="../../" class="nav-link">Home</a>
-    <a href="../../?page=about-josh" class="nav-link">About Josh</a>
-    <a href="../../?page=jots" class="nav-link">Jots</a>
-    <a href="../../?page=archive" class="nav-link">Blog</a>
-    <a href="../../?page=projects" class="nav-link">Projects</a>
-    <a href="../../?page=contact" class="nav-link">Contact</a>
+    <a href="/" class="nav-link">Home</a>
+    <a href="/?page=about-josh" class="nav-link">About Josh</a>
+    <a href="/?page=jots" class="nav-link">Jots</a>
+    <a href="/?page=archive" class="nav-link">Blog</a>
+    <a href="/?page=projects" class="nav-link">Projects</a>
+    <a href="/?page=contact" class="nav-link">Contact</a>
   </nav>
 
   <!-- Volume Controls -->
@@ -76,11 +76,11 @@
     <div id="game-1" class="screen game-screen hidden">
       <div class="game-header">
         <button class="back-btn" onclick="showLanding()">← Back</button>
-        <h2>Game 1: Passkey</h2>
+        <h2>Game 1: Wordle</h2>
       </div>
       
       <div class="container">
-        <p class="game-description">Guess the 5 letter word in 6 attempts or less to continue. <em>Each incorrect guess deducts 25 points.</em></p>
+        <p class="game-description"><strong>Passkey:</strong> Guess the 5 letter word in 6 attempts or less to continue. <em>Each incorrect guess deducts 25 points.</em></p>
         <div class="game-content">
           <div id="wordle-feedback" class="feedback"></div>
           <div id="wordle-attempts" class="attempts"></div>
@@ -95,11 +95,11 @@
     <div id="game-2" class="screen game-screen hidden">
       <div class="game-header">
         <button class="back-btn" onclick="showLanding()">← Back</button>
-        <h2>Game 2: Chained Lock</h2>
+        <h2>Game 2: Word Chain</h2>
       </div>
       
       <div class="container">
-        <p class="game-description">Connect the Passkey to the Final Word by guessing the next word in sequenced two-word phrases to continue. <em>Each incorrect guess deducts 25 points.</em></p>
+        <p class="game-description"><strong>Chained Lock:</strong> Connect the Passkey to the Final Word by guessing the next word in sequenced two-word phrases to continue. <em>Each incorrect guess deducts 25 points.</em></p>
         <div class="game-content">
           <div id="chain-display" class="chain-display-horizontal"></div>
           <div id="chain-feedback" class="feedback" style="margin-top: 20px;"></div>
@@ -113,11 +113,11 @@
     <div id="game-3" class="screen game-screen hidden">
       <div class="game-header">
         <button class="back-btn" onclick="showLanding()">← Back</button>
-        <h2>Game 3: Structural Integrity</h2>
+        <h2>Game 3: Cryptogram</h2>
       </div>
       
       <div class="container">
-        <p class="game-description">Fill in the missing words using the cryptographic key under each letter to continue. <em>Each incorrect guess deducts 25 points.</em></p>
+        <p class="game-description"><strong>Structural Integrity:</strong> Fill in the missing words using the cryptographic key under each letter to continue. <em>Each incorrect guess deducts 25 points.</em></p>
         <div class="game-content">
           <div id="crypto-message" class="crypto-message"></div>
           
@@ -140,11 +140,11 @@
     <div id="game-4" class="screen game-screen hidden">
       <div class="game-header">
         <button class="back-btn" onclick="showLanding()">← Back</button>
-        <h2>Game 4: Digit Matrix</h2>
+        <h2>Game 4: Sudoku</h2>
       </div>
       
       <div class="container">
-        <p class="game-description">Complete each series of 9x9 number puzzles to collect your final clue before you hit your stride.</p>
+        <p class="game-description"><strong>Digit Matrix:</strong> Complete each series of 9x9 number puzzles to collect your final clue before you hit your stride.</p>
         <div class="game-content">
           <div id="sudoku-feedback" class="feedback"></div>
           <div id="sudoku-grid" class="sudoku-grid"></div>
@@ -157,7 +157,7 @@
     <div id="final-screen" class="screen hidden">
       <div class="game-header">
         <button class="back-btn" onclick="showLanding()">← Back</button>
-        <h2>Solve the Cadence</h2>
+        <h2>Final Answer</h2>
       </div>
       
       <div class="container">
@@ -165,9 +165,8 @@
         
         <div class="password-section">
           <h3>Enter Your Unlock Code</h3>
-          <p>Combine Game 1 and The Current'mmyy'</p>
-          <p>Password Is Case Sensitive</p>
-          <input type="text" id="password-input" class="game-input" placeholder="cloud0226" style="font-size: 18px; letter-spacing: 2px;">
+          <p>Combine Game 1 and Game 4 results.</p>
+          <input type="text" id="password-input" class="game-input" placeholder="Enter unlock code..." style="font-size: 18px; letter-spacing: 2px;">
           <button id="password-submit" class="game-button">Verify</button>
           <div id="password-feedback" class="feedback"></div>
         </div>
@@ -177,7 +176,7 @@
           <p>You've done it! The Cadence has been satisfied…for now.</p>
           <p style="font-size: 14px; margin-top: 20px;">Submit your email in the following Google Form to add your name to this month's leaderboard, and be notified with a chance to <em>Solve Yourself, Again.</em></p>
           <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
-            <button id="leaderboard-submit" class="game-button" a href:"https://forms.gle/DFdKwSb244C4WEJy8">Submit Your Score</button></a>
+            <button id="leaderboard-submit" class="game-button">Submit Your Score</button>
             <a href="javascript:showLanding();" style="padding: 12px; text-align: center; background: var(--bg-light); color: var(--primary); border-radius: var(--radius); text-decoration: none; font-weight: 500;">Play Again</a>
             <a href="https://soulseesbest.com" target="_blank" style="padding: 12px; text-align: center; background: var(--bg-light); color: var(--primary); border-radius: var(--radius); text-decoration: none; font-weight: 500;">Follow the Music</a>
             <a href="the-cadence.md" target="_blank" style="padding: 12px; text-align: center; background: var(--bg-light); color: var(--primary); border-radius: var(--radius); text-decoration: none; font-weight: 500;">The Cadence: Codex</a>
