@@ -1,358 +1,869 @@
-// Game Logic Classes for The Cadence
+// The Cadence - Updated Main Application Script with Audio
 
-class WordleGame {
-  constructor(answer, maxAttempts = 6) {
-    this.answer = answer.toUpperCase();
-    this.maxAttempts = maxAttempts;
-    this.attempts = 0;
-    this.guesses = [];
-    this.errors = 0;
-  }
+/** @type {CadenceGame} */
+let cadenceGame = null;
 
-  validateGuess(guess) {
-    guess = guess.toUpperCase().trim();
-    
-    if (guess.length !== this.answer.length) {
-      return { valid: false, message: `Word must be ${this.answer.length} letters` };
-    }
-    
-    if (!/^[A-Z]+$/.test(guess)) {
-      return { valid: false, message: "Only letters allowed" };
-    }
-    
-    if (this.guesses.includes(guess)) {
-      return { valid: false, message: "Already guessed this word" };
-    }
-    
-    this.guesses.push(guess);
-    this.attempts++;
-    
-    if (guess === this.answer) {
-      return { valid: true, correct: true };
-    } else {
-      this.errors++;
-      return { valid: true, correct: false, feedback: this.getFeedback(guess) };
-    }
-  }
+/** @type {AudioSystem} */
+let audioSystem = null;
 
-  getFeedback(guess) {
-    const feedback = [];
-    for (let i = 0; i < guess.length; i++) {
-      if (guess[i] === this.answer[i]) {
-        feedback.push('correct');
-      } else if (this.answer.includes(guess[i])) {
-        feedback.push('wrong-position');
-      } else {
-        feedback.push('wrong');
-      }
-    }
-    return feedback;
-  }
+// ===== SHARE FUNCTION =====
+function shareCurrentPage() {
+  const title = 'The Cadence - Solve Yourself, Again';
+  const text = 'Test your mind with The Cadence puzzle suite. Complete 4 games to unlock the leaderboard!';
+  const url = window.location.href;
 
-  isComplete() {
-    return this.guesses.includes(this.answer) || this.attempts >= this.maxAttempts;
+  if (navigator.share) {
+    navigator.share({ 
+      title: title,
+      text: text,
+      url: url 
+    }).catch(err => console.log('Share failed:', err));
+  } else {
+    alert('Share not supported on this device');
   }
 }
 
-class WordChainGame {
-  constructor(startWord, endWord, chain, alternatives = {}) {
-    this.startWord = startWord.toUpperCase();
-    this.endWord = endWord.toUpperCase();
-    this.chain = chain.map(w => w.toUpperCase());
-    this.alternatives = alternatives;
-    this.chainIndex = 0;
-    this.currentWord = this.chain[0].toUpperCase();
-    this.revealedLetters = 1;
-    this.errors = 0;
-    this.guesses = [];
-  }
-
-  getCurrentDisplay() {
-    const revealed = this.currentWord.substring(0, this.revealedLetters);
-    const hidden = "_".repeat(Math.max(0, this.currentWord.length - this.revealedLetters));
-    return revealed + hidden;
-  }
-
-  validateGuess(guess) {
-    guess = guess.toUpperCase().trim();
-    this.guesses.push(guess);
-    
-    const isCorrect = guess === this.currentWord || 
-                     (this.alternatives[this.currentWord] && 
-                      this.alternatives[this.currentWord].includes(guess));
-    
-    if (isCorrect) {
-      this.chainIndex++;
-      if (this.chainIndex < this.chain.length) {
-        this.currentWord = this.chain[this.chainIndex];
-        this.revealedLetters = 1;
-      }
-      return { correct: true, nextDisplay: this.getCurrentDisplay() };
+// ===== HIGHLIGHT ACTIVE NAV =====
+function highlightActiveNav() {
+  document.querySelectorAll('.nav-link').forEach(link => {
+    if (link.href.includes('the-cadence')) {
+      link.classList.add('active');
     } else {
-      this.errors++;
-      this.revealedLetters++;
-      
-      if (this.revealedLetters > this.currentWord.length) {
-        // Word fully revealed, auto-advance
-        this.chainIndex++;
-        if (this.chainIndex < this.chain.length) {
-          this.currentWord = this.chain[this.chainIndex];
-          this.revealedLetters = 1;
+      link.classList.remove('active');
+    }
+  });
+}
+
+// ===== AUDIO SYSTEM =====
+class AudioSystem {
+  constructor() {
+    this.currentTrack = null;
+    this.volume = 0.2; // Start at 20%
+    this.isMuted = false;
+    this.audioFiles = {
+      game1: './game1.mp3',
+      game2: './game2.mp3',
+      game3: './game3.mp3',
+      game4: './game4.mp3',
+      congratulations: './congratulations.mp3'
+    };
+    
+    // Load saved volume preference
+    const savedVolume = localStorage.getItem('cadence-volume');
+    if (savedVolume) {
+      this.volume = parseFloat(savedVolume);
+    }
+  }
+
+  async playTrack(trackName) {
+    try {
+      // Fade out current track
+      if (this.currentTrack) {
+        await this.fadeOut(this.currentTrack, 700); // 500ms → 700ms (+40%)
+        this.currentTrack.pause();
+      }
+
+      const audioFile = this.audioFiles[trackName];
+      if (!audioFile) return;
+
+      // Create new audio element
+      const audio = new Audio(audioFile);
+      audio.loop = true;
+      audio.volume = this.isMuted ? 0 : this.volume;
+
+      this.currentTrack = audio;
+
+      // Fade in
+      audio.play().catch(err => {
+        console.warn('Audio playback failed:', err);
+      });
+
+      await this.fadeIn(audio, 700); // 500ms → 700ms (+40%)
+    } catch (err) {
+      console.error('Audio playback error:', err);
+    }
+  }
+
+  async fadeOut(audio, duration = 500) {
+    return new Promise(resolve => {
+      const steps = 50;
+      const stepDuration = duration / steps;
+      const startVolume = audio.volume;
+      let step = 0;
+
+      const interval = setInterval(() => {
+        step++;
+        audio.volume = startVolume * (1 - step / steps);
+        if (step >= steps) {
+          clearInterval(interval);
+          audio.volume = 0;
+          resolve();
         }
-      }
-      
-      return { correct: false, nextDisplay: this.getCurrentDisplay(), error: true };
-    }
-  }
-
-  isComplete() {
-    return this.chainIndex >= this.chain.length;
-  }
-}
-
-class CryptogramGame {
-  constructor(plaintext, startLetters = 3) {
-    this.plaintext = plaintext.toUpperCase();
-    this.startLetters = startLetters;
-    this.errors = 0;
-    this.guesses = {};
-    this.cipher = this.generateCipher(plaintext);
-    this.letterToNumber = {};
-    
-    for (let [letter, number] of Object.entries(this.cipher)) {
-      this.letterToNumber[number] = letter;
-    }
-    
-    this.revealRandomLetters(startLetters);
-  }
-
-  generateCipher(plaintext) {
-    const uniqueLetters = [...new Set(plaintext.split('').filter(c => /[A-Z]/.test(c)))];
-    const numbers = Array.from({length: uniqueLetters.length}, (_, i) => i + 1);
-    
-    // Shuffle numbers
-    for (let i = numbers.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
-    }
-    
-    const cipher = {};
-    uniqueLetters.forEach((letter, index) => {
-      cipher[letter] = numbers[index];
-    });
-    
-    return cipher;
-  }
-
-  revealRandomLetters(count) {
-    const uniqueLetters = [...new Set(this.plaintext.split('').filter(c => /[A-Z]/.test(c)))];
-    const shuffled = [...uniqueLetters].sort(() => 0.5 - Math.random());
-    const toReveal = shuffled.slice(0, Math.min(count, uniqueLetters.length));
-    
-    toReveal.forEach(letter => {
-      const number = this.cipher[letter];
-      this.guesses[number] = letter;
+      }, stepDuration);
     });
   }
 
-  getCurrentDisplay() {
-    let display = "";
-    for (let char of this.plaintext) {
-      if (char === ' ' || char === "'") {
-        display += char;
-      } else {
-        const number = this.cipher[char];
-        const guessedLetter = this.guesses[number];
-        display += guessedLetter || "_";
-      }
-    }
-    return display;
-  }
+  async fadeIn(audio, duration = 500) {
+    return new Promise(resolve => {
+      const steps = 50;
+      const stepDuration = duration / steps;
+      const targetVolume = this.isMuted ? 0 : this.volume;
+      let step = 0;
 
-  getNumbersDisplay() {
-    let display = "";
-    for (let char of this.plaintext) {
-      if (char === ' ' || char === "'") {
-        display += " ";
-      } else {
-        const number = this.cipher[char];
-        display += number.toString().padStart(2, ' ');
-      }
-    }
-    return display;
-  }
-
-  getRevealedNumbers() {
-    return Object.keys(this.guesses).map(Number).sort((a, b) => a - b);
-  }
-
-  validateGuess(letterGuess, numberInput) {
-    letterGuess = letterGuess.toUpperCase();
-    numberInput = Number(numberInput);
-    
-    const correctLetter = this.letterToNumber[numberInput];
-    
-    if (!correctLetter) {
-      return { valid: false, message: "Invalid number" };
-    }
-    
-    if (letterGuess === correctLetter) {
-      this.guesses[numberInput] = letterGuess;
-      return { correct: true, display: this.getCurrentDisplay() };
-    } else {
-      this.errors++;
-      return { correct: false, error: true };
-    }
-  }
-
-  isComplete() {
-    return this.getCurrentDisplay() === this.plaintext;
-  }
-}
-
-class SudokuGame {
-  constructor(puzzle, solution, extractRule = "topRowSection1") {
-    this.puzzle = JSON.parse(JSON.stringify(puzzle));
-    this.solution = solution;
-    this.playerGrid = JSON.parse(JSON.stringify(puzzle));
-    this.errors = 0;
-    this.extractRule = extractRule;
-  }
-
-  validateCell(row, col, number) {
-    number = Number(number);
-    
-    if (number < 1 || number > 9) {
-      return { valid: false, message: "Number must be 1-9" };
-    }
-    
-    if (this.solution[row][col] === number) {
-      this.playerGrid[row][col] = number;
-      return { correct: true };
-    } else {
-      this.errors++;
-      return { correct: false, error: true };
-    }
-  }
-
-  isComplete() {
-    for (let i = 0; i < 9; i++) {
-      for (let j = 0; j < 9; j++) {
-        if (this.playerGrid[i][j] !== this.solution[i][j]) {
-          return false;
+      const interval = setInterval(() => {
+        step++;
+        audio.volume = (step / steps) * targetVolume;
+        if (step >= steps) {
+          clearInterval(interval);
+          audio.volume = targetVolume;
+          resolve();
         }
-      }
-    }
-    return true;
+      }, stepDuration);
+    });
   }
 
-  extractNumbers() {
-    let numbers = [];
+  setVolume(percent) {
+    this.volume = Math.max(0, Math.min(1, percent / 100));
+    localStorage.setItem('cadence-volume', this.volume.toString());
     
-    if (this.extractRule === "topRowSection1") {
-      // Top row of top-left section (row 0, cols 0-2)
-      numbers = [this.solution[0][0], this.solution[0][1], this.solution[0][2]];
+    if (this.currentTrack && !this.isMuted) {
+      this.currentTrack.volume = this.volume;
     }
-    
-    return numbers.join("");
+
+    // Update slider
+    const slider = document.getElementById('volume-slider');
+    if (slider) {
+      slider.value = this.volume * 100;
+    }
+  }
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    if (this.currentTrack) {
+      this.currentTrack.volume = this.isMuted ? 0 : this.volume;
+    }
+
+    const muteBtn = document.getElementById('mute-btn');
+    if (muteBtn) {
+      muteBtn.textContent = this.isMuted ? '🔇' : '🔊';
+    }
+  }
+
+  stop() {
+    if (this.currentTrack) {
+      this.currentTrack.pause();
+      this.currentTrack = null;
+    }
   }
 }
 
-class CadenceGame {
-  constructor(volume) {
-    this.volume = volume;
-    this.currentGameIndex = 0;
-    this.games = [];
-    this.totalErrors = 0;
-    
-    this.initializeGames();
-    this.loadProgress();
+document.addEventListener('DOMContentLoaded', function() {
+  audioSystem = new AudioSystem();
+  initializeApp();
+  highlightActiveNav();
+});
+
+function initializeApp() {
+  // @ts-ignore - currentVolume is defined in data.js
+  cadenceGame = new CadenceGame(currentVolume);
+  setupEventListeners();
+  setupAudioControls();
+  showLanding();
+}
+
+function setupAudioControls() {
+  const volumeSlider = document.getElementById('volume-slider');
+  const muteBtn = document.getElementById('mute-btn');
+
+  if (volumeSlider) {
+    volumeSlider.value = audioSystem.volume * 100;
+    volumeSlider.addEventListener('input', function() {
+      audioSystem.setVolume(this.value);
+    });
   }
 
-  initializeGames() {
-    this.games[0] = new WordleGame(this.volume.games.game1.answer);
-    this.games[1] = new WordChainGame(
-      this.volume.games.game2.start,
-      this.volume.games.game2.end,
-      this.volume.games.game2.chain,
-      this.volume.games.game2.alternatives
-    );
-    this.games[2] = new CryptogramGame(this.volume.games.game3.plaintext);
-    this.games[3] = new SudokuGame(
-      this.volume.games.game4.puzzle,
-      this.volume.games.game4.solution
-    );
+  if (muteBtn) {
+    muteBtn.textContent = audioSystem.isMuted ? '🔇' : '🔊';
+    muteBtn.addEventListener('click', function() {
+      audioSystem.toggleMute();
+    });
   }
+}
 
-  getCurrentGame() {
-    return this.games[this.currentGameIndex];
-  }
-
-  advanceGame() {
-    if (this.currentGameIndex < 3) {
-      this.currentGameIndex++;
-      this.saveProgress();
-      return true;
+function setupEventListeners() {
+  // Game 1: Wordle
+  const wordleSubmit = document.getElementById('wordle-submit');
+  if (wordleSubmit) {
+    wordleSubmit.addEventListener('click', handleWordleGuess);
+    const wordleInput = document.getElementById('wordle-input');
+    if (wordleInput) {
+      wordleInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') handleWordleGuess();
+      });
     }
-    return false;
   }
 
-  calculateScore(gameIndex) {
-    const baseScore = 200;
-    const game = this.games[gameIndex];
-    const errorPenalty = game.errors * 50;
-    return Math.max(0, baseScore - errorPenalty);
+  // Game 2: Word Chain
+  const chainSubmit = document.getElementById('chain-submit');
+  if (chainSubmit) {
+    chainSubmit.addEventListener('click', handleChainGuess);
+    const chainInput = document.getElementById('chain-input');
+    if (chainInput) {
+      chainInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') handleChainGuess();
+      });
+    }
   }
 
-  generateFinalPassword() {
-    const game1Answer = this.volume.games.game1.answer;
-    const game4Numbers = this.games[3].extractNumbers();
-    return game1Answer + game4Numbers;
+  // Game 3: Cryptogram
+  const cryptoSolveBtn = document.getElementById('crypto-solve-btn');
+  if (cryptoSolveBtn) {
+    cryptoSolveBtn.addEventListener('click', handleCryptoSolve);
   }
 
-  validateFinalPassword(input) {
-    return input === this.generateFinalPassword();
+  // Game 4: Sudoku
+  const sudokuSubmit = document.getElementById('sudoku-submit');
+  if (sudokuSubmit) {
+    sudokuSubmit.addEventListener('click', handleSudokuSubmit);
   }
 
-  getFinalStats() {
-    let totalScore = 0;
-    let totalErrors = 0;
-    const breakdown = {};
+  // Final password
+  const passwordSubmit = document.getElementById('password-submit');
+  if (passwordSubmit) {
+    passwordSubmit.addEventListener('click', handlePasswordSubmit);
+  }
+
+  // Leaderboard submit
+  const leaderboardBtn = document.getElementById('leaderboard-submit');
+  if (leaderboardBtn) {
+    leaderboardBtn.addEventListener('click', submitToLeaderboard);
+  }
+}
+
+function showLanding() {
+  hideAllScreens();
+  document.getElementById('landing').classList.remove('hidden');
+  updateGameList();
+  audioSystem.playTrack('congratulations'); // Opening music
+}
+
+function hardReset() {
+  if (confirm('Reset all progress? This cannot be undone.')) {
+    localStorage.clear();
+    // Reinitialize with fresh game objects
+    cadenceGame = new CadenceGame(currentVolume);
+    // Force reinit of all games
+    cadenceGame.games = [
+      new WordleGame(cadenceGame.puzzles.wordle.answer),
+      new WordChainGame(cadenceGame.puzzles.wordChain.startWord, cadenceGame.puzzles.wordChain.chain, cadenceGame.puzzles.wordChain.endWord, cadenceGame.puzzles.wordChain.alternatives),
+      new CryptogramGame(cadenceGame.puzzles.cryptogram.plaintext, 3),
+      new SudokuGame(cadenceGame.puzzles.sudoku.puzzle, cadenceGame.puzzles.sudoku.solution)
+    ];
+    cadenceGame.currentGameIndex = -1;
+    updateGameList();
+    showLanding();
+  }
+}
+
+function continueToNextGame() {
+  if (cadenceGame.advanceGame()) {
+    updateGameList();
+    showGame(cadenceGame.currentGameIndex);
+  }
+}
+
+function updateGameList() {
+  const gameList = document.getElementById('game-list');
+  gameList.innerHTML = '';
+  
+  const games = [
+    { name: '1. Passkey', id: 'game-1' },
+    { name: '2. Chained Lock', id: 'game-2' },
+    { name: '3. Structural Integrity', id: 'game-3' },
+    { name: '4. Digit Matrix', id: 'game-4' }
+  ];
+  
+  games.forEach((game, index) => {
+    const button = document.createElement('button');
+    button.className = 'game-button';
     
-    for (let i = 0; i < 4; i++) {
-      const score = this.calculateScore(i);
-      totalScore += score;
-      totalErrors += this.games[i].errors;
-      breakdown[`game${i + 1}`] = {
-        score: score,
-        errors: this.games[i].errors
-      };
+    if (index <= cadenceGame.currentGameIndex) {
+      button.textContent = game.name + ' ✓';
+      button.disabled = false;
+      button.addEventListener('click', () => showGame(index));
+    } else {
+      button.textContent = game.name + ' 🔒';
+      button.disabled = true;
     }
     
-    return {
-      totalScore,
-      maxScore: 800,
-      totalErrors,
-      breakdown
-    };
+    gameList.appendChild(button);
+  });
+  
+  // Show final screen button if all games complete
+  if (cadenceGame.currentGameIndex >= 4) {
+    const finalButton = document.createElement('button');
+    finalButton.className = 'game-button';
+    finalButton.textContent = '5. Final Answer';
+    finalButton.addEventListener('click', showFinal);
+    gameList.appendChild(finalButton);
   }
+}
 
-  saveProgress() {
-    const state = {
-      currentGameIndex: this.currentGameIndex
-    };
-    localStorage.setItem(`cadence-${this.volume.id}`, JSON.stringify(state));
+function showGame(gameIndex) {
+  cadenceGame.currentGameIndex = gameIndex;
+  hideAllScreens();
+  
+  const screenId = `game-${gameIndex + 1}`;
+  document.getElementById(screenId).classList.remove('hidden');
+  
+  // Play appropriate audio
+  const audioTracks = ['game1', 'game2', 'game3', 'game4'];
+  audioSystem.playTrack(audioTracks[gameIndex]);
+  
+  if (gameIndex === 0) initWordleGame();
+  else if (gameIndex === 1) initChainGame();
+  else if (gameIndex === 2) initCryptoGame();
+  else if (gameIndex === 3) initSudokuGame();
+}
+
+// ===== GAME 1: WORDLE =====
+function initWordleGame() {
+  const game = cadenceGame.games[0];
+  const feedback = document.getElementById('wordle-feedback');
+  const attemptsLeft = document.getElementById('wordle-attempts');
+  const historyDiv = document.getElementById('wordle-history');
+  
+  // If game already completed, show continue button instead
+  if (game.guesses.length > 0 && game.guesses.includes(game.answer)) {
+    feedback.textContent = `✓ Correct! The word is ${game.answer}`;
+    document.getElementById('wordle-submit').disabled = true;
+    document.getElementById('wordle-input').disabled = true;
+    
+    // Show continue button if not already there
+    if (!document.querySelector('.wordle-continue-btn')) {
+      const continueBtn = document.createElement('button');
+      continueBtn.className = 'game-button wordle-continue-btn';
+      continueBtn.textContent = 'Continue →';
+      continueBtn.style.marginTop = '15px';
+      continueBtn.onclick = continueToNextGame;
+      document.getElementById('wordle-input').parentElement.appendChild(continueBtn);
+    }
+    return;
   }
+  
+  feedback.textContent = 'Guess the word!';
+  attemptsLeft.textContent = `Attempts left: ${game.maxAttempts - game.attempts}`;
+  historyDiv.innerHTML = ''; // Clear history
+  
+  // Show previous guesses
+  game.guesses.forEach(guess => {
+    const guessedFeedback = game.getFeedback(guess);
+    const matched = guessedFeedback.map((f, i) => {
+      if (f === 'correct') return '🟩';
+      if (f === 'wrong-position') return '🟨';
+      return '⬜';
+    }).join('');
+    
+    const div = document.createElement('div');
+    div.textContent = `${guess} ${matched}`;
+    div.style.marginBottom = '5px';
+    historyDiv.appendChild(div);
+  });
+  
+  document.getElementById('wordle-input').value = '';
+  document.getElementById('wordle-submit').disabled = false;
+  document.getElementById('wordle-input').disabled = false;
+  document.getElementById('wordle-input').focus();
+  updateScoreDisplay();
+}
 
-  loadProgress() {
-    const saved = localStorage.getItem(`cadence-${this.volume.id}`);
-    if (saved) {
-      try {
-        const state = JSON.parse(saved);
-        this.currentGameIndex = state.currentGameIndex;
-      } catch (e) {
-        console.error('Error loading progress', e);
+function handleWordleGuess() {
+  const input = document.getElementById('wordle-input').value;
+  const game = cadenceGame.games[0];
+  const feedback = document.getElementById('wordle-feedback');
+  const attemptsLeft = document.getElementById('wordle-attempts');
+  const historyDiv = document.getElementById('wordle-history');
+  
+  const result = game.validateGuess(input);
+  
+  if (!result.valid) {
+    feedback.textContent = result.message;
+    return;
+  }
+  
+  // Update history
+  const feedbackItems = result.feedback ? result.feedback.map((f, i) => {
+    if (f === 'correct') return '🟩';
+    if (f === 'wrong-position') return '🟨';
+    return '⬜';
+  }).join('') : '';
+  
+  const div = document.createElement('div');
+  div.textContent = `${input} ${feedbackItems}`;
+  div.style.marginBottom = '5px';
+  historyDiv.appendChild(div);
+  
+  attemptsLeft.textContent = `Attempts left: ${game.maxAttempts - game.attempts}`;
+  updateScoreDisplay();
+  
+  if (result.correct) {
+    feedback.textContent = `✓ Correct! The word is ${input}`;
+    document.getElementById('wordle-submit').disabled = true;
+    document.getElementById('wordle-input').disabled = true;
+    
+    // Show continue button
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'game-button';
+    continueBtn.textContent = 'Continue →';
+    continueBtn.style.marginTop = '15px';
+    continueBtn.onclick = continueToNextGame;
+    document.getElementById('wordle-input').parentElement.appendChild(continueBtn);
+  } else {
+    feedback.textContent = '';
+  }
+  
+  document.getElementById('wordle-input').value = '';
+}
+
+// ===== GAME 2: WORD CHAIN =====
+function initChainGame() {
+  const game = cadenceGame.games[1];
+  renderChainDisplay();
+  updateScoreDisplay();
+  document.getElementById('chain-input').value = '';
+  document.getElementById('chain-input').focus();
+}
+
+function renderChainDisplay() {
+  const game = cadenceGame.games[1];
+  const chainContainer = document.getElementById('chain-display');
+  chainContainer.innerHTML = '';
+  
+  // Show all words in chain
+  const words = [game.startWord, ...game.chain, game.endWord];
+  
+  words.forEach((word, index) => {
+    const span = document.createElement('span');
+    span.className = 'chain-item';
+    
+    if (index < game.chainIndex + 1) {
+      // Completed word
+      span.classList.add('chain-completed');
+      span.textContent = word;
+    } else if (index === game.chainIndex + 1) {
+      // Current word
+      span.classList.add('chain-current');
+      span.textContent = game.getCurrentDisplay();
+    } else {
+      // Future word
+      span.classList.add('chain-future');
+      span.textContent = '?'.repeat(word.length);
+    }
+    
+    chainContainer.appendChild(span);
+    
+    if (index < words.length - 1) {
+      const arrow = document.createElement('span');
+      arrow.className = 'arrow';
+      arrow.textContent = '→';
+      chainContainer.appendChild(arrow);
+    }
+  });
+}
+
+function handleChainGuess() {
+  const input = document.getElementById('chain-input').value;
+  const game = cadenceGame.games[1];
+  const feedback = document.getElementById('chain-feedback');
+  
+  const result = game.validateGuess(input);
+  
+  renderChainDisplay();
+  updateScoreDisplay();
+  
+  if (result.error) {
+    feedback.textContent = '✗ Incorrect. Letter revealed.';
+  } else {
+    feedback.textContent = '✓ Correct!';
+  }
+  
+  document.getElementById('chain-input').value = '';
+  
+  // Game complete when we reach the second-to-last word (PROTECT is auto-complete)
+  if (game.chainIndex >= game.chain.length - 1) {
+    document.getElementById('chain-submit').disabled = true;
+    document.getElementById('chain-input').disabled = true;
+    feedback.textContent = '✓ Word chain complete!';
+    
+    setTimeout(() => {
+      if (cadenceGame.advanceGame()) {
+        updateGameList();
+        showGame(2);
+      }
+    }, 2000);
+  }
+}
+
+// ===== GAME 3: CRYPTOGRAM (UPDATED) =====
+function initCryptoGame() {
+  const game = cadenceGame.games[2];
+  renderCryptogramGrid(game);
+  updateScoreDisplay();
+}
+
+function renderCryptogramGrid(game) {
+  const messageDisplay = document.getElementById('crypto-message');
+  messageDisplay.innerHTML = '';
+  
+  // Split plaintext into words
+  const words = game.plaintext.split(' ');
+  let currentFocusNumber = null;
+  
+  words.forEach(word => {
+    const wordGroup = document.createElement('div');
+    wordGroup.style.display = 'inline-flex';
+    wordGroup.style.flexDirection = 'column';
+    wordGroup.style.alignItems = 'center';
+    wordGroup.style.marginRight = '20px';
+    wordGroup.style.marginBottom = '20px';
+    
+    // Letters row
+    const letterRow = document.createElement('div');
+    letterRow.style.display = 'flex';
+    letterRow.style.gap = '6px';
+    letterRow.style.marginBottom = '8px';
+    
+    // Numbers row
+    const numberRow = document.createElement('div');
+    numberRow.style.display = 'flex';
+    numberRow.style.gap = '8px';
+    numberRow.style.fontSize = '12px';
+    numberRow.style.fontWeight = '600';
+    numberRow.style.color = 'var(--text-light)';
+    numberRow.style.letterSpacing = '2px';
+    
+    for (let char of word) {
+      if (char === "'") {
+        letterRow.appendChild(document.createTextNode("'"));
+        numberRow.appendChild(document.createTextNode("'"));
+      } else {
+        const number = game.cipher[char];
+        const guessedLetter = game.guesses[number];
+        
+        // Letter block
+        const block = document.createElement('span');
+        block.className = 'crypto-block';
+        block.textContent = guessedLetter || '_';
+        block.id = `crypto-msg-${number}`;
+        block.style.cursor = 'pointer';
+        block.style.outline = 'none';
+        block.tabIndex = 0;
+        block.setAttribute('data-number', number);
+        
+        block.onclick = () => {
+          block.focus();
+          currentFocusNumber = number;
+        };
+        
+        block.onkeydown = (e) => {
+          const letter = e.key.toUpperCase();
+          if (/^[A-Z]$/.test(letter)) {
+            e.preventDefault();
+            const result = game.inputLetter(number, letter);
+            
+            if (result.correct) {
+              block.textContent = letter;
+              block.classList.add('correct-letter');
+              updateScoreDisplay();
+              
+              if (result.complete) {
+                completeGame3();
+              }
+            } else {
+              block.classList.add('error-letter');
+              setTimeout(() => block.classList.remove('error-letter'), 300);
+            }
+          }
+        };
+        
+        letterRow.appendChild(block);
+        
+        // Number below
+        const numSpan = document.createElement('span');
+        numSpan.style.display = 'inline-block';
+        numSpan.style.minWidth = '24px';
+        numSpan.style.textAlign = 'center';
+        numSpan.textContent = number;
+        numberRow.appendChild(numSpan);
       }
     }
+    
+    wordGroup.appendChild(letterRow);
+    wordGroup.appendChild(numberRow);
+    messageDisplay.appendChild(wordGroup);
+  });
+  
+  // Solve by typing full answer
+  const gridContainer = document.getElementById('crypto-grid');
+  gridContainer.innerHTML = '';
+}
+
+function handleCryptoSolve() {
+  const game = cadenceGame.games[2];
+  const input = document.getElementById('crypto-solve-input').value.toUpperCase();
+  const feedback = document.getElementById('crypto-feedback');
+  
+  if (input === game.plaintext) {
+    feedback.textContent = '✓ Correct!';
+    feedback.className = 'feedback correct';
+    
+    // Reveal all letters
+    game.skip();
+    
+    // Update all blocks
+    document.querySelectorAll('[data-number]').forEach(block => {
+      const number = block.getAttribute('data-number');
+      block.textContent = game.letterToNumber[number];
+      block.disabled = true;
+    });
+    
+    document.getElementById('crypto-solve-btn').disabled = true;
+    document.getElementById('crypto-solve-input').disabled = true;
+    
+    completeGame3();
+  } else {
+    feedback.textContent = '✗ Incorrect. Try again.';
+    feedback.className = 'feedback error';
+    game.errors++;
+    updateScoreDisplay();
   }
+}
+
+function handleCryptoSolve() {
+  const game = cadenceGame.games[2];
+  const input = document.getElementById('crypto-solve-input').value.toUpperCase();
+  const feedback = document.getElementById('crypto-feedback');
+  
+  if (input === game.plaintext) {
+    feedback.textContent = '✓ Correct!';
+    feedback.className = 'feedback correct';
+    
+    // Reveal all letters
+    game.skip();
+    document.getElementById('crypto-message').textContent = game.plaintext;
+    
+    // Disable all inputs
+    document.querySelectorAll('.crypto-cell-input').forEach(inp => inp.disabled = true);
+    document.getElementById('crypto-solve-btn').disabled = true;
+    document.getElementById('crypto-skip-btn').disabled = true;
+    
+    setTimeout(() => {
+      completeGame3();
+    }, 2000);
+  } else {
+    feedback.textContent = '✗ Incorrect. Try again.';
+    feedback.className = 'feedback error';
+    game.errors++;
+    updateScoreDisplay();
+  }
+}
+
+function handleCryptoSkip() {
+  const game = cadenceGame.games[2];
+  game.errors += 4; // Major penalty
+  game.skip();
+  
+  document.getElementById('crypto-message').textContent = game.plaintext;
+  document.querySelectorAll('.crypto-cell-input').forEach(inp => inp.disabled = true);
+  
+  const feedback = document.getElementById('crypto-feedback');
+  feedback.textContent = '⏭️ Skipped. -200 points.';
+  feedback.className = 'feedback';
+  
+  updateScoreDisplay();
+  
+  setTimeout(() => {
+    completeGame3();
+  }, 2000);
+}
+
+function completeGame3() {
+  document.getElementById('crypto-solve-btn').disabled = true;
+  document.getElementById('crypto-solve-input').disabled = true;
+  
+  // Show continue button
+  const continueBtn = document.createElement('button');
+  continueBtn.className = 'game-button';
+  continueBtn.textContent = 'Continue →';
+  continueBtn.style.marginTop = '15px';
+  continueBtn.onclick = continueToNextGame;
+  document.getElementById('crypto-solve-input').parentElement.appendChild(continueBtn);
+}
+
+// ===== GAME 4: SUDOKU =====
+function initSudokuGame() {
+  const game = cadenceGame.games[3];
+  renderSudokuGrid(game);
+  updateScoreDisplay();
+}
+
+function renderSudokuGrid(game) {
+  const container = document.getElementById('sudoku-grid');
+  container.innerHTML = '';
+  
+  for (let i = 0; i < 9; i++) {
+    for (let j = 0; j < 9; j++) {
+      const cell = document.createElement('input');
+      cell.type = 'number';
+      cell.min = '1';
+      cell.max = '9';
+      cell.className = 'sudoku-cell';
+      cell.id = `sudoku-${i}-${j}`;
+      cell.value = game.playerGrid[i][j] || '';
+      cell.disabled = game.puzzle[i][j] !== 0;
+      
+      if (game.puzzle[i][j] !== 0) {
+        cell.className += ' puzzle-cell';
+      }
+      
+      if ((i + 1) % 3 === 0 && i < 8) cell.className += ' border-bottom';
+      if ((j + 1) % 3 === 0 && j < 8) cell.className += ' border-right';
+      
+      cell.addEventListener('change', (e) => handleSudokuInput(e, i, j));
+      container.appendChild(cell);
+    }
+  }
+}
+
+function handleSudokuInput(event, row, col) {
+  const value = event.target.value;
+  const game = cadenceGame.games[3];
+  
+  if (value === '') {
+    game.playerGrid[row][col] = 0;
+    return;
+  }
+  
+  const number = Number(value);
+  const result = game.validateCell(row, col, number);
+  
+  if (result.correct) {
+    event.target.classList.add('correct');
+    updateScoreDisplay();
+  } else {
+    event.target.classList.add('error');
+    event.target.value = '';
+    updateScoreDisplay();
+    setTimeout(() => {
+      event.target.classList.remove('error');
+    }, 500);
+  }
+}
+
+function handleSudokuSubmit() {
+  const game = cadenceGame.games[3];
+  const feedback = document.getElementById('sudoku-feedback');
+  
+  if (game.isComplete()) {
+    feedback.textContent = '✓ Sudoku complete!';
+    document.getElementById('sudoku-submit').disabled = true;
+    
+    setTimeout(() => {
+      if (cadenceGame.advanceGame()) {
+        updateGameList();
+        showFinal();
+      }
+    }, 2000);
+  } else {
+    feedback.textContent = '✗ Sudoku is not complete yet';
+  }
+}
+
+// ===== FINAL SCREEN =====
+function showFinal() {
+  hideAllScreens();
+  document.getElementById('final-screen').classList.remove('hidden');
+  
+  const stats = cadenceGame.getFinalStats();
+  const expectedPassword = cadenceGame.generateFinalPassword();
+  
+  const statsDiv = document.getElementById('final-stats');
+  statsDiv.innerHTML = `
+    <h2>Performance Review</h2>
+    <p><strong>Total Score:</strong> ${stats.totalScore}/${stats.maxScore}</p>
+    <p><strong>Total Errors:</strong> ${stats.totalErrors}</p>
+    <hr>
+    <h3>Breakdown:</h3>
+    ${Object.entries(stats.breakdown).map(([game, data]) => 
+      `<p>${game}: ${data.score} pts (${data.errors} errors)</p>`
+    ).join('')}
+    <hr>
+    <p style="font-size: 14px; color: #666;">
+      <strong>Hint:</strong> Your unlock code combines the answer from Game 1 and 3 numbers from Game 4.
+    </p>
+  `;
+  
+  audioSystem.playTrack('congratulations');
+  
+  document.getElementById('password-input').value = '';
+  document.getElementById('password-input').focus();
+}
+
+function handlePasswordSubmit() {
+  const input = document.getElementById('password-input').value;
+  const isCorrect = cadenceGame.validateFinalPassword(input);
+  const feedback = document.getElementById('password-feedback');
+  
+  if (isCorrect) {
+    feedback.textContent = '✓ Correct! You have unlocked the leaderboard.';
+    feedback.className = 'feedback correct';
+    document.getElementById('password-submit').disabled = true;
+    document.getElementById('password-input').disabled = true;
+    document.getElementById('leaderboard-section').style.display = 'block';
+  } else {
+    feedback.textContent = '✗ Incorrect unlock code. Try again.';
+    feedback.className = 'feedback error';
+  }
+}
+
+function submitToLeaderboard() {
+  const stats = cadenceGame.getFinalStats();
+  const playerEmail = prompt('Enter your email:') || '';
+  const playerName = prompt('Enter your name (or leave blank for anonymous):') || 'Anonymous';
+  
+  const googleFormURL = 'https://docs.google.com/forms/d/e/1FAIpQLScBt1JL312beLGEq1ToYAdOYNIXMyHNrfdSWyaH5A9EWidqBw/formResponse';
+  
+  const params = new URLSearchParams({
+    'entry.468873582': playerName,                 // Player Name
+    'entry.1095360262': stats.totalScore,          // Points Earned
+    'entry.1976953641': stats.totalErrors,         // Errors
+    'entry.1496219444': 'Intimidation',            // Challenge Name
+    'entry.1964400523': stats.totalScore           // Total Score (defining metric)
+  });
+  
+  window.open(googleFormURL + '?' + params.toString(), '_blank');
+}
+
+function updateScoreDisplay() {
+  let totalScore = 0;
+  let totalErrors = 0;
+  
+  for (let i = 0; i < cadenceGame.games.length; i++) {
+    const score = cadenceGame.calculateScore(i);
+    totalScore += score;
+    totalErrors += cadenceGame.games[i].errors;
+  }
+  
+  const scoreDisplay = document.getElementById('score-display');
+  const errorDisplay = document.getElementById('error-display');
+  
+  if (scoreDisplay) scoreDisplay.textContent = `+${totalScore}`;
+  if (errorDisplay) errorDisplay.textContent = `-${totalErrors}`;
+}
+
+// ===== UTILITY FUNCTIONS =====
+function hideAllScreens() {
+  document.querySelectorAll('.screen').forEach(el => {
+    el.classList.add('hidden');
+  });
 }
