@@ -1,27 +1,201 @@
-// The Cadence - Main Application Script
+// The Cadence - Updated Main Application Script with Audio
 
+/** @type {CadenceGame} */
 let cadenceGame = null;
 
+/** @type {AudioSystem} */
+let audioSystem = null;
+
+// ===== SHARE FUNCTION =====
+function shareCurrentPage() {
+  const title = 'The Cadence - Solve Yourself, Again';
+  const text = 'Test your mind with The Cadence puzzle suite. Complete 4 games to unlock the leaderboard!';
+  const url = window.location.href;
+
+  if (navigator.share) {
+    navigator.share({ 
+      title: title,
+      text: text,
+      url: url 
+    }).catch(err => console.log('Share failed:', err));
+  } else {
+    alert('Share not supported on this device');
+  }
+}
+
+// ===== HIGHLIGHT ACTIVE NAV =====
+function highlightActiveNav() {
+  document.querySelectorAll('.nav-link').forEach(link => {
+    if (link.href.includes('the-cadence')) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+}
+
+// ===== AUDIO SYSTEM =====
+class AudioSystem {
+  constructor() {
+    this.currentTrack = null;
+    this.volume = 0.2; // Start at 20%
+    this.isMuted = false;
+    this.audioFiles = {
+      game1: './game1.mp3',
+      game2: './game2.mp3',
+      game3: './game3.mp3',
+      game4: './game4.mp3',
+      congratulations: './congratulations.mp3'
+    };
+    
+    // Load saved volume preference
+    const savedVolume = localStorage.getItem('cadence-volume');
+    if (savedVolume) {
+      this.volume = parseFloat(savedVolume);
+    }
+  }
+
+  async playTrack(trackName) {
+    try {
+      // Fade out current track
+      if (this.currentTrack) {
+        await this.fadeOut(this.currentTrack, 500);
+        this.currentTrack.pause();
+      }
+
+      const audioFile = this.audioFiles[trackName];
+      if (!audioFile) return;
+
+      // Create new audio element
+      const audio = new Audio(audioFile);
+      audio.loop = true;
+      audio.volume = this.isMuted ? 0 : this.volume;
+
+      this.currentTrack = audio;
+
+      // Fade in
+      audio.play().catch(err => {
+        console.warn('Audio playback failed:', err);
+      });
+
+      await this.fadeIn(audio, 500);
+    } catch (err) {
+      console.error('Audio playback error:', err);
+    }
+  }
+
+  async fadeOut(audio, duration = 500) {
+    return new Promise(resolve => {
+      const steps = 50;
+      const stepDuration = duration / steps;
+      const startVolume = audio.volume;
+      let step = 0;
+
+      const interval = setInterval(() => {
+        step++;
+        audio.volume = startVolume * (1 - step / steps);
+        if (step >= steps) {
+          clearInterval(interval);
+          audio.volume = 0;
+          resolve();
+        }
+      }, stepDuration);
+    });
+  }
+
+  async fadeIn(audio, duration = 500) {
+    return new Promise(resolve => {
+      const steps = 50;
+      const stepDuration = duration / steps;
+      const targetVolume = this.isMuted ? 0 : this.volume;
+      let step = 0;
+
+      const interval = setInterval(() => {
+        step++;
+        audio.volume = (step / steps) * targetVolume;
+        if (step >= steps) {
+          clearInterval(interval);
+          audio.volume = targetVolume;
+          resolve();
+        }
+      }, stepDuration);
+    });
+  }
+
+  setVolume(percent) {
+    this.volume = Math.max(0, Math.min(1, percent / 100));
+    localStorage.setItem('cadence-volume', this.volume.toString());
+    
+    if (this.currentTrack && !this.isMuted) {
+      this.currentTrack.volume = this.volume;
+    }
+
+    // Update slider
+    const slider = document.getElementById('volume-slider');
+    if (slider) {
+      slider.value = this.volume * 100;
+    }
+  }
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    if (this.currentTrack) {
+      this.currentTrack.volume = this.isMuted ? 0 : this.volume;
+    }
+
+    const muteBtn = document.getElementById('mute-btn');
+    if (muteBtn) {
+      muteBtn.textContent = this.isMuted ? '🔇' : '🔊';
+    }
+  }
+
+  stop() {
+    if (this.currentTrack) {
+      this.currentTrack.pause();
+      this.currentTrack = null;
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+  audioSystem = new AudioSystem();
   initializeApp();
+  highlightActiveNav();
 });
 
 function initializeApp() {
+  // @ts-ignore - currentVolume is defined in data.js
   cadenceGame = new CadenceGame(currentVolume);
-  
-  // Set up event listeners
   setupEventListeners();
-  
-  // Show landing page
+  setupAudioControls();
   showLanding();
+}
+
+function setupAudioControls() {
+  const volumeSlider = document.getElementById('volume-slider');
+  const muteBtn = document.getElementById('mute-btn');
+
+  if (volumeSlider) {
+    volumeSlider.value = audioSystem.volume * 100;
+    volumeSlider.addEventListener('input', function() {
+      audioSystem.setVolume(this.value);
+    });
+  }
+
+  if (muteBtn) {
+    muteBtn.textContent = audioSystem.isMuted ? '🔇' : '🔊';
+    muteBtn.addEventListener('click', function() {
+      audioSystem.toggleMute();
+    });
+  }
 }
 
 function setupEventListeners() {
   // Game 1: Wordle
-  const wordleInput = document.getElementById('wordle-input');
   const wordleSubmit = document.getElementById('wordle-submit');
   if (wordleSubmit) {
     wordleSubmit.addEventListener('click', handleWordleGuess);
+    const wordleInput = document.getElementById('wordle-input');
     if (wordleInput) {
       wordleInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') handleWordleGuess();
@@ -30,10 +204,10 @@ function setupEventListeners() {
   }
 
   // Game 2: Word Chain
-  const chainInput = document.getElementById('chain-input');
   const chainSubmit = document.getElementById('chain-submit');
   if (chainSubmit) {
     chainSubmit.addEventListener('click', handleChainGuess);
+    const chainInput = document.getElementById('chain-input');
     if (chainInput) {
       chainInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') handleChainGuess();
@@ -42,16 +216,13 @@ function setupEventListeners() {
   }
 
   // Game 3: Cryptogram
-  const cryptoInput = document.getElementById('crypto-input');
-  const cryptoNumberInput = document.getElementById('crypto-number');
-  const cryptoSubmit = document.getElementById('crypto-submit');
-  if (cryptoSubmit) {
-    cryptoSubmit.addEventListener('click', handleCryptoGuess);
-    if (cryptoInput) {
-      cryptoInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') handleCryptoGuess();
-      });
-    }
+  const cryptoSolveBtn = document.getElementById('crypto-solve-btn');
+  const cryptoSkipBtn = document.getElementById('crypto-skip-btn');
+  if (cryptoSolveBtn) {
+    cryptoSolveBtn.addEventListener('click', handleCryptoSolve);
+  }
+  if (cryptoSkipBtn) {
+    cryptoSkipBtn.addEventListener('click', handleCryptoSkip);
   }
 
   // Game 4: Sudoku
@@ -77,6 +248,7 @@ function showLanding() {
   hideAllScreens();
   document.getElementById('landing').classList.remove('hidden');
   updateGameList();
+  audioSystem.stop();
 }
 
 function updateGameList() {
@@ -123,6 +295,10 @@ function showGame(gameIndex) {
   const screenId = `game-${gameIndex + 1}`;
   document.getElementById(screenId).classList.remove('hidden');
   
+  // Play appropriate audio
+  const audioTracks = ['game1', 'game2', 'game3', 'game4'];
+  audioSystem.playTrack(audioTracks[gameIndex]);
+  
   if (gameIndex === 0) initWordleGame();
   else if (gameIndex === 1) initChainGame();
   else if (gameIndex === 2) initCryptoGame();
@@ -140,6 +316,7 @@ function initWordleGame() {
   
   document.getElementById('wordle-input').value = '';
   document.getElementById('wordle-input').focus();
+  updateScoreDisplay();
 }
 
 function handleWordleGuess() {
@@ -156,6 +333,7 @@ function handleWordleGuess() {
   }
   
   attemptsLeft.textContent = `Attempts left: ${game.maxAttempts - game.attempts}`;
+  updateScoreDisplay();
   
   if (result.correct) {
     feedback.textContent = `✓ Correct! The word is ${input}`;
@@ -164,7 +342,6 @@ function handleWordleGuess() {
     
     setTimeout(() => {
       if (cadenceGame.advanceGame()) {
-        alert('Game 1 Complete! Moving to Game 2...');
         updateGameList();
         showGame(1);
       }
@@ -192,6 +369,7 @@ function initChainGame() {
   
   document.getElementById('chain-input').value = '';
   document.getElementById('chain-input').focus();
+  updateScoreDisplay();
 }
 
 function handleChainGuess() {
@@ -205,6 +383,7 @@ function handleChainGuess() {
   
   display.textContent = result.nextDisplay;
   progress.textContent = `Word ${game.chainIndex + 1} of ${game.chain.length}`;
+  updateScoreDisplay();
   
   if (result.error) {
     feedback.textContent = '✗ Incorrect. Letter revealed.';
@@ -221,7 +400,6 @@ function handleChainGuess() {
     
     setTimeout(() => {
       if (cadenceGame.advanceGame()) {
-        alert('Game 2 Complete! Moving to Game 3...');
         updateGameList();
         showGame(2);
       }
@@ -229,72 +407,133 @@ function handleChainGuess() {
   }
 }
 
-// ===== GAME 3: CRYPTOGRAM =====
+// ===== GAME 3: CRYPTOGRAM (UPDATED) =====
 function initCryptoGame() {
   const game = cadenceGame.games[2];
-  const plainDisplay = document.getElementById('crypto-plain');
-  const numbersDisplay = document.getElementById('crypto-numbers');
-  const guessedNumbers = document.getElementById('crypto-guessed');
-  
-  plainDisplay.textContent = game.getCurrentDisplay();
-  numbersDisplay.textContent = game.getNumbersDisplay();
-  
-  const revealed = game.getRevealedNumbers();
-  guessedNumbers.textContent = `Revealed numbers: ${revealed.join(', ')}`;
-  
-  document.getElementById('crypto-number').value = '';
-  document.getElementById('crypto-input').value = '';
-  document.getElementById('crypto-input').focus();
+  renderCryptogramGrid(game);
+  updateScoreDisplay();
 }
 
-function handleCryptoGuess() {
-  const letterGuess = document.getElementById('crypto-input').value;
-  const numberInput = document.getElementById('crypto-number').value;
+function renderCryptogramGrid(game) {
+  const container = document.getElementById('crypto-grid');
+  const messageDisplay = document.getElementById('crypto-message');
+  container.innerHTML = '';
+  
+  // Show message
+  messageDisplay.textContent = game.getCurrentDisplay();
+  
+  // Show input fields for each unique number
+  const positions = game.getPositions();
+  
+  positions.forEach(pos => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'crypto-cell-wrapper';
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'crypto-cell-input';
+    input.maxLength = '1';
+    input.placeholder = '?';
+    input.id = `crypto-${pos.number}`;
+    input.value = pos.playerGuess || '';
+    input.disabled = pos.isRevealed;
+    
+    if (pos.isRevealed) {
+      input.className += ' revealed';
+    }
+    
+    const number = document.createElement('div');
+    number.className = 'crypto-cell-number';
+    number.textContent = pos.number;
+    
+    input.addEventListener('input', function(e) {
+      const letter = e.target.value.toUpperCase();
+      const result = game.inputLetter(pos.number, letter);
+      
+      if (letter !== '') {
+        if (result.correct) {
+          input.classList.add('correct');
+          messageDisplay.textContent = game.getCurrentDisplay();
+          updateScoreDisplay();
+        } else {
+          input.classList.add('error');
+          setTimeout(() => {
+            input.classList.remove('error');
+          }, 500);
+        }
+      } else {
+        input.classList.remove('correct', 'error');
+        messageDisplay.textContent = game.getCurrentDisplay();
+      }
+      
+      // Check completion
+      if (result.complete) {
+        completeGame3();
+      }
+    });
+    
+    wrapper.appendChild(input);
+    wrapper.appendChild(number);
+    container.appendChild(wrapper);
+  });
+}
+
+function handleCryptoSolve() {
   const game = cadenceGame.games[2];
+  const input = document.getElementById('crypto-solve-input').value.toUpperCase();
   const feedback = document.getElementById('crypto-feedback');
-  const plainDisplay = document.getElementById('crypto-plain');
-  const guessedNumbers = document.getElementById('crypto-guessed');
   
-  if (!letterGuess || !numberInput) {
-    feedback.textContent = 'Enter both letter and number';
-    return;
-  }
-  
-  const result = game.validateGuess(letterGuess, numberInput);
-  
-  if (!result.valid) {
-    feedback.textContent = result.message;
-    return;
-  }
-  
-  plainDisplay.textContent = result.display;
-  
-  const revealed = game.getRevealedNumbers();
-  guessedNumbers.textContent = `Revealed numbers: ${revealed.join(', ')}`;
-  
-  if (result.correct) {
-    feedback.textContent = `✓ Correct! ${letterGuess} = ${numberInput}`;
-  } else {
-    feedback.textContent = `✗ Incorrect.`;
-  }
-  
-  document.getElementById('crypto-input').value = '';
-  document.getElementById('crypto-number').value = '';
-  
-  if (game.isComplete()) {
-    document.getElementById('crypto-submit').disabled = true;
-    document.getElementById('crypto-input').disabled = true;
-    document.getElementById('crypto-number').disabled = true;
-    feedback.textContent = '✓ Cryptogram solved!';
-    plainDisplay.textContent = game.plaintext;
+  if (input === game.plaintext) {
+    feedback.textContent = '✓ Correct!';
+    feedback.className = 'feedback correct';
+    
+    // Reveal all letters
+    game.skip();
+    document.getElementById('crypto-message').textContent = game.plaintext;
+    
+    // Disable all inputs
+    document.querySelectorAll('.crypto-cell-input').forEach(inp => inp.disabled = true);
+    document.getElementById('crypto-solve-btn').disabled = true;
+    document.getElementById('crypto-skip-btn').disabled = true;
     
     setTimeout(() => {
-      if (cadenceGame.advanceGame()) {
-        alert('Game 3 Complete! Moving to Game 4...');
-        updateGameList();
-        showGame(3);
-      }
+      completeGame3();
     }, 2000);
+  } else {
+    feedback.textContent = '✗ Incorrect. Try again.';
+    feedback.className = 'feedback error';
+    game.errors++;
+    updateScoreDisplay();
+  }
+}
+
+function handleCryptoSkip() {
+  const game = cadenceGame.games[2];
+  game.errors += 4; // Major penalty
+  game.skip();
+  
+  document.getElementById('crypto-message').textContent = game.plaintext;
+  document.querySelectorAll('.crypto-cell-input').forEach(inp => inp.disabled = true);
+  
+  const feedback = document.getElementById('crypto-feedback');
+  feedback.textContent = '⏭️ Skipped. -200 points.';
+  feedback.className = 'feedback';
+  
+  updateScoreDisplay();
+  
+  setTimeout(() => {
+    completeGame3();
+  }, 2000);
+}
+
+function completeGame3() {
+  document.getElementById('crypto-solve-btn').disabled = true;
+  document.getElementById('crypto-skip-btn').disabled = true;
+  document.getElementById('crypto-solve-input').disabled = true;
+  
+  if (cadenceGame.advanceGame()) {
+    updateGameList();
+    showGame(3);
   }
 }
 
@@ -302,7 +541,7 @@ function handleCryptoGuess() {
 function initSudokuGame() {
   const game = cadenceGame.games[3];
   renderSudokuGrid(game);
-  document.getElementById('sudoku-feedback').textContent = 'Complete the Sudoku puzzle';
+  updateScoreDisplay();
 }
 
 function renderSudokuGrid(game) {
@@ -324,7 +563,6 @@ function renderSudokuGrid(game) {
         cell.className += ' puzzle-cell';
       }
       
-      // Add borders for 3x3 sections
       if ((i + 1) % 3 === 0 && i < 8) cell.className += ' border-bottom';
       if ((j + 1) % 3 === 0 && j < 8) cell.className += ' border-right';
       
@@ -348,9 +586,11 @@ function handleSudokuInput(event, row, col) {
   
   if (result.correct) {
     event.target.classList.add('correct');
+    updateScoreDisplay();
   } else {
     event.target.classList.add('error');
     event.target.value = '';
+    updateScoreDisplay();
     setTimeout(() => {
       event.target.classList.remove('error');
     }, 500);
@@ -367,7 +607,6 @@ function handleSudokuSubmit() {
     
     setTimeout(() => {
       if (cadenceGame.advanceGame()) {
-        alert('Game 4 Complete! Moving to Final Answer...');
         updateGameList();
         showFinal();
       }
@@ -401,6 +640,8 @@ function showFinal() {
     </p>
   `;
   
+  audioSystem.playTrack('congratulations');
+  
   document.getElementById('password-input').value = '';
   document.getElementById('password-input').focus();
 }
@@ -412,30 +653,47 @@ function handlePasswordSubmit() {
   
   if (isCorrect) {
     feedback.textContent = '✓ Correct! You have unlocked the leaderboard.';
-    feedback.className = 'correct';
+    feedback.className = 'feedback correct';
     document.getElementById('password-submit').disabled = true;
     document.getElementById('password-input').disabled = true;
-    document.getElementById('leaderboard-submit').classList.remove('hidden');
+    document.getElementById('leaderboard-section').style.display = 'block';
   } else {
     feedback.textContent = '✗ Incorrect unlock code. Try again.';
-    feedback.className = 'error';
+    feedback.className = 'feedback error';
   }
 }
 
 function submitToLeaderboard() {
   const stats = cadenceGame.getFinalStats();
+  const playerName = prompt('Enter your name (or leave blank for anonymous):') || 'Anonymous';
   const googleFormURL = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse';
   
-  // Parameters for Google Form
+  // @ts-ignore - currentVolume is defined in data.js
   const params = new URLSearchParams({
-    'entry.NAME_FIELD': prompt('Enter your name (or leave blank for anonymous):') || 'Anonymous',
+    'entry.NAME_FIELD': playerName,
     'entry.SCORE_FIELD': stats.totalScore,
     'entry.ERRORS_FIELD': stats.totalErrors,
     'entry.VOLUME_FIELD': currentVolume.id
   });
   
-  // Open Google Form with pre-filled data
   window.open(googleFormURL + '?' + params.toString(), '_blank');
+}
+
+function updateScoreDisplay() {
+  let totalScore = 0;
+  let totalErrors = 0;
+  
+  for (let i = 0; i < cadenceGame.games.length; i++) {
+    const score = cadenceGame.calculateScore(i);
+    totalScore += score;
+    totalErrors += cadenceGame.games[i].errors;
+  }
+  
+  const scoreDisplay = document.getElementById('score-display');
+  const errorDisplay = document.getElementById('error-display');
+  
+  if (scoreDisplay) scoreDisplay.textContent = `+${totalScore}`;
+  if (errorDisplay) errorDisplay.textContent = `-${totalErrors}`;
 }
 
 // ===== UTILITY FUNCTIONS =====
