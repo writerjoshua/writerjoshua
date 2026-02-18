@@ -21,13 +21,15 @@ While I have been fascinated with the English language from an early age, it is 
 ---
 
 # Active Projects
-- ## 📖[AI Architecture Lab](index.html?page=ai-architecture-lab) | Artificial Intelligence and Technological Study 
+- ## 📖 [AI Architecture Lab](index.html?page=ai-architecture-lab) | Artificial Intelligence and Technological Study 
 
-- ## 🎧[SoulSeesBest](index.html?page=soulseesbest) | IDM Experimental Electronic Dance Music Rooted in the Southwest 
+- ## 🎧 [SoulSeesBest](index.html?page=soulseesbest) | IDM Experimental Electronic Dance Music Rooted in the Southwest 
 
-- ## 📸[SeeJoshsPhotos](index.html?page=seejoshsphotos) | Visually Challenged Photography and Multimedia 
+- ## 📸 [SeeJoshsPhotos](index.html?page=seejoshsphotos) | Visually Challenged Photography and Multimedia 
 
-- ## 💌[The Inkwell](index.html?page=the-inkwell) | Sensual Creative Writing Community American Romance Writer by Beau Holliday 
+- ## 💌 [The Inkwell](index.html?page=the-inkwell) | Sensual Creative Writing Community American Romance Writer by Beau Holliday 
+
+- ## 🎲 [The Cadence](index.html?page=the-cadence) | Solve yourself, again: A monthly suite of puzzles to awaken your mind
 ---
 
 ## Social Media
