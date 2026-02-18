@@ -85,7 +85,7 @@
           <div id="wordle-feedback" class="feedback"></div>
           <div id="wordle-attempts" class="attempts"></div>
           <div id="wordle-history" style="margin-bottom: 20px; padding: 15px; background: var(--bg-light); border-radius: var(--radius); min-height: 20px;"></div>
-          <input type="text" id="wordle-input" class="game-input" placeholder="Type a word..." maxlength="5">
+          <input type="text" id="wordle-input" class="game-input" placeholder="Type a word..." maxlength="5" onkeypress="if(event.key==='Enter')handleWordleGuess();">
           <button id="wordle-submit" class="game-button">Submit</button>
         </div>
       </div>
@@ -103,7 +103,7 @@
         <div class="game-content">
           <div id="chain-display" class="chain-display-horizontal"></div>
           <div id="chain-feedback" class="feedback" style="margin-top: 20px;"></div>
-          <input type="text" id="chain-input" class="game-input" placeholder="Guess the word...">
+          <input type="text" id="chain-input" class="game-input" placeholder="Guess the word..." onkeypress="if(event.key==='Enter')handleChainGuess();">
           <button id="chain-submit" class="game-button">Submit</button>
         </div>
       </div>
@@ -157,7 +157,7 @@
     <div id="final-screen" class="screen hidden">
       <div class="game-header">
         <button class="back-btn" onclick="showLanding()">← Back</button>
-        <h2>Congratulations!</h2>
+        <h2>The Cadence Solve</h2>
       </div>
       
       <div class="container">

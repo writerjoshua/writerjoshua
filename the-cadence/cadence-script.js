@@ -479,11 +479,11 @@ function handleChainGuess() {
   
   document.getElementById('chain-input').value = '';
   
-  // Game complete when we reach the second-to-last word (PROTECT is auto-complete)
+  // Game complete when we reach PASSWORD (last word of chain, not counting PROTECT)
   if (game.chainIndex >= game.chain.length - 1) {
     document.getElementById('chain-submit').disabled = true;
     document.getElementById('chain-input').disabled = true;
-    feedback.textContent = '✓ Word chain complete!';
+    feedback.textContent = '✓ Chained Lock complete!';
     
     // Show continue button
     if (!document.querySelector('.chain-continue-btn')) {
@@ -667,30 +667,36 @@ function handleCryptoSolve() {
 
 function handleCryptoSolve() {
   const game = cadenceGame.games[2];
-  const input = document.getElementById('crypto-solve-input').value.toUpperCase();
-  const feedback = document.getElementById('crypto-feedback');
   
-  if (input === game.plaintext) {
-    feedback.textContent = '✓ Correct!';
-    feedback.className = 'feedback correct';
+  // Check if all letter boxes are filled correctly
+  const allLettersCorrect = Object.keys(game.cipher).every(char => {
+    const number = game.cipher[char];
+    return game.guesses[number] === char;
+  });
+  
+  if (allLettersCorrect) {
+    const feedback = document.getElementById('crypto-feedback');
+    feedback.textContent = '✓ Structural Integrity complete!';
+    feedback.style.color = '#155724';
     
-    // Reveal all letters
-    game.skip();
-    document.getElementById('crypto-message').textContent = game.plaintext;
-    
-    // Disable all inputs
-    document.querySelectorAll('.crypto-cell-input').forEach(inp => inp.disabled = true);
+    document.querySelectorAll('[id^="crypto-input-"]').forEach(inp => inp.disabled = true);
     document.getElementById('crypto-solve-btn').disabled = true;
-    document.getElementById('crypto-skip-btn').disabled = true;
     
-    setTimeout(() => {
-      completeGame3();
-    }, 2000);
-  } else {
-    feedback.textContent = '✗ Incorrect. Try again.';
-    feedback.className = 'feedback error';
-    game.errors++;
     updateScoreDisplay();
+    
+    // Show continue button
+    if (!document.querySelector('.crypto-continue-btn')) {
+      const continueBtn = document.createElement('button');
+      continueBtn.className = 'game-button crypto-continue-btn';
+      continueBtn.textContent = 'Continue →';
+      continueBtn.style.marginTop = '15px';
+      continueBtn.onclick = continueToNextGame;
+      document.getElementById('crypto-solve-btn').parentElement.appendChild(continueBtn);
+    }
+  } else {
+    const feedback = document.getElementById('crypto-feedback');
+    feedback.textContent = '✗ Not all letters correct. Keep trying.';
+    feedback.style.color = '#721c24';
   }
 }
 
@@ -703,10 +709,9 @@ function handleCryptoSkip() {
   
   const feedback = document.getElementById('crypto-feedback');
   feedback.textContent = '⏭️ Skipped. -200 points.';
-  feedback.className = 'feedback';
+  feedback.style.color = '#666';
   
   document.getElementById('crypto-solve-btn').disabled = true;
-  document.getElementById('crypto-solve-input').disabled = true;
   
   updateScoreDisplay();
   
@@ -717,7 +722,7 @@ function handleCryptoSkip() {
     continueBtn.textContent = 'Continue →';
     continueBtn.style.marginTop = '15px';
     continueBtn.onclick = continueToNextGame;
-    document.getElementById('crypto-solve-input').parentElement.appendChild(continueBtn);
+    document.getElementById('crypto-solve-btn').parentElement.appendChild(continueBtn);
   }
 }
 
