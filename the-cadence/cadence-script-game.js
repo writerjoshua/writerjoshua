@@ -248,9 +248,12 @@ function showLanding() {
 }
 
 function hardReset() {
-  if (confirm('Clear all game progress? This will reset everything.')) {
+  if (confirm('Reset all progress? This cannot be undone.')) {
     localStorage.clear();
-    location.reload();
+    // Reinitialize to fresh state
+    cadenceGame = new CadenceGame(currentVolume);
+    updateGameList();
+    showLanding();
   }
 }
 
@@ -322,14 +325,32 @@ function initWordleGame() {
   const attemptsLeft = document.getElementById('wordle-attempts');
   const historyDiv = document.getElementById('wordle-history');
   
+  // If game already completed, show continue button instead
+  if (game.guesses.length > 0 && game.guesses.includes(game.answer)) {
+    feedback.textContent = `✓ Correct! The word is ${game.answer}`;
+    document.getElementById('wordle-submit').disabled = true;
+    document.getElementById('wordle-input').disabled = true;
+    
+    // Show continue button if not already there
+    if (!document.querySelector('.wordle-continue-btn')) {
+      const continueBtn = document.createElement('button');
+      continueBtn.className = 'game-button wordle-continue-btn';
+      continueBtn.textContent = 'Continue →';
+      continueBtn.style.marginTop = '15px';
+      continueBtn.onclick = continueToNextGame;
+      document.getElementById('wordle-input').parentElement.appendChild(continueBtn);
+    }
+    return;
+  }
+  
   feedback.textContent = 'Guess the word!';
   attemptsLeft.textContent = `Attempts left: ${game.maxAttempts - game.attempts}`;
   historyDiv.innerHTML = ''; // Clear history
   
   // Show previous guesses
   game.guesses.forEach(guess => {
-    const feedback = game.getFeedback(guess);
-    const matched = feedback.map((f, i) => {
+    const guessedFeedback = game.getFeedback(guess);
+    const matched = guessedFeedback.map((f, i) => {
       if (f === 'correct') return '🟩';
       if (f === 'wrong-position') return '🟨';
       return '⬜';
@@ -342,6 +363,8 @@ function initWordleGame() {
   });
   
   document.getElementById('wordle-input').value = '';
+  document.getElementById('wordle-submit').disabled = false;
+  document.getElementById('wordle-input').disabled = false;
   document.getElementById('wordle-input').focus();
   updateScoreDisplay();
 }

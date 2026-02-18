@@ -49,24 +49,25 @@
       <div class="landing-header">
         <h1>The Cadence</h1>
         <p>Solve Yourself, Again</p>
-        <p style="font-size: 14px; margin-top: 10px;"><strong><a href="https://www.writerjoshua.com/?page=ai-architecture-lab" target="_blank" style="color: var(--primary);">Game Suite by WriterJoshua</a></strong></p>
+        <p style="font-size: 14px; margin-top: 10px;"><strong><a href="https://www.writerjoshua.com/?page=ai-architecture-lab" target="_blank" style="color: var(--primary);">WriterJoshua</a></strong></p>
         <p style="font-size: 12px; margin-top: 5px; color: var(--text-lighter);">Music by <a href="https://soulseesbest.com" target="_blank" style="color: var(--primary);">SoulSeesBest</a></p>
       </div>
       
       <div class="container">
         <div class="volume-section">
-          <h2>Current Challenge: The Answers</h2>
+          <h2>Current Challenge: Intimidation</h2>
           <p class="description">Complete each puzzle to unlock the next. All games must be solved in sequence.</p>
           <div id="game-list" class="game-list"></div>
           <div style="margin-top: 20px; display: flex; gap: 10px;">
             <button onclick="continueToNextGame()" class="game-button" style="flex: 1; background: #2ecc71;">Jump to Latest Game →</button>
-            <button onclick="hardReset()" class="game-button" style="flex: 1; background: #e74c3c;">Hard Reset</button>
+            <button onclick="hardReset()" class="game-button" style="flex: 1; background: #e74c3c;">Reset Progress</button>
           </div>
         </div>
         
         <div class="archives-section">
-          <h3>Previous Challenges</h3>
-          <p style="color: #999; font-size: 14px;">No previous challenges yet. Check back next month!</p>
+          <h3>Past Challenges</h3>
+          <p style="color: var(--text-light); font-size: 14px;">Previous Cadence challenges available for play. Only your best score per challenge will be tracked on the leaderboard.</p>
+          <p style="color: #999; font-size: 13px;">Coming soon...</p>
         </div>
       </div>
     </div>
@@ -79,7 +80,7 @@
       </div>
       
       <div class="container">
-        <p class="game-description">Guess the word in 6 attempts or less.</p>
+        <p class="game-description"><strong>Passkey:</strong> Guess the 5 letter word in 6 attempts or less to continue. <em>Each incorrect guess deducts 25 points.</em></p>
         <div class="game-content">
           <div id="wordle-feedback" class="feedback"></div>
           <div id="wordle-attempts" class="attempts"></div>
@@ -98,7 +99,7 @@
       </div>
       
       <div class="container">
-        <p class="game-description">Complete the word chain. Guess each word to reveal the next letter.</p>
+        <p class="game-description"><strong>Chained Lock:</strong> Connect the Passkey to the Final Word by guessing the next word in sequenced two-word phrases to continue. <em>Each incorrect guess deducts 25 points.</em></p>
         <div class="game-content">
           <div id="chain-display" class="chain-display-horizontal"></div>
           <div id="chain-feedback" class="feedback" style="margin-top: 20px;"></div>
@@ -116,7 +117,7 @@
       </div>
       
       <div class="container">
-        <p class="game-description">Decrypt the message like Wheel of Fortune. Numbers under blanks match letter inputs below.</p>
+        <p class="game-description"><strong>Structural Integrity:</strong> Fill in the missing words using the cryptographic key under each letter to continue. <em>Each incorrect guess deducts 25 points.</em></p>
         <div class="game-content">
           <div id="crypto-message" class="crypto-message"></div>
           
@@ -143,7 +144,7 @@
       </div>
       
       <div class="container">
-        <p class="game-description">Complete the puzzle. Extract the top row of section one (top-left 3×3).</p>
+        <p class="game-description"><strong>Digit Matrix:</strong> Complete each series of 9x9 number puzzles to collect your final clue before you hit your stride.</p>
         <div class="game-content">
           <div id="sudoku-feedback" class="feedback"></div>
           <div id="sudoku-grid" class="sudoku-grid"></div>
@@ -171,9 +172,15 @@
         </div>
         
         <div id="leaderboard-section" style="display: none;">
-          <h3>Submit Your Score</h3>
-          <p>Add your name and score to The Cadence Leaderboard.</p>
-          <button id="leaderboard-submit" class="game-button">Submit to Leaderboard</button>
+          <h3>Congratulations!</h3>
+          <p>You've done it! The Cadence has been satisfied…for now.</p>
+          <p style="font-size: 14px; margin-top: 20px;">Submit your email in the following Google Form to add your name to this month's leaderboard, and be notified with a chance to <em>Solve Yourself, Again.</em></p>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+            <button id="leaderboard-submit" class="game-button">Submit Your Score</button>
+            <a href="javascript:showLanding();" style="padding: 12px; text-align: center; background: var(--bg-light); color: var(--primary); border-radius: var(--radius); text-decoration: none; font-weight: 500;">Play Again</a>
+            <a href="https://soulseesbest.com" target="_blank" style="padding: 12px; text-align: center; background: var(--bg-light); color: var(--primary); border-radius: var(--radius); text-decoration: none; font-weight: 500;">Follow the Music</a>
+            <a href="the-cadence.md" target="_blank" style="padding: 12px; text-align: center; background: var(--bg-light); color: var(--primary); border-radius: var(--radius); text-decoration: none; font-weight: 500;">The Cadence: Codex</a>
+          </div>
         </div>
       </div>
     </div>
