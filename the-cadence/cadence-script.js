@@ -1,4 +1,5 @@
-// The Cadence - Updated Main Application Script with Audio
+// The Cadence - Fixed Main Application Script with Audio
+// All bugs fixed: G1 validation, G2 progression, G3 UI, G4 skip+progression, reset, audio
 
 /** @type {CadenceGame} */
 let cadenceGame = null;
@@ -40,12 +41,14 @@ class AudioSystem {
     this.currentTrack = null;
     this.volume = 0.2; // Start at 20%
     this.isMuted = false;
+    
+    // FIX #8: Use absolute paths to avoid 404 errors
     this.audioFiles = {
-      game1: './game1.mp3',
-      game2: './game2.mp3',
-      game3: './game3.mp3',
-      game4: './game4.mp3',
-      congratulations: './congratulations.mp3'
+      game1: '/the-cadence/game1.mp3',
+      game2: '/the-cadence/game2.mp3',
+      game3: '/the-cadence/game3.mp3',
+      game4: '/the-cadence/game4.mp3',
+      congratulations: '/the-cadence/congratulations.mp3'
     };
     
     // Load saved volume preference
@@ -59,7 +62,7 @@ class AudioSystem {
     try {
       // Fade out current track
       if (this.currentTrack) {
-        await this.fadeOut(this.currentTrack, 700); // 500ms → 700ms (+40%)
+        await this.fadeOut(this.currentTrack, 700);
         this.currentTrack.pause();
       }
 
@@ -78,7 +81,7 @@ class AudioSystem {
         console.warn('Audio playback failed:', err);
       });
 
-      await this.fadeIn(audio, 700); // 500ms → 700ms (+40%)
+      await this.fadeIn(audio, 700);
     } catch (err) {
       console.error('Audio playback error:', err);
     }
@@ -247,19 +250,15 @@ function showLanding() {
   audioSystem.playTrack('congratulations'); // Opening music
 }
 
+// FIX #7: Reset Progress now properly reinitializes
 function hardReset() {
   if (confirm('Reset all progress? This cannot be undone.')) {
-    localStorage.clear();
-    // Reinitialize with fresh game objects
+    localStorage.removeItem(`cadence-${currentVolume.id}`);
+    
+    // Reinitialize with fresh game objects using currentVolume data
     cadenceGame = new CadenceGame(currentVolume);
-    // Force reinit of all games
-    cadenceGame.games = [
-      new WordleGame(cadenceGame.puzzles.wordle.answer),
-      new WordChainGame(cadenceGame.puzzles.wordChain.startWord, cadenceGame.puzzles.wordChain.chain, cadenceGame.puzzles.wordChain.endWord, cadenceGame.puzzles.wordChain.alternatives),
-      new CryptogramGame(cadenceGame.puzzles.cryptogram.plaintext, 3),
-      new SudokuGame(cadenceGame.puzzles.sudoku.puzzle, cadenceGame.puzzles.sudoku.solution)
-    ];
-    cadenceGame.currentGameIndex = -1;
+    
+    // Refresh the UI
     updateGameList();
     showLanding();
   }
@@ -363,19 +362,28 @@ function initWordleGame() {
   updateScoreDisplay();
 }
 
+// FIX #1: Game 1 validation now correctly handles correct answers
 function handleWordleGuess() {
-  const input = document.getElementById('wordle-input').value;
+  const input = document.getElementById('wordle-input').value.toUpperCase();
   const game = cadenceGame.games[0];
   const feedback = document.getElementById('wordle-feedback');
   const attemptsLeft = document.getElementById('wordle-attempts');
   const historyDiv = document.getElementById('wordle-history');
   
-  const result = game.validateGuess(input);
-  
-  if (!result.valid) {
-    feedback.textContent = result.message;
+  // Validate length BEFORE attempting
+  if (input.length !== game.answer.length) {
+    feedback.textContent = `Word must be ${game.answer.length} letters`;
+    feedback.style.color = '#721c24';
     return;
   }
+  
+  if (!/^[A-Z]+$/.test(input)) {
+    feedback.textContent = 'Only letters allowed';
+    feedback.style.color = '#721c24';
+    return;
+  }
+  
+  const result = game.validateGuess(input);
   
   // Update history
   const feedbackItems = result.feedback ? result.feedback.map((f, i) => {
@@ -394,18 +402,29 @@ function handleWordleGuess() {
   
   if (result.correct) {
     feedback.textContent = `✓ Correct! The word is ${input}`;
+    feedback.style.color = '#155724';
     document.getElementById('wordle-submit').disabled = true;
     document.getElementById('wordle-input').disabled = true;
     
     // Show continue button
-    const continueBtn = document.createElement('button');
-    continueBtn.className = 'game-button';
-    continueBtn.textContent = 'Continue →';
-    continueBtn.style.marginTop = '15px';
-    continueBtn.onclick = continueToNextGame;
-    document.getElementById('wordle-input').parentElement.appendChild(continueBtn);
+    if (!document.querySelector('.wordle-continue-btn')) {
+      const continueBtn = document.createElement('button');
+      continueBtn.className = 'game-button wordle-continue-btn';
+      continueBtn.textContent = 'Continue →';
+      continueBtn.style.marginTop = '15px';
+      continueBtn.onclick = continueToNextGame;
+      document.getElementById('wordle-input').parentElement.appendChild(continueBtn);
+    }
   } else {
     feedback.textContent = '';
+    feedback.style.color = '#721c24';
+  }
+  
+  // Check for game over (no more attempts)
+  if (game.isComplete() && !result.correct) {
+    feedback.textContent = `✗ Game Over! The word was ${game.answer}`;
+    document.getElementById('wordle-submit').disabled = true;
+    document.getElementById('wordle-input').disabled = true;
   }
   
   document.getElementById('wordle-input').value = '';
@@ -414,6 +433,12 @@ function handleWordleGuess() {
 // ===== GAME 2: WORD CHAIN =====
 function initChainGame() {
   const game = cadenceGame.games[1];
+  
+  // FIX #2: Reset revealedLetters to 1 when initializing
+  if (game.chainIndex === 0 && game.revealedLetters !== 1) {
+    game.revealedLetters = 1;
+  }
+  
   renderChainDisplay();
   updateScoreDisplay();
   document.getElementById('chain-input').value = '';
@@ -451,222 +476,153 @@ function renderChainDisplay() {
     }
     
     chainContainer.appendChild(span);
-    
-    if (index < words.length - 1) {
-      const arrow = document.createElement('span');
-      arrow.className = 'arrow';
-      arrow.textContent = '→';
-      chainContainer.appendChild(arrow);
-    }
   });
 }
 
+// FIX #3: Game 2 now properly progresses with continue button
 function handleChainGuess() {
-  const input = document.getElementById('chain-input').value;
+  const input = document.getElementById('chain-input').value.toUpperCase();
   const game = cadenceGame.games[1];
   const feedback = document.getElementById('chain-feedback');
   
-  const result = game.validateGuess(input);
+  const isCorrect = input === game.currentWord || 
+                   (game.alternatives[game.currentWord] && 
+                    game.alternatives[game.currentWord].includes(input));
   
-  renderChainDisplay();
-  updateScoreDisplay();
-  
-  if (result.error) {
-    feedback.textContent = '✗ Incorrect. Letter revealed.';
-  } else {
-    feedback.textContent = '✓ Correct!';
-  }
-  
-  document.getElementById('chain-input').value = '';
-  
-  // Game complete when we reach PASSWORD (last word of chain, not counting PROTECT)
-  if (game.chainIndex >= game.chain.length - 1) {
-    document.getElementById('chain-submit').disabled = true;
-    document.getElementById('chain-input').disabled = true;
-    feedback.textContent = '✓ Chained Lock complete!';
+  if (isCorrect) {
+    game.chainIndex++;
     
-    // Show continue button
-    if (!document.querySelector('.chain-continue-btn')) {
-      const continueBtn = document.createElement('button');
-      continueBtn.className = 'game-button chain-continue-btn';
-      continueBtn.textContent = 'Continue →';
-      continueBtn.style.marginTop = '15px';
-      continueBtn.onclick = continueToNextGame;
-      document.getElementById('chain-input').parentElement.appendChild(continueBtn);
+    if (game.chainIndex < game.chain.length) {
+      game.currentWord = game.chain[game.chainIndex];
+      game.revealedLetters = 1;
     }
-  }
-}
-
-// ===== GAME 3: CRYPTOGRAM (UPDATED) =====
-function initCryptoGame() {
-  const game = cadenceGame.games[2];
-  renderCryptogramGrid(game);
-  updateScoreDisplay();
-}
-
-function renderCryptogramGrid(game) {
-  const messageDisplay = document.getElementById('crypto-message');
-  messageDisplay.innerHTML = '';
-  
-  // Split plaintext into words
-  const words = game.plaintext.split(' ');
-  
-  words.forEach(word => {
-    const wordGroup = document.createElement('div');
-    wordGroup.style.display = 'inline-flex';
-    wordGroup.style.flexDirection = 'column';
-    wordGroup.style.alignItems = 'center';
-    wordGroup.style.marginRight = '20px';
-    wordGroup.style.marginBottom = '20px';
     
-    // Input boxes row
-    const inputRow = document.createElement('div');
-    inputRow.style.display = 'flex';
-    inputRow.style.gap = '6px';
-    inputRow.style.marginBottom = '8px';
+    feedback.textContent = '✓ Correct!';
+    feedback.style.color = '#155724';
+    feedback.className = 'feedback correct';
     
-    // Numbers row
-    const numberRow = document.createElement('div');
-    numberRow.style.display = 'flex';
-    numberRow.style.gap = '8px';
-    numberRow.style.fontSize = '12px';
-    numberRow.style.fontWeight = '600';
-    numberRow.style.color = 'var(--text-light)';
-    numberRow.style.letterSpacing = '2px';
+    renderChainDisplay();
+    updateScoreDisplay();
     
-    for (let char of word) {
-      if (char === "'") {
-        const apostrophe = document.createElement('span');
-        apostrophe.textContent = "'";
-        apostrophe.style.fontSize = '18px';
-        inputRow.appendChild(apostrophe);
-        numberRow.appendChild(document.createTextNode("'"));
-      } else {
-        const number = game.cipher[char];
-        const guessedLetter = game.guesses[number];
-        
-        // Input box for this letter
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'crypto-letter-box';
-        input.maxLength = '1';
-        input.id = `crypto-input-${number}`;
-        input.value = guessedLetter || '';
-        input.disabled = game.guesses.hasOwnProperty(number);
-        input.placeholder = '';
-        
-        if (game.guesses.hasOwnProperty(number)) {
-          input.style.background = 'var(--bg-light)';
-          input.style.cursor = 'default';
-        }
-        
-        input.addEventListener('input', function(e) {
-          const letter = e.target.value.toUpperCase();
-          if (letter) {
-            const result = game.inputLetter(number, letter);
-            
-            if (result.correct) {
-              input.classList.add('correct');
-              input.classList.remove('error');
-              updateScoreDisplay();
-              
-              if (result.complete) {
-                completeGame3();
-              }
-            } else {
-              input.classList.add('error');
-              input.value = '';
-              setTimeout(() => input.classList.remove('error'), 300);
-            }
-          }
-        });
-        
-        inputRow.appendChild(input);
-        
-        // Number below
-        const numSpan = document.createElement('span');
-        numSpan.style.display = 'inline-block';
-        numSpan.style.minWidth = '24px';
-        numSpan.style.textAlign = 'center';
-        numSpan.textContent = number;
-        numberRow.appendChild(numSpan);
+    // Check if game is complete (all words in chain guessed)
+    if (game.isComplete()) {
+      document.getElementById('chain-input').disabled = true;
+      document.getElementById('chain-submit').disabled = true;
+      
+      if (!document.querySelector('.chain-continue-btn')) {
+        const continueBtn = document.createElement('button');
+        continueBtn.className = 'game-button chain-continue-btn';
+        continueBtn.textContent = 'Continue →';
+        continueBtn.style.marginTop = '15px';
+        continueBtn.onclick = continueToNextGame;
+        document.getElementById('chain-submit').parentElement.appendChild(continueBtn);
+      }
+    }
+  } else {
+    game.errors++;
+    game.revealedLetters++;
+    
+    feedback.textContent = '✗ Incorrect. Try again.';
+    feedback.style.color = '#721c24';
+    feedback.className = 'feedback error';
+    
+    // Auto-advance if word fully revealed
+    if (game.revealedLetters > game.currentWord.length) {
+      game.chainIndex++;
+      if (game.chainIndex < game.chain.length) {
+        game.currentWord = game.chain[game.chainIndex];
+        game.revealedLetters = 1;
       }
     }
     
-    wordGroup.appendChild(inputRow);
-    wordGroup.appendChild(numberRow);
-    messageDisplay.appendChild(wordGroup);
-  });
-  
-  // Solve section below
-  const gridContainer = document.getElementById('crypto-grid');
-  gridContainer.innerHTML = '';
-  
-  const solveSection = document.createElement('div');
-  solveSection.className = 'crypto-solve-section';
-  solveSection.innerHTML = '<p>Or type the full answer here:</p>';
-  
-  const solveInput = document.createElement('input');
-  solveInput.type = 'text';
-  solveInput.id = 'crypto-solve-input';
-  solveInput.className = 'game-input';
-  solveInput.placeholder = 'Type the full message...';
-  solveSection.appendChild(solveInput);
-  
-  gridContainer.appendChild(solveSection);
-  
-  const feedback = document.createElement('div');
-  feedback.id = 'crypto-feedback';
-  feedback.className = 'feedback';
-  gridContainer.appendChild(feedback);
-  
-  const solveBtn = document.createElement('button');
-  solveBtn.id = 'crypto-solve-btn';
-  solveBtn.className = 'game-button';
-  solveBtn.textContent = '✓ Solve';
-  solveBtn.onclick = handleCryptoSolve;
-  gridContainer.appendChild(solveBtn);
-  
-  const skipLink = document.createElement('p');
-  skipLink.style.textAlign = 'center';
-  skipLink.style.marginTop = '10px';
-  skipLink.innerHTML = '<a href="#" onclick="handleCryptoSkip(); return false;" style="color: var(--primary); font-size: 14px;">Skip (-200 pts)</a>';
-  gridContainer.appendChild(skipLink);
-}
-
-function handleCryptoSolve() {
-  const game = cadenceGame.games[2];
-  const input = document.getElementById('crypto-solve-input').value.toUpperCase();
-  const feedback = document.getElementById('crypto-feedback');
-  
-  if (input === game.plaintext) {
-    feedback.textContent = '✓ Correct!';
-    feedback.className = 'feedback correct';
-    
-    // Reveal all letters
-    game.skip();
-    
-    // Update all blocks
-    document.querySelectorAll('[data-number]').forEach(block => {
-      const number = block.getAttribute('data-number');
-      block.textContent = game.letterToNumber[number];
-      block.disabled = true;
-    });
-    
-    document.getElementById('crypto-solve-btn').disabled = true;
-    document.getElementById('crypto-solve-input').disabled = true;
-    
-    completeGame3();
-  } else {
-    feedback.textContent = '✗ Incorrect. Try again.';
-    feedback.className = 'feedback error';
-    game.errors++;
+    renderChainDisplay();
     updateScoreDisplay();
   }
+  
+  document.getElementById('chain-input').value = '';
+  document.getElementById('chain-input').focus();
 }
 
+// ===== GAME 3: CRYPTOGRAM =====
+function initCryptoGame() {
+  const game = cadenceGame.games[2];
+  const cryptoMessage = document.getElementById('crypto-message');
+  
+  cryptoMessage.textContent = game.getNumbersDisplay();
+  cryptoMessage.style.fontSize = '14px';
+  cryptoMessage.style.letterSpacing = '4px';
+  cryptoMessage.style.fontFamily = 'monospace';
+  cryptoMessage.style.marginBottom = '10px';
+  
+  renderCryptoGrid();
+  updateScoreDisplay();
+}
+
+function renderCryptoGrid() {
+  const game = cadenceGame.games[2];
+  const container = document.getElementById('crypto-grid');
+  container.innerHTML = '';
+  
+  const revealedNumbers = game.getRevealedNumbers();
+  
+  revealedNumbers.forEach(number => {
+    const label = document.createElement('label');
+    label.style.display = 'inline-block';
+    label.style.marginRight = '15px';
+    label.style.marginBottom = '10px';
+    label.style.fontFamily = 'monospace';
+    
+    const numberSpan = document.createElement('span');
+    numberSpan.textContent = number.toString().padStart(2, ' ') + ': ';
+    numberSpan.style.fontWeight = 'bold';
+    
+    const input = document.createElement('input');
+    input.id = `crypto-input-${number}`;
+    input.type = 'text';
+    input.maxLength = '1';
+    input.size = '2';
+    input.className = 'crypto-letter-input';
+    input.style.fontSize = '16px';
+    input.style.padding = '5px';
+    input.style.textTransform = 'uppercase';
+    
+    const currentGuess = game.guesses[number];
+    if (currentGuess) {
+      input.value = currentGuess;
+      input.disabled = true;
+      input.style.backgroundColor = '#e6f2ff';
+    }
+    
+    input.addEventListener('input', (e) => {
+      const value = e.target.value.toUpperCase();
+      if (value && /^[A-Z]$/.test(value)) {
+        const result = game.validateGuess(value, number);
+        if (result.correct) {
+          e.target.disabled = true;
+          e.target.style.backgroundColor = '#e6f2ff';
+          updateScoreDisplay();
+        } else {
+          e.target.style.backgroundColor = '#ffcccc';
+          game.errors++;
+          updateScoreDisplay();
+          setTimeout(() => {
+            e.target.value = '';
+            e.target.style.backgroundColor = '';
+          }, 300);
+        }
+      }
+    });
+    
+    label.appendChild(numberSpan);
+    label.appendChild(input);
+    container.appendChild(label);
+  });
+}
+
+// FIX #4: Game 3 now uses ONLY letter boxes (removed duplicate text input)
 function handleCryptoSolve() {
   const game = cadenceGame.games[2];
+  const feedback = document.getElementById('crypto-feedback');
   
   // Check if all letter boxes are filled correctly
   const allLettersCorrect = Object.keys(game.cipher).every(char => {
@@ -675,9 +631,9 @@ function handleCryptoSolve() {
   });
   
   if (allLettersCorrect) {
-    const feedback = document.getElementById('crypto-feedback');
     feedback.textContent = '✓ Structural Integrity complete!';
     feedback.style.color = '#155724';
+    feedback.className = 'feedback correct';
     
     document.querySelectorAll('[id^="crypto-input-"]').forEach(inp => inp.disabled = true);
     document.getElementById('crypto-solve-btn').disabled = true;
@@ -694,22 +650,23 @@ function handleCryptoSolve() {
       document.getElementById('crypto-solve-btn').parentElement.appendChild(continueBtn);
     }
   } else {
-    const feedback = document.getElementById('crypto-feedback');
     feedback.textContent = '✗ Not all letters correct. Keep trying.';
     feedback.style.color = '#721c24';
+    feedback.className = 'feedback error';
   }
 }
 
+// FIX #5: Game 3 skip now properly advances to next game
 function handleCryptoSkip() {
   const game = cadenceGame.games[2];
-  game.errors += 4; // Major penalty
-  game.skip();
+  game.errors += 4; // Major penalty (200 pts = 4 errors × 50)
   
   document.querySelectorAll('[id^="crypto-input-"]').forEach(inp => inp.disabled = true);
   
   const feedback = document.getElementById('crypto-feedback');
   feedback.textContent = '⏭️ Skipped. -200 points.';
   feedback.style.color = '#666';
+  feedback.className = 'feedback warning';
   
   document.getElementById('crypto-solve-btn').disabled = true;
   
@@ -726,24 +683,24 @@ function handleCryptoSkip() {
   }
 }
 
-function completeGame3() {
-  document.getElementById('crypto-solve-btn').disabled = true;
-  document.getElementById('crypto-solve-input').disabled = true;
-  
-  // Show continue button
-  const continueBtn = document.createElement('button');
-  continueBtn.className = 'game-button';
-  continueBtn.textContent = 'Continue →';
-  continueBtn.style.marginTop = '15px';
-  continueBtn.onclick = continueToNextGame;
-  document.getElementById('crypto-solve-input').parentElement.appendChild(continueBtn);
-}
-
 // ===== GAME 4: SUDOKU =====
 function initSudokuGame() {
   const game = cadenceGame.games[3];
   renderSudokuGrid(game);
   updateScoreDisplay();
+  
+  // FIX #6: Add skip button for Game 4
+  if (!document.querySelector('.sudoku-skip-link')) {
+    const skipLink = document.createElement('p');
+    skipLink.style.textAlign = 'center';
+    skipLink.style.marginTop = '20px';
+    skipLink.innerHTML = '<a href="#" class="sudoku-skip-link" onclick="handleSudokuSkip(); return false;" style="color: var(--primary); font-size: 14px;">Skip (-200 pts)</a>';
+    const container = document.getElementById('sudoku-grid').parentElement;
+    if (container.querySelector('.sudoku-skip-link')) {
+      container.querySelector('.sudoku-skip-link').parentElement.remove();
+    }
+    container.appendChild(skipLink);
+  }
 }
 
 function renderSudokuGrid(game) {
@@ -799,13 +756,18 @@ function handleSudokuInput(event, row, col) {
   }
 }
 
+// FIX #6: Game 4 progression now works correctly to final screen
 function handleSudokuSubmit() {
   const game = cadenceGame.games[3];
   const feedback = document.getElementById('sudoku-feedback');
   
   if (game.isComplete()) {
-    feedback.textContent = '✓ Sudoku complete!';
+    feedback.textContent = '✓ Digit Matrix complete!';
+    feedback.style.color = '#155724';
+    feedback.className = 'feedback correct';
     document.getElementById('sudoku-submit').disabled = true;
+    
+    updateScoreDisplay();
     
     // Show continue button
     if (!document.querySelector('.sudoku-continue-btn')) {
@@ -814,15 +776,50 @@ function handleSudokuSubmit() {
       continueBtn.textContent = 'Continue →';
       continueBtn.style.marginTop = '15px';
       continueBtn.onclick = () => {
-        if (cadenceGame.advanceGame()) {
-          updateGameList();
-          showFinal();
-        }
+        // Game 4 is the last game, so advance to final screen directly
+        cadenceGame.currentGameIndex = 4;
+        cadenceGame.saveProgress();
+        updateGameList();
+        showFinal();
       };
       document.getElementById('sudoku-submit').parentElement.appendChild(continueBtn);
     }
   } else {
-    feedback.textContent = '✗ Sudoku is not complete yet';
+    feedback.textContent = '✗ Sudoku is not complete yet. Fill all cells.';
+    feedback.style.color = '#721c24';
+    feedback.className = 'feedback error';
+  }
+}
+
+// FIX #6: Game 4 skip button handler
+function handleSudokuSkip() {
+  const game = cadenceGame.games[3];
+  game.errors += 4; // 200 pts = 4 errors × 50
+  
+  const feedback = document.getElementById('sudoku-feedback');
+  feedback.textContent = '⏭️ Skipped. -200 points.';
+  feedback.style.color = '#666';
+  feedback.className = 'feedback warning';
+  
+  document.getElementById('sudoku-submit').disabled = true;
+  const skipLink = document.querySelector('.sudoku-skip-link');
+  if (skipLink) skipLink.parentElement.remove();
+  
+  updateScoreDisplay();
+  
+  // Show continue button
+  if (!document.querySelector('.sudoku-continue-btn')) {
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'game-button sudoku-continue-btn';
+    continueBtn.textContent = 'Continue →';
+    continueBtn.style.marginTop = '15px';
+    continueBtn.onclick = () => {
+      cadenceGame.currentGameIndex = 4;
+      cadenceGame.saveProgress();
+      updateGameList();
+      showFinal();
+    };
+    document.getElementById('sudoku-submit').parentElement.appendChild(continueBtn);
   }
 }
 
