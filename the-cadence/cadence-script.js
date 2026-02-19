@@ -1,5 +1,4 @@
 // The Cadence - Fixed Main Application Script with Audio
-// All bugs fixed: G1 validation, G2 progression, G3 UI, G4 skip+progression, reset, audio
 
 /** @type {CadenceGame} */
 let cadenceGame = null;
@@ -41,14 +40,13 @@ class AudioSystem {
     this.currentTrack = null;
     this.volume = 0.2; // Start at 20%
     this.isMuted = false;
-    
-    // FIX #8: Use absolute paths to avoid 404 errors
+    // Use relative paths from the-cadence directory
     this.audioFiles = {
-      game1: '/the-cadence/game1.mp3',
-      game2: '/the-cadence/game2.mp3',
-      game3: '/the-cadence/game3.mp3',
-      game4: '/the-cadence/game4.mp3',
-      congratulations: '/the-cadence/congratulations.mp3'
+      game1: './game1.mp3',
+      game2: './game2.mp3',
+      game3: './game3.mp3',
+      game4: './game4.mp3',
+      congratulations: './congratulations.mp3'
     };
     
     // Load saved volume preference
@@ -67,7 +65,10 @@ class AudioSystem {
       }
 
       const audioFile = this.audioFiles[trackName];
-      if (!audioFile) return;
+      if (!audioFile) {
+        console.error(`Audio file not found for: ${trackName}`);
+        return;
+      }
 
       // Create new audio element
       const audio = new Audio(audioFile);
@@ -250,15 +251,10 @@ function showLanding() {
   audioSystem.playTrack('congratulations'); // Opening music
 }
 
-// FIX #7: Reset Progress now properly reinitializes
 function hardReset() {
   if (confirm('Reset all progress? This cannot be undone.')) {
     localStorage.removeItem(`cadence-${currentVolume.id}`);
-    
-    // Reinitialize with fresh game objects using currentVolume data
     cadenceGame = new CadenceGame(currentVolume);
-    
-    // Refresh the UI
     updateGameList();
     showLanding();
   }
@@ -362,7 +358,6 @@ function initWordleGame() {
   updateScoreDisplay();
 }
 
-// FIX #1: Game 1 validation now correctly handles correct answers
 function handleWordleGuess() {
   const input = document.getElementById('wordle-input').value.toUpperCase();
   const game = cadenceGame.games[0];
@@ -370,20 +365,12 @@ function handleWordleGuess() {
   const attemptsLeft = document.getElementById('wordle-attempts');
   const historyDiv = document.getElementById('wordle-history');
   
-  // Validate length BEFORE attempting
-  if (input.length !== game.answer.length) {
-    feedback.textContent = `Word must be ${game.answer.length} letters`;
-    feedback.style.color = '#721c24';
-    return;
-  }
-  
-  if (!/^[A-Z]+$/.test(input)) {
-    feedback.textContent = 'Only letters allowed';
-    feedback.style.color = '#721c24';
-    return;
-  }
-  
   const result = game.validateGuess(input);
+  
+  if (!result.valid) {
+    feedback.textContent = result.message;
+    return;
+  }
   
   // Update history
   const feedbackItems = result.feedback ? result.feedback.map((f, i) => {
@@ -402,7 +389,6 @@ function handleWordleGuess() {
   
   if (result.correct) {
     feedback.textContent = `✓ Correct! The word is ${input}`;
-    feedback.style.color = '#155724';
     document.getElementById('wordle-submit').disabled = true;
     document.getElementById('wordle-input').disabled = true;
     
@@ -417,14 +403,6 @@ function handleWordleGuess() {
     }
   } else {
     feedback.textContent = '';
-    feedback.style.color = '#721c24';
-  }
-  
-  // Check for game over (no more attempts)
-  if (game.isComplete() && !result.correct) {
-    feedback.textContent = `✗ Game Over! The word was ${game.answer}`;
-    document.getElementById('wordle-submit').disabled = true;
-    document.getElementById('wordle-input').disabled = true;
   }
   
   document.getElementById('wordle-input').value = '';
@@ -433,12 +411,6 @@ function handleWordleGuess() {
 // ===== GAME 2: WORD CHAIN =====
 function initChainGame() {
   const game = cadenceGame.games[1];
-  
-  // FIX #2: Reset revealedLetters to 1 when initializing
-  if (game.chainIndex === 0 && game.revealedLetters !== 1) {
-    game.revealedLetters = 1;
-  }
-  
   renderChainDisplay();
   updateScoreDisplay();
   document.getElementById('chain-input').value = '';
@@ -462,7 +434,7 @@ function renderChainDisplay() {
       span.classList.add('chain-completed');
       span.textContent = word;
     } else if (index === game.chainIndex + 1) {
-      // Current word
+      // Current word - show 1 letter revealed
       span.classList.add('chain-current');
       span.textContent = game.getCurrentDisplay();
     } else if (index === words.length - 1) {
@@ -479,7 +451,6 @@ function renderChainDisplay() {
   });
 }
 
-// FIX #3: Game 2 now properly progresses with continue button
 function handleChainGuess() {
   const input = document.getElementById('chain-input').value.toUpperCase();
   const game = cadenceGame.games[1];
@@ -499,12 +470,11 @@ function handleChainGuess() {
     
     feedback.textContent = '✓ Correct!';
     feedback.style.color = '#155724';
-    feedback.className = 'feedback correct';
     
     renderChainDisplay();
     updateScoreDisplay();
     
-    // Check if game is complete (all words in chain guessed)
+    // Check if game is complete (all words guessed including PASSWORD)
     if (game.isComplete()) {
       document.getElementById('chain-input').disabled = true;
       document.getElementById('chain-submit').disabled = true;
@@ -524,7 +494,6 @@ function handleChainGuess() {
     
     feedback.textContent = '✗ Incorrect. Try again.';
     feedback.style.color = '#721c24';
-    feedback.className = 'feedback error';
     
     // Auto-advance if word fully revealed
     if (game.revealedLetters > game.currentWord.length) {
@@ -601,6 +570,16 @@ function renderCryptoGrid() {
           e.target.disabled = true;
           e.target.style.backgroundColor = '#e6f2ff';
           updateScoreDisplay();
+          
+          // Check if all letters are correct
+          const allLettersCorrect = Object.keys(game.cipher).every(char => {
+            const num = game.cipher[char];
+            return game.guesses[num] === char;
+          });
+          
+          if (allLettersCorrect) {
+            completeGame3();
+          }
         } else {
           e.target.style.backgroundColor = '#ffcccc';
           game.errors++;
@@ -619,7 +598,6 @@ function renderCryptoGrid() {
   });
 }
 
-// FIX #4: Game 3 now uses ONLY letter boxes (removed duplicate text input)
 function handleCryptoSolve() {
   const game = cadenceGame.games[2];
   const feedback = document.getElementById('crypto-feedback');
@@ -631,32 +609,34 @@ function handleCryptoSolve() {
   });
   
   if (allLettersCorrect) {
-    feedback.textContent = '✓ Structural Integrity complete!';
-    feedback.style.color = '#155724';
-    feedback.className = 'feedback correct';
-    
-    document.querySelectorAll('[id^="crypto-input-"]').forEach(inp => inp.disabled = true);
-    document.getElementById('crypto-solve-btn').disabled = true;
-    
-    updateScoreDisplay();
-    
-    // Show continue button
-    if (!document.querySelector('.crypto-continue-btn')) {
-      const continueBtn = document.createElement('button');
-      continueBtn.className = 'game-button crypto-continue-btn';
-      continueBtn.textContent = 'Continue →';
-      continueBtn.style.marginTop = '15px';
-      continueBtn.onclick = continueToNextGame;
-      document.getElementById('crypto-solve-btn').parentElement.appendChild(continueBtn);
-    }
+    completeGame3();
   } else {
     feedback.textContent = '✗ Not all letters correct. Keep trying.';
     feedback.style.color = '#721c24';
-    feedback.className = 'feedback error';
   }
 }
 
-// FIX #5: Game 3 skip now properly advances to next game
+function completeGame3() {
+  const feedback = document.getElementById('crypto-feedback');
+  feedback.textContent = '✓ Structural Integrity complete!';
+  feedback.style.color = '#155724';
+  
+  document.querySelectorAll('[id^="crypto-input-"]').forEach(inp => inp.disabled = true);
+  document.getElementById('crypto-solve-btn').disabled = true;
+  
+  updateScoreDisplay();
+  
+  // Show continue button
+  if (!document.querySelector('.crypto-continue-btn')) {
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'game-button crypto-continue-btn';
+    continueBtn.textContent = 'Continue →';
+    continueBtn.style.marginTop = '15px';
+    continueBtn.onclick = continueToNextGame;
+    document.getElementById('crypto-solve-btn').parentElement.appendChild(continueBtn);
+  }
+}
+
 function handleCryptoSkip() {
   const game = cadenceGame.games[2];
   game.errors += 4; // Major penalty (200 pts = 4 errors × 50)
@@ -666,7 +646,6 @@ function handleCryptoSkip() {
   const feedback = document.getElementById('crypto-feedback');
   feedback.textContent = '⏭️ Skipped. -200 points.';
   feedback.style.color = '#666';
-  feedback.className = 'feedback warning';
   
   document.getElementById('crypto-solve-btn').disabled = true;
   
@@ -689,16 +668,13 @@ function initSudokuGame() {
   renderSudokuGrid(game);
   updateScoreDisplay();
   
-  // FIX #6: Add skip button for Game 4
+  // Add skip button
   if (!document.querySelector('.sudoku-skip-link')) {
     const skipLink = document.createElement('p');
     skipLink.style.textAlign = 'center';
     skipLink.style.marginTop = '20px';
     skipLink.innerHTML = '<a href="#" class="sudoku-skip-link" onclick="handleSudokuSkip(); return false;" style="color: var(--primary); font-size: 14px;">Skip (-200 pts)</a>';
     const container = document.getElementById('sudoku-grid').parentElement;
-    if (container.querySelector('.sudoku-skip-link')) {
-      container.querySelector('.sudoku-skip-link').parentElement.remove();
-    }
     container.appendChild(skipLink);
   }
 }
@@ -746,6 +722,11 @@ function handleSudokuInput(event, row, col) {
   if (result.correct) {
     event.target.classList.add('correct');
     updateScoreDisplay();
+    
+    // Check if sudoku is complete
+    if (game.isComplete()) {
+      completeSudoku();
+    }
   } else {
     event.target.classList.add('error');
     event.target.value = '';
@@ -756,50 +737,53 @@ function handleSudokuInput(event, row, col) {
   }
 }
 
-// FIX #6: Game 4 progression now works correctly to final screen
 function handleSudokuSubmit() {
   const game = cadenceGame.games[3];
   const feedback = document.getElementById('sudoku-feedback');
   
   if (game.isComplete()) {
-    feedback.textContent = '✓ Digit Matrix complete!';
-    feedback.style.color = '#155724';
-    feedback.className = 'feedback correct';
-    document.getElementById('sudoku-submit').disabled = true;
-    
-    updateScoreDisplay();
-    
-    // Show continue button
-    if (!document.querySelector('.sudoku-continue-btn')) {
-      const continueBtn = document.createElement('button');
-      continueBtn.className = 'game-button sudoku-continue-btn';
-      continueBtn.textContent = 'Continue →';
-      continueBtn.style.marginTop = '15px';
-      continueBtn.onclick = () => {
-        // Game 4 is the last game, so advance to final screen directly
-        cadenceGame.currentGameIndex = 4;
-        cadenceGame.saveProgress();
-        updateGameList();
-        showFinal();
-      };
-      document.getElementById('sudoku-submit').parentElement.appendChild(continueBtn);
-    }
+    completeSudoku();
   } else {
     feedback.textContent = '✗ Sudoku is not complete yet. Fill all cells.';
     feedback.style.color = '#721c24';
-    feedback.className = 'feedback error';
   }
 }
 
-// FIX #6: Game 4 skip button handler
+function completeSudoku() {
+  const feedback = document.getElementById('sudoku-feedback');
+  feedback.textContent = '✓ Digit Matrix complete!';
+  feedback.style.color = '#155724';
+  document.getElementById('sudoku-submit').disabled = true;
+  
+  // Remove skip link
+  const skipLink = document.querySelector('.sudoku-skip-link');
+  if (skipLink) skipLink.parentElement.remove();
+  
+  updateScoreDisplay();
+  
+  // Show continue button
+  if (!document.querySelector('.sudoku-continue-btn')) {
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'game-button sudoku-continue-btn';
+    continueBtn.textContent = 'Continue →';
+    continueBtn.style.marginTop = '15px';
+    continueBtn.onclick = () => {
+      cadenceGame.currentGameIndex = 4;
+      cadenceGame.saveProgress();
+      updateGameList();
+      showFinal();
+    };
+    document.getElementById('sudoku-submit').parentElement.appendChild(continueBtn);
+  }
+}
+
 function handleSudokuSkip() {
   const game = cadenceGame.games[3];
-  game.errors += 4; // 200 pts = 4 errors × 50
+  game.errors += 4;
   
   const feedback = document.getElementById('sudoku-feedback');
   feedback.textContent = '⏭️ Skipped. -200 points.';
   feedback.style.color = '#666';
-  feedback.className = 'feedback warning';
   
   document.getElementById('sudoku-submit').disabled = true;
   const skipLink = document.querySelector('.sudoku-skip-link');
@@ -828,29 +812,12 @@ function showFinal() {
   hideAllScreens();
   document.getElementById('final-screen').classList.remove('hidden');
   
-  const stats = cadenceGame.getFinalStats();
-  const expectedPassword = cadenceGame.generateFinalPassword();
-  
-  const statsDiv = document.getElementById('final-stats');
-  statsDiv.innerHTML = `
-    <h2>Performance Review</h2>
-    <p><strong>Total Score:</strong> ${stats.totalScore}/${stats.maxScore}</p>
-    <p><strong>Total Errors:</strong> ${stats.totalErrors}</p>
-    <hr>
-    <h3>Breakdown:</h3>
-    ${Object.entries(stats.breakdown).map(([game, data]) => 
-      `<p>${game}: ${data.score} pts (${data.errors} errors)</p>`
-    ).join('')}
-    <hr>
-    <p style="font-size: 14px; color: #666;">
-      <strong>Hint:</strong> Your unlock code combines the answer from Game 1 and 3 numbers from Game 4.
-    </p>
-  `;
-  
-  audioSystem.playTrack('congratulations');
-  
+  // Show password input section only, hide stats
+  document.getElementById('final-stats').style.display = 'none';
   document.getElementById('password-input').value = '';
   document.getElementById('password-input').focus();
+  
+  audioSystem.playTrack('congratulations');
 }
 
 function handlePasswordSubmit() {
@@ -859,14 +826,33 @@ function handlePasswordSubmit() {
   const feedback = document.getElementById('password-feedback');
   
   if (isCorrect) {
-    feedback.textContent = '✓ Correct! You have unlocked the leaderboard.';
-    feedback.className = 'feedback correct';
-    document.getElementById('password-submit').disabled = true;
+    // Hide password section, show stats and leaderboard
     document.getElementById('password-input').disabled = true;
+    document.getElementById('password-submit').disabled = true;
+    document.querySelector('.password-section').style.display = 'none';
+    
+    // Show stats and leaderboard section
+    const stats = cadenceGame.getFinalStats();
+    const statsDiv = document.getElementById('final-stats');
+    statsDiv.innerHTML = `
+      <h2>Performance Review</h2>
+      <p><strong>Total Score:</strong> ${stats.totalScore}/${stats.maxScore}</p>
+      <p><strong>Total Errors:</strong> ${stats.totalErrors}</p>
+      <hr>
+      <h3>Breakdown:</h3>
+      ${Object.entries(stats.breakdown).map(([game, data]) => 
+        `<p>${game}: ${data.score} pts (${data.errors} errors)</p>`
+      ).join('')}
+    `;
+    statsDiv.style.display = 'block';
+    
     document.getElementById('leaderboard-section').style.display = 'block';
+    
+    feedback.textContent = '✓ Correct! You have unlocked the leaderboard.';
+    feedback.style.color = '#155724';
   } else {
     feedback.textContent = '✗ Incorrect unlock code. Try again.';
-    feedback.className = 'feedback error';
+    feedback.style.color = '#721c24';
   }
 }
 
@@ -878,11 +864,11 @@ function submitToLeaderboard() {
   const googleFormURL = 'https://docs.google.com/forms/d/e/1FAIpQLScBt1JL312beLGEq1ToYAdOYNIXMyHNrfdSWyaH5A9EWidqBw/formResponse';
   
   const params = new URLSearchParams({
-    'entry.468873582': playerName,                 // Player Name
-    'entry.1095360262': stats.totalScore,          // Points Earned
-    'entry.1976953641': stats.totalErrors,         // Errors
-    'entry.1496219444': 'Intimidation',            // Challenge Name
-    'entry.1964400523': stats.totalScore           // Total Score (defining metric)
+    'entry.468873582': playerName,
+    'entry.1095360262': stats.totalScore,
+    'entry.1976953641': stats.totalErrors,
+    'entry.1496219444': 'Intimidation',
+    'entry.1964400523': stats.totalScore
   });
   
   window.open(googleFormURL + '?' + params.toString(), '_blank');

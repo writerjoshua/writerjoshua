@@ -21,7 +21,7 @@
 
   <!-- STATIC NAVIGATION -->
   <nav>
-    <a href="/" class="nav-link">Home</a>
+    <a href="/?page=home" class="nav-link">Home</a>
     <a href="/?page=about-josh" class="nav-link">About Josh</a>
     <a href="/?page=jots" class="nav-link">Jots</a>
     <a href="/?page=archive" class="nav-link">Blog</a>
@@ -117,7 +117,7 @@
       </div>
       
       <div class="container">
-        <p class="game-description"><strong>Structural Integrity:</strong> Fill in the missing letters using the cryptographic key under each number to continue. <em>Each incorrect guess deducts 25 points.</em></p>
+        <p class="game-description"><strong>Structural Integrity:</strong> Fill in the missing letters using the cryptographic key. <em>Each incorrect guess deducts 25 points.</em></p>
         <div class="game-content">
           <div id="crypto-message" class="crypto-message"></div>
           
@@ -139,7 +139,7 @@
       </div>
       
       <div class="container">
-        <p class="game-description"><strong>Digit Matrix:</strong> Complete the 9x9 number puzzle to collect your final clue before you hit your stride.</p>
+        <p class="game-description"><strong>Digit Matrix:</strong> Complete each series of 9x9 number puzzles to collect your final clue before you hit your stride.</p>
         <div class="game-content">
           <div id="sudoku-feedback" class="feedback"></div>
           <div id="sudoku-grid" class="sudoku-grid"></div>
@@ -156,8 +156,6 @@
       </div>
       
       <div class="container">
-        <div id="final-stats" class="final-stats"></div>
-        
         <div class="password-section">
           <h3>Enter Your Unlock Code</h3>
           <p>Combine Game 1 and Game 4 results.</p>
@@ -165,6 +163,8 @@
           <button id="password-submit" class="game-button">Verify</button>
           <div id="password-feedback" class="feedback"></div>
         </div>
+        
+        <div id="final-stats" class="final-stats" style="display: none;"></div>
         
         <div id="leaderboard-section" style="display: none;">
           <h3>Congratulations!</h3>
