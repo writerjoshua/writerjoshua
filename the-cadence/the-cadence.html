@@ -10,7 +10,7 @@
 <body>
   <!-- STATIC HEADER -->
   <header>
-    <a href="?page=home" class="header-link">
+    <a href="index.html?page=home" class="header-link">
       <img src="../assets/media/writerjoshua.jpg" alt="WriterJoshua" class="profile-pic">
     </a>
     <div class="header-text">
@@ -21,14 +21,19 @@
 
   <!-- STATIC NAVIGATION -->
   <nav>
-    <a href="/?page=home" class="nav-link">Home</a>
-    <a href="/?page=about-josh" class="nav-link">About Josh</a>
-    <a href="/?page=jots" class="nav-link">Jots</a>
-    <a href="/?page=archive" class="nav-link">Blog</a>
-    <a href="/?page=projects" class="nav-link">Projects</a>
-    <a href="/?page=contact" class="nav-link">Contact</a>
+    <a href="/index.html?page=home" class="nav-link">Home</a>
+    <a href="index.html?page=about-josh" class="nav-link">About Josh</a>
+    <a href="/index.html?page=jots" class="nav-link">Jots</a>
+    <a href="/index.html?page=archive" class="nav-link">Blog</a>
+    <a href="/index.html?page=projects" class="nav-link">Projects</a>
+    <a href="/index.html?page=contact" class="nav-link">Contact</a>
   </nav>
-
+  
+ <!-- Scripts -->
+  <script src="./cadence-data.js"></script>
+  <script src="./cadence-script-game.js"></script>
+  <script src="./cadence-script.js"></script>
+  
   <!-- Volume Controls -->
   <div class="volume-controls">
     <button id="mute-btn" title="Toggle mute">🔊</button>
@@ -49,14 +54,14 @@
       <div class="landing-header">
         <h1>The Cadence</h1>
         <p>Solve Yourself, Again</p>
-        <p style="font-size: 12px; margin-top: 5px; color: var(--text-lighter);">Game Suite by <a href="the-cadence.md" target="_blank" style="color: var(--primary);">WriterJoshua</a></p>
-        <p style="font-size: 12px; color: var(--text-lighter);">Music by <a href="https://soulseesbest.com" target="_blank" style="color: var(--primary);">SoulSeesBest</a></p>
+        <p style="font-size: 12px; margin-top: 5px; color: var(--text-lighter);">Game Suite by <a href="index.html?page=the-cadence.md" target="_blank" style="color: var(--primary);">WriterJoshua</a></p>
+        <p style="font-size: 12px; color: var(--text-lighter);">Music by <a href="index.html?page=soulseesbest" target="_blank" style="color: var(--primary);">SoulSeesBest</a></p>
       </div>
       
       <div class="container">
         <div class="volume-section">
           <h2>Current Challenge: Intimidation</h2>
-          <p class="description">Complete each puzzle to unlock the next. All games must be solved in sequence.</p>
+          <p class="description">Complete each puzzle to unlock the next. <br>All games must be solved in sequence.</p>
           <div id="game-list" class="game-list"></div>
           <div style="margin-top: 20px; display: flex; gap: 10px;">
             <button onclick="continueToNextGame()" class="game-button" style="flex: 1; background: #2ecc71;">Jump to Latest Game →</button>
@@ -80,12 +85,12 @@
       </div>
       
       <div class="container">
-        <p class="game-description"><strong>Passkey:</strong> Guess the 5 letter word in 6 attempts or less to continue. <em>Each incorrect guess deducts 25 points.</em></p>
+        <p class="game-description">Guess the 5 letter word in 6 attempts or less to continue. <em>Each incorrect guess deducts 25 points.</em></p>
         <div class="game-content">
           <div id="wordle-feedback" class="feedback"></div>
           <div id="wordle-attempts" class="attempts"></div>
           <div id="wordle-history" style="margin-bottom: 20px; padding: 15px; background: var(--bg-light); border-radius: var(--radius); min-height: 20px;"></div>
-          <input type="text" id="wordle-input" class="game-input" placeholder="Type a word..." maxlength="5" onkeypress="if(event.key==='Enter')handleWordleGuess();">
+          <input type="text" id="wordle-input" class="game-input" placeholder="Type a 5 letter word..." maxlength="5" onkeypress="if(event.key==='Enter')handleWordleGuess();">
           <button id="wordle-submit" class="game-button">Submit</button>
         </div>
       </div>
@@ -99,11 +104,11 @@
       </div>
       
       <div class="container">
-        <p class="game-description"><strong>Chained Lock:</strong> Connect the Passkey to the Final Word by guessing the next word in sequenced two-word phrases to continue. <em>Each incorrect guess deducts 25 points.</em></p>
+        <p class="game-description">Connect the Passkey to the Final Word by guessing the next word in sequenced two-word phrases to continue. <em>Each incorrect guess deducts 25 points.</em></p>
         <div class="game-content">
           <div id="chain-display" class="chain-display-horizontal"></div>
           <div id="chain-feedback" class="feedback" style="margin-top: 20px;"></div>
-          <input type="text" id="chain-input" class="game-input" placeholder="Guess the word..." onkeypress="if(event.key==='Enter')handleChainGuess();">
+          <input type="text" id="chain-input" class="game-input" placeholder="Guess the next word..." onkeypress="if(event.key==='Enter')handleChainGuess();">
           <button id="chain-submit" class="game-button">Submit</button>
         </div>
       </div>
@@ -117,7 +122,7 @@
       </div>
       
       <div class="container">
-        <p class="game-description"><strong>Structural Integrity:</strong> Fill in the missing letters using the cryptographic key. <em>Each incorrect guess deducts 25 points.</em></p>
+        <p class="game-description">Fill in the missing letters using the cryptographic key. <em>Each incorrect guess deducts 25 points.</em></p>
         <div class="game-content">
           <div id="crypto-message" class="crypto-message"></div>
           
@@ -139,7 +144,7 @@
       </div>
       
       <div class="container">
-        <p class="game-description"><strong>Digit Matrix:</strong> Complete each series of 9x9 number puzzles to collect your final clue before you hit your stride.</p>
+        <p class="game-description">Complete each series of 9x9 number puzzles to collect your final clue before you hit your stride.</p>
         <div class="game-content">
           <div id="sudoku-feedback" class="feedback"></div>
           <div id="sudoku-grid" class="sudoku-grid"></div>
@@ -154,17 +159,6 @@
         <button class="back-btn" onclick="showLanding()">← Back</button>
         <h2>The Cadence Solve</h2>
       </div>
-      
-      <div class="container">
-        <div class="password-section">
-          <h3>Enter Your Unlock Code</h3>
-          <p>Combine Game 1 and Game 4 results.</p>
-          <input type="text" id="password-input" class="game-input" placeholder="Enter unlock code..." style="font-size: 18px; letter-spacing: 2px;">
-          <button id="password-submit" class="game-button">Verify</button>
-          <div id="password-feedback" class="feedback"></div>
-        </div>
-        
-        <div id="final-stats" class="final-stats" style="display: none;"></div>
         
         <div id="leaderboard-section" style="display: none;">
           <h3>Congratulations!</h3>
@@ -176,6 +170,17 @@
             <a href="https://soulseesbest.com" target="_blank" style="padding: 12px; text-align: center; background: var(--bg-light); color: var(--primary); border-radius: var(--radius); text-decoration: none; font-weight: 500;">Follow the Music</a>
             <a href="the-cadence.md" target="_blank" style="padding: 12px; text-align: center; background: var(--bg-light); color: var(--primary); border-radius: var(--radius); text-decoration: none; font-weight: 500;">The Cadence: Codex</a>
           </div>
+          
+      <div class="container">
+        <div class="password-section">
+          <h3>Enter Your Unlock Code</h3>
+          <p>Combine Game 1 and Game 4 results.</p>
+          <input type="text" id="password-input" class="game-input" placeholder="Enter unlock code..." style="font-size: 18px; letter-spacing: 2px;">
+          <button id="password-submit" class="game-button">Verify</button>
+          <div id="password-feedback" class="feedback"></div>
+        </div>
+        
+        <div id="final-stats" class="final-stats" style="display: none;"></div>
         </div>
       </div>
     </div>
@@ -189,10 +194,5 @@
     </div>
     <p class="footer-copyright">&copy; 2026 Joshua Lucero</p>
   </footer>
-
-  <!-- Scripts -->
-  <script src="./cadence-data.js"></script>
-  <script src="./cadence-script-game.js"></script>
-  <script src="./cadence-script.js"></script>
 </body>
 </html>
