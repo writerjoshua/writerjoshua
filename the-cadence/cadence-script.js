@@ -60,7 +60,7 @@ class AudioSystem {
     try {
       // Fade out current track
       if (this.currentTrack) {
-        await this.fadeOut(this.currentTrack, 700);
+        await this.fadeOut(this.currentTrack, 900);
         this.currentTrack.pause();
       }
 
@@ -88,7 +88,7 @@ class AudioSystem {
     }
   }
 
-  async fadeOut(audio, duration = 500) {
+  async fadeOut(audio, duration = 800) {
     return new Promise(resolve => {
       const steps = 50;
       const stepDuration = duration / steps;
@@ -302,7 +302,7 @@ function updateGameList() {
   if (cadenceGame.currentGameIndex >= 4) {
     const finalButton = document.createElement('button');
     finalButton.className = 'game-button';
-    finalButton.textContent = '5. Final Answer';
+    finalButton.textContent = '5. Solve The Cadence';
     finalButton.addEventListener('click', showFinal);
     gameList.appendChild(finalButton);
   }
@@ -316,7 +316,7 @@ function showGame(gameIndex) {
   document.getElementById(screenId).classList.remove('hidden');
   
   // Play appropriate audio
-  const audioTracks = ['game1', 'game2', 'game3', 'game4'];
+  const audioTracks = ['game1', 'game2', 'game3', 'game4', 'congratulations'];
   audioSystem.playTrack(audioTracks[gameIndex]);
   
   if (gameIndex === 0) initWordleGame();
